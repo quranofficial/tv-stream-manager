@@ -99,12 +99,20 @@ def source_candidates(channel):
     known = {
         "197": [("ava_4k", "separate")],
         "198": [("rudaw_4k", "separate")],
+        "195": [("k24_4k", "muxed")],
+        "194": [("kurdsat_4k", "muxed")],
+        "183": [("channel_8_4k", "muxed")],
+        "192": [("nrt", "muxed")],
+        "191": [("nrt_2_hd", "muxed")],
+        "190": [("nrt_3_kids_hd", "separate")],
+        "182": [("waar_4k", "muxed")],
+        "185": [("zagros_4k", "muxed")],
         "180": [("kurdmax_sound2", "muxed"), ("kurdmax", "muxed")],
         "179": [("kurdmax", "muxed"), ("kurdmax_sound2", "muxed")],
         "178": [("kurdmax_show_sound2", "muxed"), ("kurdmax_show", "muxed")],
         "177": [("kurdmax_show", "muxed"), ("kurdmax_show_sound2", "muxed")],
     }
-    entries = known.get(cid, [])
+    entries = list(known.get(cid, []))
     name = channel["name"].strip()
     lower_words = re.sub(r"[^a-z0-9]+", " ", name.lower()).strip()
     preserve_words = re.sub(r"[^A-Za-z0-9]+", " ", name).strip()
