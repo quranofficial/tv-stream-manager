@@ -40,9 +40,9 @@ public class MainActivity extends Activity {
   void showHome(){
     root=new LinearLayout(this);root.setOrientation(1);root.setBackground(gradient(0xff07101d,0xff10243a,0));setContentView(root);
     LinearLayout top=new LinearLayout(this);top.setGravity(Gravity.CENTER_VERTICAL);top.setPadding(dp(20),dp(20),dp(20),dp(14));
-    TextView logo=label("▣",28,ACCENT);logo.setGravity(Gravity.CENTER);logo.setBackground(shape(0xff123a42,14));top.addView(logo,new LinearLayout.LayoutParams(dp(48),dp(48)));
+    FrameLayout logoBox=new FrameLayout(this);logoBox.setBackground(gradient(0xff0b5960,0xff102b45,16));ImageView logo=new ImageView(this);logo.setImageResource(com.kurdish.tv.R.drawable.ic_kurdish_tv_logo);logo.setScaleType(ImageView.ScaleType.FIT_CENTER);logoBox.addView(logo,new FrameLayout.LayoutParams(-1,-1));top.addView(logoBox,new LinearLayout.LayoutParams(dp(54),dp(54)));
     LinearLayout titleBox=new LinearLayout(this);titleBox.setOrientation(1);titleBox.setPadding(dp(10),0,0,0);
-    TextView title=label("KURDISH TV",21,WHITE);title.setTypeface(null,Typeface.BOLD);titleBox.addView(title);titleBox.addView(label("LIVE • کەناڵە کوردییەکان",10,MUTED));top.addView(titleBox,new LinearLayout.LayoutParams(0,-2,1));
+    TextView title=label("KURDISH TV+",21,WHITE);title.setTypeface(null,Typeface.BOLD);titleBox.addView(title);titleBox.addView(label("PREMIUM LIVE TELEVISION",9,MUTED));top.addView(titleBox,new LinearLayout.LayoutParams(0,-2,1));
     TextView settings=label("⚙",22,WHITE);settings.setGravity(Gravity.CENTER);settings.setBackground(shape(CARD,14));top.addView(settings,new LinearLayout.LayoutParams(dp(44),dp(44)));settings.setOnClickListener(v->relaySettings());
     root.addView(top);
     ScrollView scroll=new ScrollView(this);scroll.setFillViewport(true);scroll.setClipToPadding(false);LinearLayout page=new LinearLayout(this);page.setOrientation(1);page.setPadding(dp(16),dp(10),dp(16),dp(28));scroll.addView(page);root.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));
@@ -54,8 +54,8 @@ public class MainActivity extends Activity {
     navFav.setOnClickListener(v->{onlyFav=true;showHome();});
     LinearLayout hero=new LinearLayout(this);hero.setOrientation(1);hero.setPadding(dp(20),dp(22),dp(20),dp(22));hero.setBackground(gradient(0xff087f79,0xff183451,24));
     hero.addView(pill("●  پەخشی ڕاستەوخۆ"));
-    TextView welcome=label("گەشتێکی نوێ بۆ\nجیهانی تەلەڤیزیۆن",25,WHITE);welcome.setTypeface(null,Typeface.BOLD);welcome.setPadding(0,dp(12),0,dp(5));hero.addView(welcome);
-    hero.addView(label(channels.length()+" کەناڵ بەردەستن • بەبێ Login",13,0xffc9e9e8));
+    TextView welcome=label("هەموو جیهانی\nتەلەڤیزیۆن لە یەک شوێن",24,WHITE);welcome.setTypeface(null,Typeface.BOLD);welcome.setPadding(0,dp(12),0,dp(5));hero.addView(welcome);
+    hero.addView(label(channels.length()+" کەناڵی ڕاستەوخۆ • بێ چوونەژوورەوە",13,0xffc9e9e8));
     LinearLayout stats=new LinearLayout(this);stats.setPadding(0,dp(14),0,0);stats.setGravity(Gravity.CENTER_VERTICAL);
     TextView stat1=label("◉  "+channels.length()+" کەناڵ",12,WHITE);stat1.setPadding(dp(12),dp(9),dp(12),dp(9));stat1.setBackground(shape(0x334fffff,22));stats.addView(stat1);
     TextView stat2=label("  ★ دڵخوازەکانت",12,WHITE);stat2.setPadding(dp(12),dp(9),dp(12),dp(9));stat2.setBackground(shape(0x334fffff,22));LinearLayout.LayoutParams s2=new LinearLayout.LayoutParams(-2,-2);s2.leftMargin=dp(8);stats.addView(stat2,s2);hero.addView(stats);page.addView(hero);
@@ -70,7 +70,7 @@ public class MainActivity extends Activity {
     list=new LinearLayout(this);list.setOrientation(1);LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(-1,-2);lp.topMargin=dp(8);page.addView(list,lp);
     Runnable filter=()->renderChannels();search.addTextChangedListener(new android.text.TextWatcher(){public void beforeTextChanged(CharSequence s,int st,int c,int a){}public void onTextChanged(CharSequence s,int st,int before,int count){renderChannels();}public void afterTextChanged(android.text.Editable e){}});
     renderChannels();
-    TextView footer=label("Kurdish TV  •  Live Player",11,MUTED);footer.setGravity(Gravity.CENTER);footer.setPadding(0,dp(22),0,0);page.addView(footer);
+    TextView footer=label("KURDISH TV+  •  PREMIUM LIVE EXPERIENCE",10,MUTED);footer.setGravity(Gravity.CENTER);footer.setPadding(0,dp(22),0,0);page.addView(footer);
     if(jumpToChannels){scroll.post(()->scroll.smoothScrollTo(0,list.getTop()));jumpToChannels=false;}
   }
   void renderChannels(){if(list==null)return;list.removeAllViews();String q=search==null?"":search.getText().toString().toLowerCase(Locale.ROOT);int shown=0;
