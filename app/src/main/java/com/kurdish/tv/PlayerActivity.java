@@ -48,6 +48,7 @@ public class PlayerActivity extends Activity {
 
   int dp(float n){return (int)(n*getResources().getDisplayMetrics().density+.5f);}
   GradientDrawable bg(int color,int radius){GradientDrawable d=new GradientDrawable();d.setColor(color);d.setCornerRadius(dp(radius));return d;}
+  GradientDrawable gradient(int top,int bottom,int radius){GradientDrawable d=new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,new int[]{top,bottom});d.setCornerRadius(dp(radius));return d;}
   GradientDrawable stroke(int color,int line,int radius){GradientDrawable d=bg(color,radius);d.setStroke(dp(1),line);return d;}
   TextView txt(String value,int size,int color){TextView t=new TextView(this);t.setText(value);t.setTextSize(size);t.setTextColor(color);t.setGravity(Gravity.CENTER);return t;}
   TextView control(String value){TextView t=txt(value,19,WHITE);t.setBackground(stroke(0xdd172438,0x665b718d,16));return t;}
@@ -70,14 +71,14 @@ public class PlayerActivity extends Activity {
     FrameLayout root=new FrameLayout(this);root.setBackgroundColor(Color.BLACK);
     playerView=new PlayerView(this);playerView.setUseController(false);playerView.setShutterBackgroundColor(Color.BLACK);playerView.setKeepContentOnPlayerReset(true);playerView.setResizeMode(fitMode);
     root.addView(playerView,new FrameLayout.LayoutParams(-1,-1));
-    FrameLayout shade=new FrameLayout(this);shade.setBackgroundColor(0x44000000);root.addView(shade,new FrameLayout.LayoutParams(-1,-1));
+    FrameLayout shade=new FrameLayout(this);shade.setBackground(new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,new int[]{0xaa050d18,0x00000000,0x00000000,0xbb050d18}));root.addView(shade,new FrameLayout.LayoutParams(-1,-1));
     LinearLayout overlay=new LinearLayout(this);overlay.setOrientation(1);
     FrameLayout.LayoutParams op=new FrameLayout.LayoutParams(-1,-1);root.addView(overlay,op);
-    topBar=new LinearLayout(this);topBar.setGravity(Gravity.CENTER_VERTICAL);topBar.setPadding(dp(18),dp(12),dp(18),dp(8));
+    topBar=new LinearLayout(this);topBar.setGravity(Gravity.CENTER_VERTICAL);topBar.setPadding(dp(18),dp(12),dp(18),dp(8));topBar.setBackground(gradient(0xee07111f,0x0007111f,0));
     TextView back=control("‹");topBar.addView(back,lp(44,44));back.setOnClickListener(v->finish());
     LinearLayout titleBox=new LinearLayout(this);titleBox.setOrientation(1);titleBox.setPadding(dp(12),0,0,0);
     TextView title=txt(channelTitle,17,WHITE);title.setGravity(Gravity.CENTER_VERTICAL);title.setTypeface(null,Typeface.BOLD);
-    TextView sub=txt("VLC RELAY  •  COMBINED STREAM",9,0xffc0cbd9);sub.setGravity(Gravity.CENTER_VERTICAL);
+    TextView sub=txt("KURDISH TV+  •  PREMIUM LIVE",9,0xff8fe8dc);sub.setGravity(Gravity.CENTER_VERTICAL);
     titleBox.addView(title);titleBox.addView(sub);topBar.addView(titleBox,new LinearLayout.LayoutParams(0,-2,1));
     TextView channelsButton=control("☷");LinearLayout.LayoutParams chp=lp(48,44);chp.leftMargin=dp(8);topBar.addView(channelsButton,chp);channelsButton.setOnClickListener(v->toggleChannelDrawer());
     liveBadge=txt("●  LIVE",11,ACCENT);liveBadge.setPadding(dp(12),dp(8),dp(12),dp(8));liveBadge.setBackground(bg(0xdd123a37,24));topBar.addView(liveBadge);
@@ -88,7 +89,7 @@ public class PlayerActivity extends Activity {
     stateText=txt("پەیوەندی بە کەناڵ...",13,WHITE);LinearLayout.LayoutParams st=new LinearLayout.LayoutParams(-2,-2);st.topMargin=dp(10);center.addView(stateText,st);
     overlay.addView(center,new LinearLayout.LayoutParams(-1,-2));
     View spacer2=new View(this);overlay.addView(spacer2,new LinearLayout.LayoutParams(1,0,1));
-    extraPanel=new LinearLayout(this);extraPanel.setOrientation(1);extraPanel.setPadding(dp(20),dp(8),dp(20),dp(8));extraPanel.setBackgroundColor(0xdd091321);
+    extraPanel=new LinearLayout(this);extraPanel.setOrientation(1);extraPanel.setPadding(dp(20),dp(8),dp(20),dp(8));extraPanel.setBackground(gradient(0x00091321,0xee091321,0));
     LinearLayout volRow=new LinearLayout(this);volRow.setGravity(Gravity.CENTER_VERTICAL);volRow.addView(txt("🔊",16,WHITE),lp(35,34));
     volumeSeek=new SeekBar(this);volumeSeek.setMax(100);volumeSeek.setProgress(100);volRow.addView(volumeSeek,new LinearLayout.LayoutParams(0,dp(34),1));extraPanel.addView(volRow);
     LinearLayout brightRow=new LinearLayout(this);brightRow.setGravity(Gravity.CENTER_VERTICAL);brightRow.addView(txt("☼",20,WHITE),lp(35,34));
@@ -96,9 +97,9 @@ public class PlayerActivity extends Activity {
     overlay.addView(extraPanel,lp(-1,-2));
     volumeSeek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){public void onProgressChanged(SeekBar s,int p,boolean u){if(player!=null){player.setVolume(p/100f);muted=p==0;muteButton.setText(muted?"×":"🔊");}}public void onStartTrackingTouch(SeekBar s){}public void onStopTrackingTouch(SeekBar s){}});
     brightnessSeek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){public void onProgressChanged(SeekBar s,int p,boolean u){WindowManager.LayoutParams a=getWindow().getAttributes();a.screenBrightness=Math.max(.02f,p/100f);getWindow().setAttributes(a);}public void onStartTrackingTouch(SeekBar s){}public void onStopTrackingTouch(SeekBar s){}});
-    bottomPanel=new LinearLayout(this);bottomPanel.setGravity(Gravity.CENTER_VERTICAL);bottomPanel.setPadding(dp(18),dp(10),dp(18),dp(14));bottomPanel.setBackgroundColor(0xdd091321);
+    bottomPanel=new LinearLayout(this);bottomPanel.setGravity(Gravity.CENTER_VERTICAL);bottomPanel.setPadding(dp(18),dp(10),dp(18),dp(14));bottomPanel.setBackground(gradient(0xee091321,0xff07111f,0));
     playButton=control("Ⅱ");bottomPanel.addView(playButton,lp(50,46));playButton.setOnClickListener(v->{if(player==null)return;if(player.isPlaying())player.pause();else player.play();});
-    TextView label=txt("VLC Relay • یەکگرتوو",12,0xffc0cbd9);label.setGravity(Gravity.CENTER_VERTICAL);label.setPadding(dp(13),0,0,0);bottomPanel.addView(label,new LinearLayout.LayoutParams(0,-2,1));
+    TextView label=txt("KURDISH TV+  •  LIVE",11,0xffc0cbd9);label.setGravity(Gravity.CENTER_VERTICAL);label.setPadding(dp(13),0,0,0);bottomPanel.addView(label,new LinearLayout.LayoutParams(0,-2,1));
     muteButton=control("🔊");bottomPanel.addView(muteButton,lp(48,46));muteButton.setOnClickListener(v->{muted=!muted;if(player!=null)player.setVolume(muted?0f:(volumeSeek.getProgress()/100f));muteButton.setText(muted?"×":"🔊");});
     fitButton=control("▣");LinearLayout.LayoutParams fp=lp(48,46);fp.leftMargin=dp(8);bottomPanel.addView(fitButton,fp);fitButton.setOnClickListener(v->{fitMode=fitMode==AspectRatioFrameLayout.RESIZE_MODE_FIT?AspectRatioFrameLayout.RESIZE_MODE_ZOOM:fitMode==AspectRatioFrameLayout.RESIZE_MODE_ZOOM?AspectRatioFrameLayout.RESIZE_MODE_FILL:AspectRatioFrameLayout.RESIZE_MODE_FIT;playerView.setResizeMode(fitMode);fitButton.setText(fitMode==AspectRatioFrameLayout.RESIZE_MODE_FIT?"FIT":fitMode==AspectRatioFrameLayout.RESIZE_MODE_ZOOM?"ZOOM":"FILL");showControls();});
     TextView retry=control("↻");LinearLayout.LayoutParams rp=lp(48,46);rp.leftMargin=dp(8);bottomPanel.addView(retry,rp);retry.setOnClickListener(v->startStream());
@@ -112,12 +113,12 @@ public class PlayerActivity extends Activity {
     drawerLayer.setBackgroundColor(0x99000000);
     drawerLayer.setOnClickListener(v->toggleChannelDrawer());
     channelPanel=new LinearLayout(this);channelPanel.setOrientation(1);channelPanel.setPadding(dp(14),dp(18),dp(14),dp(14));
-    channelPanel.setBackground(bg(0xff0d1929,22));
+    channelPanel.setBackground(gradient(0xff14263b,0xff091321,22));
     FrameLayout.LayoutParams panelParams=new FrameLayout.LayoutParams(dp(330),-1,Gravity.RIGHT);
     panelParams.setMargins(0,dp(10),dp(10),dp(10));
     drawerLayer.addView(channelPanel,panelParams);
     LinearLayout head=new LinearLayout(this);head.setGravity(Gravity.CENTER_VERTICAL);
-    TextView heading=txt("لیستی کەناڵەکان",18,WHITE);heading.setTypeface(null,Typeface.BOLD);head.addView(heading,new LinearLayout.LayoutParams(0,-2,1));
+    TextView heading=txt("KURDISH TV+  /  کەناڵەکان",16,WHITE);heading.setTypeface(null,Typeface.BOLD);head.addView(heading,new LinearLayout.LayoutParams(0,-2,1));
     TextView close=control("×");head.addView(close,lp(42,42));close.setOnClickListener(v->toggleChannelDrawer());channelPanel.addView(head);
     TextView hint=txt("گەڕان و هەڵبژاردنی کەناڵ",11,MUTED);hint.setGravity(Gravity.CENTER_VERTICAL);hint.setPadding(0,dp(7),0,dp(8));channelPanel.addView(hint);
     drawerSearch=new EditText(this);drawerSearch.setSingleLine(true);drawerSearch.setTextColor(WHITE);drawerSearch.setHintTextColor(MUTED);drawerSearch.setHint("گەڕان بە ناو یان جۆری کەناڵ...");drawerSearch.setTextSize(13);drawerSearch.setPadding(dp(13),dp(9),dp(13),dp(9));drawerSearch.setBackground(stroke(0xff17263a,0xff30445d,13));channelPanel.addView(drawerSearch,lp(-1,46));
