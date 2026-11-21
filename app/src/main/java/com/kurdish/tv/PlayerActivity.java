@@ -27,7 +27,7 @@ public class PlayerActivity extends Activity {
   private PlayerView playerView;
   private TextView stateText, playButton, muteButton, lockButton, fitButton, liveBadge;
   private ProgressBar loading;
-  private LinearLayout topBar, bottomPanel, extraPanel;
+  private LinearLayout topBar, bottomPanel, extraPanel, channelPanel, channelList;\n  private FrameLayout drawerLayer;\n  private JSONArray channelItems=new JSONArray();\n  private String runtimeBase="", runtimeKey="", currentChannelId="";\n  private boolean drawerVisible=false;
   private SeekBar volumeSeek, brightnessSeek;
   private Handler handler=new Handler(Looper.getMainLooper());
   private Runnable hideRunnable;
@@ -49,7 +49,7 @@ public class PlayerActivity extends Activity {
     channelTitle=getIntent().getStringExtra("title");streamUrl=getIntent().getStringExtra("url");
     if(channelTitle==null)channelTitle="Live TV";if(streamUrl==null)streamUrl="";
     sourceApiUrl=getIntent().getStringExtra("source_api_url");
-    relayUrl=getIntent().getStringExtra("relay_url");
+    relayUrl=getIntent().getStringExtra("relay_url");\n    runtimeBase=getIntent().getStringExtra("runtime_base");if(runtimeBase==null)runtimeBase="";\n    runtimeKey=getIntent().getStringExtra("runtime_key");if(runtimeKey==null)runtimeKey="";\n    currentChannelId=getIntent().getStringExtra("channel_id");if(currentChannelId==null)currentChannelId="";\n    try{channelItems=new JSONArray(getIntent().getStringExtra("channels_json"));}catch(Exception ignored){}
     if(relayUrl==null||relayUrl.isEmpty())relayUrl=streamUrl;
     getWindow().setStatusBarColor(Color.BLACK);getWindow().setNavigationBarColor(Color.BLACK);
     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -67,7 +67,7 @@ public class PlayerActivity extends Activity {
     TextView title=txt(channelTitle,17,WHITE);title.setGravity(Gravity.CENTER_VERTICAL);title.setTypeface(null,Typeface.BOLD);
     TextView sub=txt("VLC RELAY  •  COMBINED STREAM",9,0xffc0cbd9);sub.setGravity(Gravity.CENTER_VERTICAL);
     titleBox.addView(title);titleBox.addView(sub);topBar.addView(titleBox,new LinearLayout.LayoutParams(0,-2,1));
-    liveBadge=txt("●  LIVE",11,ACCENT);liveBadge.setPadding(dp(12),dp(8),dp(12),dp(8));liveBadge.setBackground(bg(0xdd123a37,24));topBar.addView(liveBadge);
+    TextView channelsButton=control("☷");LinearLayout.LayoutParams chp=lp(48,44);chp.leftMargin=dp(8);topBar.addView(channelsButton,chp);channelsButton.setOnClickListener(v->toggleChannelDrawer());\n    liveBadge=txt("●  LIVE",11,ACCENT);liveBadge.setPadding(dp(12),dp(8),dp(12),dp(8));liveBadge.setBackground(bg(0xdd123a37,24));topBar.addView(liveBadge);
     overlay.addView(topBar,lp(-1,62));
     View spacer=new View(this);overlay.addView(spacer,new LinearLayout.LayoutParams(1,0,1));
     LinearLayout center=new LinearLayout(this);center.setGravity(Gravity.CENTER);center.setOrientation(1);
@@ -92,11 +92,56 @@ public class PlayerActivity extends Activity {
     lockButton=control("🔓");LinearLayout.LayoutParams lk=lp(48,46);lk.leftMargin=dp(8);bottomPanel.addView(lockButton,lk);lockButton.setOnClickListener(v->{controlsLocked=!controlsLocked;lockButton.setText(controlsLocked?"🔒":"🔓");if(controlsLocked){extraPanel.setVisibility(View.GONE);topBar.setVisibility(View.GONE);bottomPanel.setVisibility(View.GONE);controlsVisible=false;}else showControls();});
     overlay.addView(bottomPanel,lp(-1,68));
     playerView.setOnClickListener(v->{if(controlsLocked){controlsLocked=false;lockButton.setText("🔓");showControls();}else toggleControls();});
-    setContentView(root);startStream();showControls();
+    setContentView(root);buildChannelDrawer(root);startStream();showControls();
+  }
+  private void buildChannelDrawer(FrameLayout root){
+    drawerLayer=new FrameLayout(this);drawerLayer.setVisibility(View.GONE);
+    drawerLayer.setBackgroundColor(0x99000000);
+    drawerLayer.setOnClickListener(v->toggleChannelDrawer());
+    channelPanel=new LinearLayout(this);channelPanel.setOrientation(1);channelPanel.setPadding(dp(14),dp(18),dp(14),dp(14));
+    channelPanel.setBackground(bg(0xff0d1929,22));
+    FrameLayout.LayoutParams panelParams=new FrameLayout.LayoutParams(dp(330),-1,Gravity.RIGHT);
+    panelParams.setMargins(0,dp(10),dp(10),dp(10));
+    drawerLayer.addView(channelPanel,panelParams);
+    LinearLayout head=new LinearLayout(this);head.setGravity(Gravity.CENTER_VERTICAL);
+    TextView heading=txt("لیستی کەناڵەکان",18,WHITE);heading.setTypeface(null,Typeface.BOLD);head.addView(heading,new LinearLayout.LayoutParams(0,-2,1));
+    TextView close=control("×");head.addView(close,lp(42,42));close.setOnClickListener(v->toggleChannelDrawer());channelPanel.addView(head);
+    TextView hint=txt("کەناڵێک هەڵبژێرە بۆ گۆڕینی پەخش",11,MUTED);hint.setGravity(Gravity.CENTER_VERTICAL);hint.setPadding(0,dp(7),0,dp(12));channelPanel.addView(hint);
+    ScrollView scroll=new ScrollView(this);channelList=new LinearLayout(this);channelList.setOrientation(1);scroll.addView(channelList);channelPanel.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));
+    for(int i=0;i<channelItems.length();i++){
+      JSONObject item=channelItems.optJSONObject(i);if(item==null)continue;
+      String id=item.optString("id"),name=item.optString("name","TV"),genre=item.optString("genre","Live");
+      TextView row=txt((id.equals(currentChannelId)?"●  ":"   ")+name+"\n      "+genre,14,id.equals(currentChannelId)?ACCENT:WHITE);
+      row.setGravity(Gravity.CENTER_VERTICAL);row.setPadding(dp(12),dp(10),dp(8),dp(10));
+      row.setBackground(bg(id.equals(currentChannelId)?0xff174b4a:0xff17263a,14));
+      LinearLayout.LayoutParams rp=lp(-1,58);rp.bottomMargin=dp(7);channelList.addView(row,rp);
+      row.setOnClickListener(v->selectChannel(id,name));
+    }
+    root.addView(drawerLayer,new FrameLayout.LayoutParams(-1,-1));
+  }
+  private void toggleChannelDrawer(){
+    if(drawerLayer==null)return;
+    drawerVisible=!drawerVisible;drawerLayer.setVisibility(drawerVisible?View.VISIBLE:View.GONE);
+    if(drawerVisible){handler.removeCallbacks(hideRunnable);showControls();}
+    else showControls();
+  }
+  private void selectChannel(String id,String name){
+    if(id.equals(currentChannelId)){toggleChannelDrawer();return;}
+    if(runtimeBase.isEmpty()||runtimeKey.isEmpty()){
+      Toast.makeText(this,"لینکی کەناڵ بەردەست نییە",Toast.LENGTH_SHORT).show();return;
+    }
+    currentChannelId=id;channelTitle=name;relayUrl=runtimeBase+"/stream/"+id+".ts?key="+runtimeKey;
+    if(drawerLayer!=null)drawerLayer.setVisibility(View.GONE);drawerVisible=false;
+    // Update the title without rebuilding the player controls.
+    if(topBar.getChildCount()>1&&topBar.getChildAt(1) instanceof LinearLayout){
+      LinearLayout titleBox=(LinearLayout)topBar.getChildAt(1);
+      if(titleBox.getChildCount()>0&&titleBox.getChildAt(0) instanceof TextView)((TextView)titleBox.getChildAt(0)).setText(name);
+    }
+    relayAttempted=false;directAttempted=false;playRelay("گۆڕینی کەناڵ بۆ "+name);showControls();
   }
   private void hideSystemBars(){getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN|View.SYSTEM_UI_FLAG_HIDE_NAVIGATION|View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY|View.SYSTEM_UI_FLAG_LAYOUT_STABLE|View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN|View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);}
   private void toggleControls(){if(controlsVisible){topBar.setVisibility(View.GONE);bottomPanel.setVisibility(View.GONE);extraPanel.setVisibility(View.GONE);controlsVisible=false;handler.removeCallbacks(hideRunnable);}else showControls();}
-  private void showControls(){if(controlsLocked)return;topBar.setVisibility(View.VISIBLE);bottomPanel.setVisibility(View.VISIBLE);extraPanel.setVisibility(View.VISIBLE);controlsVisible=true;handler.removeCallbacks(hideRunnable);hideRunnable=()->{if(!controlsLocked){topBar.setVisibility(View.GONE);bottomPanel.setVisibility(View.GONE);extraPanel.setVisibility(View.GONE);controlsVisible=false;}};handler.postDelayed(hideRunnable,6500);}
+  private void showControls(){if(controlsLocked)return;topBar.setVisibility(View.VISIBLE);bottomPanel.setVisibility(View.VISIBLE);extraPanel.setVisibility(View.VISIBLE);controlsVisible=true;handler.removeCallbacks(hideRunnable);hideRunnable=()->{if(!controlsLocked&&!drawerVisible){topBar.setVisibility(View.GONE);bottomPanel.setVisibility(View.GONE);extraPanel.setVisibility(View.GONE);controlsVisible=false;}};handler.postDelayed(hideRunnable,6500);}
   private void startStream(){
     directAttempted=false;relayAttempted=false;
     loading.setVisibility(View.VISIBLE);
