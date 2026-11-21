@@ -232,7 +232,7 @@ async def stream_handler(request):
     video_codec = await _probe_video_codec(video_input)
     # Force H.264 for Android devices known to fail HEVC decoding on these channels.
     # Other channels are transcoded only when ffprobe positively detects HEVC.
-    transcode_video = video_codec in {"hevc", "h265"} or cid in {"195", "198"}
+    transcode_video = video_codec in {"hevc", "h265"} or cid in {"195", "196", "198"}
     log.info(
         "Relay video codec: channel=%s codec=%s video_transcode=%s",
         cid, video_codec or "unknown", transcode_video,
