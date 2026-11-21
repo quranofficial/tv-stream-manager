@@ -1,23 +1,69 @@
 name: Telegram TV Bot
+
 on:
   workflow_dispatch:
   schedule:
     - cron: "7 */6 * * *"
+
 concurrency:
   group: tv-telegram-bot
   cancel-in-progress: true
+
+permissions:
+  contents: read
+
 jobs:
   bot:
     runs-on: ubuntu-latest
     timeout-minutes: 350
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Install dependencies
+
+      - name: Install FFmpeg and Cloudflare Tunnel
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg curl
+          curl -L --fail --silent --show-error \
+            https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb \
+            -o /tmp/cloudflared.deb
+          sudo dpkg -i /tmp/cloudflared.deb
+          ffmpeg -version | head -n 1
+          cloudflared --version
+
+      - name: Install Python dependencies
         run: pip install -r requirements.txt
-      - name: Run Telegram bot
+
+      - name: Start temporary public tunnel
+        run: |
+          cloudflared tunnel --url http://127.0.0.1:8080 --no-autoupdate \
+            --loglevel info > /tmp/cloudflared.log 2>&1 &
+          for i in $(seq 1 60); do
+            URL=$(grep -Eo 'https://[a-zA-Z0-9-]+\.trycloudflare\.com' /tmp/cloudflared.log | head -n 1 || true)
+            if [ -n "$URL" ]; then
+              echo "STREAM_PUBLIC_BASE=$URL" >> "$GITHUB_ENV"
+              KEY=$(python -c 'import secrets; print(secrets.token_urlsafe(24))')
+              echo "STREAM_ACCESS_KEY=$KEY" >> "$GITHUB_ENV"
+              echo "Temporary stream tunnel is ready."
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Cloudflare tunnel did not provide a public URL."
+          cat /tmp/cloudflared.log
+          exit 1
+
+      - name: Run Telegram bot and combined stream server
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
         run: python bot.py
+
+      - name: Show tunnel diagnostics
+        if: always()
+        run: |
+          if [ -f /tmp/cloudflared.log ]; then
+            tail -n 40 /tmp/cloudflared.log
+          fi
