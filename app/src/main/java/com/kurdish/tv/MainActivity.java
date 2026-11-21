@@ -30,7 +30,8 @@ public class MainActivity extends Activity {
   TextView label(String s,int size,int color){TextView t=new TextView(this);t.setText(s);t.setTextSize(size);t.setTextColor(color);t.setGravity(Gravity.CENTER_VERTICAL);return t;}
   TextView pill(String s){TextView t=label(s,12,ACCENT);t.setPadding(dp(10),dp(5),dp(10),dp(5));t.setBackground(shape(0xff123a42,30));return t;}
   @Override public void onCreate(Bundle b){super.onCreate(b);getWindow().setStatusBarColor(BG);getWindow().setNavigationBarColor(BG);getWindow().getDecorView().setSystemUiVisibility(0);prefs=getSharedPreferences("kurdish_tv",0);fav.addAll(prefs.getStringSet("favorites",new HashSet<>()));try{InputStream in=getAssets().open("channels.json");ByteArrayOutputStream out=new ByteArrayOutputStream();byte[] buf=new byte[8192];int n;while((n=in.read(buf))>0)out.write(buf,0,n);channels=new JSONObject(out.toString("UTF-8")).getJSONArray("data");}catch(Exception e){}showHome();showLastCrash();}
-  GradientDrawable strokeHome(int color,int line,int radius){GradientDrawable d=shape(color,radius);d.setStroke(dp(1),line);return d;}\n  void showLastCrash(){String report=getSharedPreferences("crash_report",0).getString("last_crash",null);if(report==null||report.isEmpty())return;new AlertDialog.Builder(this).setTitle("Crash report").setMessage("ئەمە هۆکاری داخستنی جارەکەی پێشووترە. تکایە Copy بکە و بۆم بینێرە.\\n\\n"+report).setPositiveButton("Copy", (d,w)->{((android.content.ClipboardManager)getSystemService(CLIPBOARD_SERVICE)).setPrimaryClip(android.content.ClipData.newPlainText("Crash report",report));Toast.makeText(this,"Crash report کۆپی کرا",Toast.LENGTH_SHORT).show();}).setNegativeButton("داخستن",null).show();}
+  GradientDrawable strokeHome(int color,int line,int radius){GradientDrawable d=shape(color,radius);d.setStroke(dp(1),line);return d;}
+  void showLastCrash(){String report=getSharedPreferences("crash_report",0).getString("last_crash",null);if(report==null||report.isEmpty())return;new AlertDialog.Builder(this).setTitle("Crash report").setMessage("ئەمە هۆکاری داخستنی جارەکەی پێشووترە. تکایە Copy بکە و بۆم بینێرە.\\n\\n"+report).setPositiveButton("Copy", (d,w)->{((android.content.ClipboardManager)getSystemService(CLIPBOARD_SERVICE)).setPrimaryClip(android.content.ClipData.newPlainText("Crash report",report));Toast.makeText(this,"Crash report کۆپی کرا",Toast.LENGTH_SHORT).show();}).setNegativeButton("داخستن",null).show();}
   TextView textButton(String s,Runnable r){TextView t=label(s,14,WHITE);t.setGravity(Gravity.CENTER);t.setPadding(dp(14),dp(10),dp(14),dp(10));t.setBackground(shape(CARD,14));t.setOnClickListener(v->r.run());return t;}
   void showHome(){
     root=new LinearLayout(this);root.setOrientation(1);root.setBackground(gradient(0xff07101d,0xff10243a,0));setContentView(root);
@@ -104,7 +105,11 @@ public class MainActivity extends Activity {
           intent.putExtra("title",title);
           intent.putExtra("url",streamUrl);
           intent.putExtra("source_api_url",base+"/source/"+id+"?key="+key);
-          intent.putExtra("relay_url",streamUrl);\n          intent.putExtra("runtime_base",base);\n          intent.putExtra("runtime_key",key);\n          intent.putExtra("channel_id",id);\n          intent.putExtra("channels_json",channels.toString());
+          intent.putExtra("relay_url",streamUrl);
+          intent.putExtra("runtime_base",base);
+          intent.putExtra("runtime_key",key);
+          intent.putExtra("channel_id",id);
+          intent.putExtra("channels_json",channels.toString());
           startActivity(intent);
         });
       }catch(Exception e){String message=e.getMessage()==null?"هەڵە لە پەیوەندی بە ستریم":e.getMessage();runOnUiThread(()->new AlertDialog.Builder(MainActivity.this).setTitle("پەخش ئامادە نییە").setMessage(message+"\n\nGitHub → Actions → Telegram TV Bot → Run workflow").setPositiveButton("باشە",null).show());}
