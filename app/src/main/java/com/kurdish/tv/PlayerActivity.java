@@ -80,7 +80,7 @@ public class PlayerActivity extends Activity {
     TextView retry=control("↻");LinearLayout.LayoutParams rp=lp(48,46);rp.leftMargin=dp(8);bottomPanel.addView(retry,rp);retry.setOnClickListener(v->startStream());
     lockButton=control("🔓");LinearLayout.LayoutParams lk=lp(48,46);lk.leftMargin=dp(8);bottomPanel.addView(lockButton,lk);lockButton.setOnClickListener(v->{controlsLocked=!controlsLocked;lockButton.setText(controlsLocked?"🔒":"🔓");if(controlsLocked){extraPanel.setVisibility(View.GONE);topBar.setVisibility(View.GONE);bottomPanel.setVisibility(View.GONE);controlsVisible=false;}else showControls();});
     overlay.addView(bottomPanel,lp(-1,68));
-    playerView.setOnClickListener(v->{if(!controlsLocked)toggleControls();});
+    playerView.setOnClickListener(v->{if(controlsLocked){controlsLocked=false;lockButton.setText("🔓");showControls();}else toggleControls();});
     setContentView(root);startStream();showControls();
   }
   private void hideSystemBars(){getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN|View.SYSTEM_UI_FLAG_HIDE_NAVIGATION|View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY|View.SYSTEM_UI_FLAG_LAYOUT_STABLE|View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN|View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);}
