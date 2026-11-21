@@ -97,7 +97,10 @@ public class MainActivity extends Activity {
         String streamUrl=base+"/stream/"+id+".ts?key="+key;
         runOnUiThread(()->{
           Intent intent=new Intent(MainActivity.this,PlayerActivity.class);
-          intent.putExtra("title",title);intent.putExtra("url",streamUrl);
+          intent.putExtra("title",title);
+          intent.putExtra("url",streamUrl);
+          intent.putExtra("source_api_url",base+"/source/"+id+"?key="+key);
+          intent.putExtra("relay_url",streamUrl);
           startActivity(intent);
         });
       }catch(Exception e){String message=e.getMessage()==null?"هەڵە لە پەیوەندی بە ستریم":e.getMessage();runOnUiThread(()->new AlertDialog.Builder(MainActivity.this).setTitle("پەخش ئامادە نییە").setMessage(message+"\n\nGitHub → Actions → Telegram TV Bot → Run workflow").setPositiveButton("باشە",null).show());}
