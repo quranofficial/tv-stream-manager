@@ -338,13 +338,13 @@ async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
         link = f"{PUBLIC_BASE}/stream/{cid}.ts?key={ACCESS_KEY}"
         if source["mode"] == "muxed":
-            source_text = f"🔗 لینکی ڕاستەوخۆ (v1a1):\\n{source['url']}"
+            source_text = f"🔗 لینکی ڕاستەوخۆ (v1a1):\n{source['url']}"
         else:
-            source_text = ("🔗 ڤیدیۆ (v1):\\n" + source["video"] +
-                           "\\n\\n🔊 دەنگ (a1):\\n" + source["audio"])
+            source_text = ("🔗 ڤیدیۆ (v1):\n" + source["video"] +
+                           "\n\n🔊 دەنگ (a1):\n" + source["audio"])
         await query.message.reply_text(
-            f"✅ سەرچاوەی کارا: {channel['name']}\\n🧪 شێواز: {source['mode']}\\n\\n"
-            f"{source_text}\\n\\n🎬 لینکی یەکگرتوو بۆ VLC:\\n{link}",
+            f"✅ سەرچاوەی کارا: {channel['name']}\n🧪 شێواز: {source['mode']}\n\n"
+            f"{source_text}\n\n🎬 لینکی یەکگرتوو بۆ VLC:\n{link}",
             disable_web_page_preview=True,
         )
 
