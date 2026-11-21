@@ -1,4 +1,5 @@
 import asyncio
+import aiohttp
 import json
 import logging
 import os
@@ -31,8 +32,76 @@ def slug_for(channel):
     cid = str(channel["id"])
     if cid in OVERRIDES:
         return OVERRIDES[cid]
-    name = channel["name"].lower().strip()
-    return re.sub(r"[^a-z0-9]+", "_", name).strip("_")
+    name = channel["name"].strip()
+    lower_words = re.sub(r"[^a-z0-9]+", " ", name.lower()).strip()
+    preserve_words = re.sub(r"[^A-Za-z0-9]+", " ", name).strip()
+    candidates = (
+        lower_words.replace(" ", "_"),
+        lower_words.replace(" ", ""),
+        lower_words.replace(" ", "-"),
+        preserve_words.replace(" ", "_"),
+        preserve_words.replace(" ", ""),
+        preserve_words.replace(" ", "-"),
+    )
+    return next((x for x in candidates if x), "")
+
+
+SLUG_CACHE = {}
+
+
+async def _manifest_ok(session, url):
+    try:
+        timeout = aiohttp.ClientTimeout(total=10)
+        async with session.get(url, timeout=timeout) as response:
+            if response.status != 200:
+                return False, response.status
+            body = await response.content.read(4096)
+            return b"#EXTM3U" in body, response.status
+    except (aiohttp.ClientError, asyncio.TimeoutError) as exc:
+        return False, type(exc).__name__
+
+
+async def resolve_slug(channel):
+    cid = str(channel["id"])
+    if cid in SLUG_CACHE:
+        return SLUG_CACHE[cid]
+    if cid in OVERRIDES:
+        SLUG_CACHE[cid] = OVERRIDES[cid]
+        return OVERRIDES[cid]
+
+    name = channel["name"].strip()
+    lower_words = re.sub(r"[^a-z0-9]+", " ", name.lower()).strip()
+    preserve_words = re.sub(r"[^A-Za-z0-9]+", " ", name).strip()
+    candidates = list(dict.fromkeys(x for x in (
+        lower_words.replace(" ", "_"),
+        lower_words.replace(" ", ""),
+        lower_words.replace(" ", "-"),
+        preserve_words.replace(" ", "_"),
+        preserve_words.replace(" ", ""),
+        preserve_words.replace(" ", "-"),
+    ) if x))
+
+    async with aiohttp.ClientSession(
+        headers={"User-Agent": "Mozilla/5.0 TVStreamManager/1.0"}
+    ) as session:
+        for candidate in candidates:
+            video_url = f"{BASE.rstrip('/')}/{candidate}/tracks-v1/index.fmp4.m3u8"
+            audio_url = f"{BASE.rstrip('/')}/{candidate}/tracks-a1/index.fmp4.m3u8"
+            video_result, audio_result = await asyncio.gather(
+                _manifest_ok(session, video_url),
+                _manifest_ok(session, audio_url),
+            )
+            log.info(
+                "Slug probe channel %s (%s): %s video=%s audio=%s",
+                cid, name, candidate, video_result[1], audio_result[1]
+            )
+            if video_result[0] and audio_result[0]:
+                SLUG_CACHE[cid] = candidate
+                log.info("Resolved channel %s (%s) to upstream slug %s", cid, name, candidate)
+                return candidate
+
+    log.error("No valid video+audio slug found for channel %s (%s)", cid, name)
+    return None
 
 
 def channel_page(page=0, query=""):
@@ -65,9 +134,13 @@ async def stream_handler(request):
     if channel is None:
         raise web.HTTPNotFound(text="Unknown channel")
 
-    slug = slug_for(channel)
-    video_url = f"{BASE}/{slug}/tracks-v1/index.fmp4.m3u8"
-    audio_url = f"{BASE}/{slug}/tracks-a1/index.fmp4.m3u8"
+    slug = await resolve_slug(channel)
+    if not slug:
+        raise web.HTTPBadGateway(
+            text="Could not find a valid upstream video+audio source for this channel. Check Actions logs."
+        )
+    video_url = f"{BASE.rstrip('/')}/{slug}/tracks-v1/index.fmp4.m3u8"
+    audio_url = f"{BASE.rstrip('/')}/{slug}/tracks-a1/index.fmp4.m3u8"
     cmd = [
         "ffmpeg", "-hide_banner", "-loglevel", "error",
         "-rw_timeout", "20000000",
@@ -197,7 +270,7 @@ async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"🔊🎥 لینکی یەکگرتوو بۆ VLC:\n{link}\n\n"
             "VLC → Open Network Stream → لینکەکە دابنێ.\n"
             "⚠️ ئەم لینکە تەنها تا کاتی چالاکبوونی GitHub Actions کار دەکات. "
-            "کلیلی کەناڵەکەش لە ناوی کەناڵەوە پێشبینی کراوە؛ هەموو کەناڵەکان پێویستیان بە تاقیکردنەوە هەیە.",
+            "سەرچاوەی دەنگ و ڤیدیۆی کەناڵەکە لە کاتی داواکاری بە شێوەی ئۆتۆماتیکی دەپشکنرێت.",
             disable_web_page_preview=True,
         )
 
