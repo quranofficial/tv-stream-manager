@@ -5,7 +5,7 @@ on:
 
 # Never cancel a healthy bot run to make room for another dispatch.
 concurrency:
-  group: telegram-tv-bot
+  group: tv-telegram-bot
   cancel-in-progress: false
 
 permissions:
