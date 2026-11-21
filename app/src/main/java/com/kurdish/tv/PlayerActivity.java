@@ -9,6 +9,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.view.*;
 import android.widget.*;
 import org.json.JSONObject;
+import org.json.JSONArray;
 import java.io.*;
 import java.net.*;
 import androidx.media3.common.MediaItem;
@@ -27,7 +28,8 @@ public class PlayerActivity extends Activity {
   private PlayerView playerView;
   private TextView stateText, playButton, muteButton, lockButton, fitButton, liveBadge;
   private ProgressBar loading;
-  private LinearLayout topBar, bottomPanel, extraPanel, channelPanel, channelList;\n  private FrameLayout drawerLayer;\n  private JSONArray channelItems=new JSONArray();\n  private String runtimeBase="", runtimeKey="", currentChannelId="";\n  private boolean drawerVisible=false;
+  private LinearLayout topBar, bottomPanel, extraPanel, channelPanel, channelList;
+  private FrameLayout drawerLayer;\n  private JSONArray channelItems=new JSONArray();\n  private String runtimeBase="", runtimeKey="", currentChannelId="";\n  private boolean drawerVisible=false;
   private SeekBar volumeSeek, brightnessSeek;
   private Handler handler=new Handler(Looper.getMainLooper());
   private Runnable hideRunnable;
