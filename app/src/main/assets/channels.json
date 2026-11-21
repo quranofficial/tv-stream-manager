@@ -1,0 +1,2715 @@
+{
+  "data": [
+    {
+      "id": 197,
+      "name": "AVA",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/a/ava-197/square_any.png",
+      "genre": "Family",
+      "order": 1,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/197/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 196,
+      "name": "Ava Sport",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/a/ava-sport-196/square_any.png",
+      "genre": "Sports",
+      "order": 2,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/196/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 198,
+      "name": "Rudaw",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/r/rudaw-198/square_any.png",
+      "genre": "News",
+      "order": 3,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/198/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 195,
+      "name": "K24",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/k/k24-195/square_any.png",
+      "genre": "News",
+      "order": 4,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/195/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 151,
+      "name": "K24 Doc",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/k/k24-doc-151/square_any.png",
+      "genre": "Documentary",
+      "order": 5,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/151/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 179,
+      "name": "KurdMax Kur",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/k/kurdmax-kur-179/square_any.png",
+      "genre": "Family",
+      "order": 6,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/179/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 180,
+      "name": "KurdMax Sor",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/k/kurdmax-sor-180/square_any.png",
+      "genre": "Family",
+      "order": 7,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/180/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 177,
+      "name": "KurdMax Show Kur",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/k/kurdmax-show-kur-177/square_any.png",
+      "genre": "Family",
+      "order": 8,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/177/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 178,
+      "name": "KurdMax Show Sor",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/k/kurdmax-show-sor-178/square_any.png",
+      "genre": "Family",
+      "order": 9,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/178/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 176,
+      "name": "KurdMax Music",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/k/kurdmax-music-176/square_any.png",
+      "genre": "Music",
+      "order": 10,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/176/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 175,
+      "name": "Kurdmax Pepula",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/k/kurdmax-pepula-175/square_any.png",
+      "genre": "Series",
+      "order": 11,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/175/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 194,
+      "name": "Kurdsat",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/k/kurdsat-194/square_any.png",
+      "genre": "News",
+      "order": 12,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/194/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 193,
+      "name": "Kurdsat News",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/k/kurdsat-news-193/square_any.png",
+      "genre": "News",
+      "order": 13,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/193/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 183,
+      "name": "Channel 8",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/c/channel-8-183/square_any.png",
+      "genre": "News",
+      "order": 14,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/183/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 192,
+      "name": "NRT 1",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/n/nrt-1-192/square_any.png",
+      "genre": "News",
+      "order": 15,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/192/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 191,
+      "name": "NRT 2",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/n/nrt-2-191/square_any.png",
+      "genre": "News",
+      "order": 16,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/191/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 190,
+      "name": "NRT 3 Kids",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/n/nrt-3-kids-190/square_any.png",
+      "genre": "Kids",
+      "order": 17,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/190/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 189,
+      "name": "NRT 4",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/n/nrt-4-189/square_any.png",
+      "genre": "Islamic",
+      "order": 18,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/189/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 188,
+      "name": "NRT Sport",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/n/nrt-sport-188/square_any.png",
+      "genre": "Sports",
+      "order": 19,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/188/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 182,
+      "name": "Waar",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/w/waar-182/square_any.png",
+      "genre": "Family",
+      "order": 20,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/182/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 185,
+      "name": "Zagros",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/z/zagros-185/square_any.png",
+      "genre": "News",
+      "order": 21,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/185/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Zagros 24",
+      "logo": null,
+      "genre": "News",
+      "order": 22,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/2/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 186,
+      "name": "Kurdistan TV",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/k/kurdistan-tv-186/square_any.png",
+      "genre": "News",
+      "order": 23,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/186/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 84,
+      "name": "Kurdistan Sport",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/k/kurdistan-sport-84/square_any.png",
+      "genre": "Sports",
+      "order": 24,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/84/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 121,
+      "name": "MMN Radio Farsy",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/m/mmn-radio-farsy-121/square_any.png",
+      "genre": "Music",
+      "order": 25,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/121/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 120,
+      "name": "MMN Radio Turky",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/m/mmn-radio-turky-120/square_any.png",
+      "genre": "Music",
+      "order": 26,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/120/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 126,
+      "name": "MMN Action",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/m/mmn-action-126/square_any.png",
+      "genre": "Movies",
+      "order": 27,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/126/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 122,
+      "name": "MMN Classic Music",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/m/mmn-classic-music-122/square_any.png",
+      "genre": "Music",
+      "order": 28,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/122/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 123,
+      "name": "MMN Clip",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/m/mmn-clip-123/square_any.png",
+      "genre": "Music",
+      "order": 29,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/123/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 131,
+      "name": "MMN Documentary",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/m/mmn-documentary-131/square_any.png",
+      "genre": "Documentary",
+      "order": 30,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/131/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 125,
+      "name": "MMN Drama",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/m/mmn-drama-125/square_any.png",
+      "genre": "Series",
+      "order": 31,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/125/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 127,
+      "name": "MMN Kids",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/m/mmn-kids-127/square_any.png",
+      "genre": "Kids",
+      "order": 32,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/127/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 119,
+      "name": "MMN Melody",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/m/mmn-melody-119/square_any.png",
+      "genre": "Music",
+      "order": 33,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/119/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 128,
+      "name": "MMN Movies",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/m/mmn-movies-128/square_any.png",
+      "genre": "Movies",
+      "order": 34,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/128/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 130,
+      "name": "MMN News",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/m/mmn-news-130/square_any.png",
+      "genre": "News",
+      "order": 35,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/130/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 129,
+      "name": "MMN Show",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/m/mmn-show-129/square_any.png",
+      "genre": "Series",
+      "order": 36,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/129/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 124,
+      "name": "MMN Sport",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/m/mmn-sport-124/square_any.png",
+      "genre": "Sports",
+      "order": 37,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/124/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 110,
+      "name": "Astera Sport",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/a/astera-sport-110/square_any.png",
+      "genre": "Sports",
+      "order": 38,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/110/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5437,
+      "name": "Astera Sport 2",
+      "logo": null,
+      "genre": "Sports",
+      "order": 39,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5437/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 114,
+      "name": "Astera Baby",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/a/astera-baby-114/square_any.png",
+      "genre": "Kids",
+      "order": 40,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/114/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 108,
+      "name": "Astera Documentary",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/a/astera-documentary-108/square_any.png",
+      "genre": "Documentary",
+      "order": 41,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/108/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 113,
+      "name": "Astera Family",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/a/astera-family-113/square_any.png",
+      "genre": "Family",
+      "order": 42,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/113/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 109,
+      "name": "Astera Folclor",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/a/astera-folclor-109/square_any.png",
+      "genre": "History",
+      "order": 43,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/109/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 112,
+      "name": "Astera Movies",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/a/astera-movies-112/square_any.png",
+      "genre": "Movies",
+      "order": 44,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/112/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 111,
+      "name": "Astera Show",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/a/astera-show-111/square_any.png",
+      "genre": "Series",
+      "order": 45,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/111/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 22,
+      "name": "LD Anime",
+      "logo": null,
+      "genre": "Series",
+      "order": 46,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/22/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 21,
+      "name": "LD AZHIN",
+      "logo": null,
+      "genre": "News",
+      "order": 47,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/21/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 20,
+      "name": "LD Kurdcinema",
+      "logo": null,
+      "genre": "Movies",
+      "order": 48,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/20/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 19,
+      "name": "LD LIFE",
+      "logo": null,
+      "genre": "News",
+      "order": 49,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/19/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 18,
+      "name": "LD Nujin",
+      "logo": null,
+      "genre": "News",
+      "order": 50,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/18/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 17,
+      "name": "LD Pshdar",
+      "logo": null,
+      "genre": "News",
+      "order": 51,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/17/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5438,
+      "name": "LD Sport",
+      "logo": null,
+      "genre": "Sports",
+      "order": 52,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5438/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 80,
+      "name": "NewLine",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/n/newline-80/square_any.png",
+      "genre": "News",
+      "order": 53,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/80/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 79,
+      "name": "Newline 2",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/n/newline-2-79/square_any.png",
+      "genre": "News",
+      "order": 54,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/79/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 78,
+      "name": "Newline Bollywood",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/n/newline-bollywood-78/square_any.png",
+      "genre": "Movies",
+      "order": 55,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/78/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 76,
+      "name": "Newline Kids",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/n/newline-kids-76/square_any.png",
+      "genre": "Kids",
+      "order": 56,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/76/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 75,
+      "name": "Newline Movies",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/n/newline-movies-75/square_any.png",
+      "genre": "Movies",
+      "order": 57,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/75/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 74,
+      "name": "Newline Sport",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/n/newline-sport-74/square_any.png",
+      "genre": "Sports",
+      "order": 58,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/74/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 55,
+      "name": "Aro Drama",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/a/aro-drama-55/square_any.png",
+      "genre": "Series",
+      "order": 59,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/55/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 115,
+      "name": "Aro Family",
+      "logo": null,
+      "genre": "Family",
+      "order": 60,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/115/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 54,
+      "name": "Aro Kids",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/a/aro-kids-54/square_any.png",
+      "genre": "Kids",
+      "order": 61,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/54/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5432,
+      "name": "Aro Sport",
+      "logo": null,
+      "genre": "Sports",
+      "order": 62,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5432/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 51,
+      "name": "Barin Doc",
+      "logo": null,
+      "genre": "Documentary",
+      "order": 63,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/51/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5431,
+      "name": "Barin Family",
+      "logo": null,
+      "genre": "Family",
+      "order": 64,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5431/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 136,
+      "name": "Barin Movies",
+      "logo": null,
+      "genre": "Movies",
+      "order": 65,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/136/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 50,
+      "name": "Barin Quran",
+      "logo": null,
+      "genre": "Islamic",
+      "order": 66,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/50/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 48,
+      "name": "Dasinya",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/d/dasinya-48/square_any.png",
+      "genre": "News",
+      "order": 67,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/48/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 47,
+      "name": "Dasinya kids",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/d/dasinya-kids-47/square_any.png",
+      "genre": "Kids",
+      "order": 68,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/47/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 46,
+      "name": "Dasinya Music",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/d/dasinya-music-46/square_any.png",
+      "genre": "Music",
+      "order": 69,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/46/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5433,
+      "name": "Dasinya Sport",
+      "logo": null,
+      "genre": "Sports",
+      "order": 70,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5433/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5414,
+      "name": "Sima",
+      "logo": null,
+      "genre": "General",
+      "order": 71,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5414/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5415,
+      "name": "Sima Documentary",
+      "logo": null,
+      "genre": "Documentary",
+      "order": 72,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5415/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5413,
+      "name": "Sima Kids",
+      "logo": null,
+      "genre": "Kids",
+      "order": 73,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5413/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5439,
+      "name": "Sima Sport",
+      "logo": null,
+      "genre": "Sports",
+      "order": 74,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5439/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 133,
+      "name": "Bnar Action",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/b/bnar-action-133/square_any.png",
+      "genre": "Movies",
+      "order": 75,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/133/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 135,
+      "name": "Bnar Family",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/b/bnar-family-135/square_any.png",
+      "genre": "Family",
+      "order": 76,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/135/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 134,
+      "name": "Bnar Movies",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/b/bnar-movies-134/square_any.png",
+      "genre": "Movies",
+      "order": 77,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/134/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 4862,
+      "name": "falcone 1",
+      "logo": null,
+      "genre": "Sports",
+      "order": 78,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/4862/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 4863,
+      "name": "falcone 2",
+      "logo": null,
+      "genre": "Sports",
+      "order": 79,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/4863/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 4861,
+      "name": "falcone family",
+      "logo": null,
+      "genre": "News",
+      "order": 80,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/4861/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 14,
+      "name": "MTV Family",
+      "logo": null,
+      "genre": "Family",
+      "order": 81,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/14/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 12,
+      "name": "MTV Music",
+      "logo": null,
+      "genre": "Music",
+      "order": 82,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/12/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 81,
+      "name": "MTV Sport",
+      "logo": null,
+      "genre": "Sports",
+      "order": 83,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/81/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 149,
+      "name": "Niga Family",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/n/niga-family-149/square_any.png",
+      "genre": "Family",
+      "order": 84,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/149/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 148,
+      "name": "Niga Kids",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/n/niga-kids-148/square_any.png",
+      "genre": "Kids",
+      "order": 85,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/148/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 147,
+      "name": "Niga Movies",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/n/niga-movies-147/square_any.png",
+      "genre": "Movies",
+      "order": 86,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/147/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 8,
+      "name": "Niroj",
+      "logo": null,
+      "genre": "News",
+      "order": 87,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/8/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5393,
+      "name": "Niroj Ayini",
+      "logo": null,
+      "genre": "Islamic",
+      "order": 88,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5393/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 7,
+      "name": "Niroj Kids",
+      "logo": null,
+      "genre": "Kids",
+      "order": 89,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/7/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5429,
+      "name": "One Kids",
+      "logo": null,
+      "genre": "Kids",
+      "order": 90,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5429/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5428,
+      "name": "One Plus",
+      "logo": null,
+      "genre": "General",
+      "order": 91,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5428/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5399,
+      "name": "One World",
+      "logo": null,
+      "genre": "Documentary",
+      "order": 92,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5399/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5434,
+      "name": "See Sport 1",
+      "logo": null,
+      "genre": "Sports",
+      "order": 93,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5434/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5435,
+      "name": "See Sport 2",
+      "logo": null,
+      "genre": "Sports",
+      "order": 94,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5435/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5436,
+      "name": "See Sport 3",
+      "logo": null,
+      "genre": "Sports",
+      "order": 95,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5436/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 160,
+      "name": "Speda",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/s/speda-160/square_any.png",
+      "genre": "News",
+      "order": 96,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/160/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 144,
+      "name": "Speda Drama",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/s/speda-drama-144/square_any.png",
+      "genre": "Series",
+      "order": 97,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/144/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 66,
+      "name": "Speda Kur",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/s/speda-kur-66/square_any.png",
+      "genre": "Music",
+      "order": 98,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/66/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 118,
+      "name": "Afarin Baxcha",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/a/afarin-baxcha-118/square_any.png",
+      "genre": "Kids",
+      "order": 99,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/118/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5490,
+      "name": "TURKMENELI TV HD",
+      "logo": null,
+      "genre": "News",
+      "order": 100,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5490/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 117,
+      "name": "Afarin Kids",
+      "logo": null,
+      "genre": "Kids",
+      "order": 101,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/117/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5427,
+      "name": "Ashti Family",
+      "logo": null,
+      "genre": "Islamic",
+      "order": 102,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5427/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5402,
+      "name": "Ashti Quran",
+      "logo": null,
+      "genre": "Islamic",
+      "order": 103,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5402/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 102,
+      "name": "Delal Sport",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/d/delal-sport-102/square_any.png",
+      "genre": "Sports",
+      "order": 104,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/102/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 101,
+      "name": "Delal TV",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/d/delal-tv-101/square_any.png",
+      "genre": "News",
+      "order": 105,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/101/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 98,
+      "name": "Duhok Sport",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/d/duhok-sport-98/square_any.png",
+      "genre": "Sports",
+      "order": 106,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/98/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 97,
+      "name": "Duhok TV",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/d/duhok-tv-97/square_any.png",
+      "genre": "News",
+      "order": 107,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/97/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 42,
+      "name": "ESRA 2",
+      "logo": null,
+      "genre": "News",
+      "order": 108,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/42/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 40,
+      "name": "ESRA TV",
+      "logo": null,
+      "genre": "News",
+      "order": 109,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/40/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 35,
+      "name": "GEWHER",
+      "logo": null,
+      "genre": "News",
+      "order": 110,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/35/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5392,
+      "name": "Gewher Kids",
+      "logo": null,
+      "genre": "Kids",
+      "order": 111,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5392/play-url",
+      "variants": [
+        "sd"
+      ]
+    },
+    {
+      "id": 171,
+      "name": "Iraqia Kurdish TV",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/i/iraqia-kurdish-tv-171/square_any.png",
+      "genre": "News",
+      "order": 112,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/171/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 95,
+      "name": "Iraqia News",
+      "logo": null,
+      "genre": "News",
+      "order": 113,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/95/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 26,
+      "name": "Komal Ranya",
+      "logo": null,
+      "genre": "Music",
+      "order": 114,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/26/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 92,
+      "name": "Komal TV",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/k/komal-tv-92/square_any.png",
+      "genre": "Family",
+      "order": 115,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/92/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 16,
+      "name": "Mihrab FM",
+      "logo": null,
+      "genre": "Islamic",
+      "order": 116,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/16/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 83,
+      "name": "Mihrab TV",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/m/mihrab-tv-83/square_any.png",
+      "genre": "Islamic",
+      "order": 117,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/83/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5401,
+      "name": "Parwarday Duhok",
+      "logo": null,
+      "genre": "Education",
+      "order": 118,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5401/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5400,
+      "name": "Parwarday Slemani",
+      "logo": null,
+      "genre": "Education",
+      "order": 119,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5400/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5403,
+      "name": "Qalam Ayni",
+      "logo": null,
+      "genre": "Islamic",
+      "order": 120,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5403/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5404,
+      "name": "Qalam TV",
+      "logo": null,
+      "genre": "General",
+      "order": 121,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5404/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5406,
+      "name": "Ranya",
+      "logo": null,
+      "genre": "General",
+      "order": 122,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5406/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5407,
+      "name": "Ranya City",
+      "logo": null,
+      "genre": "General",
+      "order": 123,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5407/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5409,
+      "name": "Reng",
+      "logo": null,
+      "genre": "General",
+      "order": 124,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5409/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5410,
+      "name": "Reng Document",
+      "logo": null,
+      "genre": "Documentary",
+      "order": 125,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5410/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5398,
+      "name": "Shar Quran",
+      "logo": null,
+      "genre": "Islamic",
+      "order": 126,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5398/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5426,
+      "name": "Shar TV",
+      "logo": null,
+      "genre": "General",
+      "order": 127,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5426/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5412,
+      "name": "Shna",
+      "logo": null,
+      "genre": "General",
+      "order": 128,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5412/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Shna Quran",
+      "logo": null,
+      "genre": "Islamic",
+      "order": 129,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5417,
+      "name": "Spi Kids",
+      "logo": null,
+      "genre": "Kids",
+      "order": 130,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5417/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5418,
+      "name": "Spi Quran",
+      "logo": null,
+      "genre": "Islamic",
+      "order": 131,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5418/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 140,
+      "name": "UTV",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/u/utv-140/square_any.png",
+      "genre": "News",
+      "order": 132,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/140/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5419,
+      "name": "UTV Duhok",
+      "logo": null,
+      "genre": "General",
+      "order": 133,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5419/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 162,
+      "name": "Zarok TV",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/z/zarok-tv-162/square_any.webp",
+      "genre": "Kids",
+      "order": 134,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/162/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 161,
+      "name": "Zarok TV Kurmanji",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/z/zarok-tv-kurmanji-161/square_any.webp",
+      "genre": "Kids",
+      "order": 135,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/161/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 64,
+      "name": "ZAXO",
+      "logo": null,
+      "genre": "News",
+      "order": 136,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/64/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5389,
+      "name": "ZAXO Sport",
+      "logo": null,
+      "genre": "Sports",
+      "order": 137,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5389/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 139,
+      "name": "Zed",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/z/zed-139/square_any.png",
+      "genre": "News",
+      "order": 138,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/139/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 138,
+      "name": "Zed Plus",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/z/zed-plus-138/square_any.png",
+      "genre": "News",
+      "order": 139,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/138/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 62,
+      "name": "ZNAR",
+      "logo": null,
+      "genre": "News",
+      "order": 140,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/62/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5421,
+      "name": "Znar Kids",
+      "logo": null,
+      "genre": "Kids",
+      "order": 141,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5421/play-url",
+      "variants": [
+        "sd"
+      ]
+    },
+    {
+      "id": 60,
+      "name": "4 Kurd",
+      "logo": null,
+      "genre": "Music",
+      "order": 142,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/60/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 1,
+      "name": "A.Amozhgary",
+      "logo": null,
+      "genre": "Islamic",
+      "order": 143,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/1/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 59,
+      "name": "A2",
+      "logo": null,
+      "genre": "Education",
+      "order": 144,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/59/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 58,
+      "name": "Akili TV",
+      "logo": null,
+      "genre": "Family",
+      "order": 145,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/58/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 159,
+      "name": "Ala",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/a/ala-159/square_any.png",
+      "genre": "News",
+      "order": 146,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/159/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 116,
+      "name": "Alawla",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/a/alawla-116/square_any.png",
+      "genre": "News",
+      "order": 147,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/116/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 174,
+      "name": "Amozhgary TV",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/a/amozhgary-tv-174/square_any.png",
+      "genre": "Family",
+      "order": 148,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/174/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 56,
+      "name": "ANIMAL BOX",
+      "logo": null,
+      "genre": "Kids",
+      "order": 149,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/56/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 158,
+      "name": "Asman",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/a/asman-158/square_any.png",
+      "genre": "General",
+      "order": 150,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/158/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 157,
+      "name": "Aso Sport",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/a/aso-sport-157/square_any.png",
+      "genre": "Sports",
+      "order": 151,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/157/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 53,
+      "name": "Atv Kurd",
+      "logo": null,
+      "genre": "News",
+      "order": 152,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/53/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 107,
+      "name": "Avar TV",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/a/avar-tv-107/square_any.png",
+      "genre": "News",
+      "order": 153,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/107/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 52,
+      "name": "Azadi",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/a/azadi-52/square_any.png",
+      "genre": "News",
+      "order": 154,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/52/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 106,
+      "name": "Baboly",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/b/baboly-106/square_any.png",
+      "genre": "News",
+      "order": 155,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/106/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 173,
+      "name": "Bangawaz tv",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/b/bangawaz-tv-173/square_any.png",
+      "genre": "Family",
+      "order": 156,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/173/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5422,
+      "name": "Bangxwazen Badinan",
+      "logo": null,
+      "genre": "Islamic",
+      "order": 157,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5422/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 104,
+      "name": "BASK",
+      "logo": null,
+      "genre": "News",
+      "order": 158,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/104/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 49,
+      "name": "BEFRIN",
+      "logo": null,
+      "genre": "News",
+      "order": 159,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/49/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5394,
+      "name": "Binar",
+      "logo": null,
+      "genre": "General",
+      "order": 160,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5394/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 103,
+      "name": "BMC",
+      "logo": null,
+      "genre": "News",
+      "order": 161,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/103/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 156,
+      "name": "Cihan",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/c/cihan-156/square_any.png",
+      "genre": "News",
+      "order": 162,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/156/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 172,
+      "name": "Cira TV",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/c/cira-tv-172/square_any.png",
+      "genre": "Family",
+      "order": 163,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/172/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 100,
+      "name": "Derin TV",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/d/derin-tv-100/square_any.png",
+      "genre": "News",
+      "order": 164,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/100/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 99,
+      "name": "Derwaza Music",
+      "logo": null,
+      "genre": "Music",
+      "order": 165,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/99/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 45,
+      "name": "Derwaze",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/d/derwaze-45/square_any.png",
+      "genre": "News",
+      "order": 166,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/45/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 44,
+      "name": "Dever",
+      "logo": null,
+      "genre": "News",
+      "order": 167,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/44/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 155,
+      "name": "Dimen",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/d/dimen-155/square_any.png",
+      "genre": "Family",
+      "order": 168,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/155/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 43,
+      "name": "Dunya",
+      "logo": null,
+      "genre": "News",
+      "order": 169,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/43/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5397,
+      "name": "EuroKurd",
+      "logo": null,
+      "genre": "General",
+      "order": 170,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5397/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 39,
+      "name": "Ezdan",
+      "logo": null,
+      "genre": "News",
+      "order": 171,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/39/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 154,
+      "name": "First",
+      "logo": null,
+      "genre": "News",
+      "order": 172,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/154/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 37,
+      "name": "Fox",
+      "logo": null,
+      "genre": "News",
+      "order": 173,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/37/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 187,
+      "name": "Gali Kurdistan TV",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/g/gali-kurdistan-tv-187/square_any.png",
+      "genre": "News",
+      "order": 174,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/187/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 36,
+      "name": "Garyan TV",
+      "logo": null,
+      "genre": "News",
+      "order": 175,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/36/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5391,
+      "name": "GK+",
+      "logo": null,
+      "genre": "General",
+      "order": 176,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5391/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 96,
+      "name": "Halabja TV",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/h/halabja-tv-96/square_any.png",
+      "genre": "News",
+      "order": 177,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/96/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5396,
+      "name": "Helhelok",
+      "logo": null,
+      "genre": "Kids",
+      "order": 178,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5396/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5395,
+      "name": "IMK",
+      "logo": null,
+      "genre": "News",
+      "order": 179,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5395/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 32,
+      "name": "Ishtar",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/i/ishtar-32/square_any.png",
+      "genre": "News",
+      "order": 180,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/32/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 31,
+      "name": "Jamawar TV",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/j/jamawar-tv-31/square_any.png",
+      "genre": "News",
+      "order": 181,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/31/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 170,
+      "name": "Jin",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/j/jin-170/square_any.png",
+      "genre": "News",
+      "order": 182,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/170/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 153,
+      "name": "Jojo Mama",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/j/jojo-mama-153/square_any.png",
+      "genre": "Kids",
+      "order": 183,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/153/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 152,
+      "name": "Judy",
+      "logo": null,
+      "genre": "News",
+      "order": 184,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/152/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 30,
+      "name": "Kalapur",
+      "logo": null,
+      "genre": "News",
+      "order": 185,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/30/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 29,
+      "name": "Kani",
+      "logo": null,
+      "genre": "News",
+      "order": 186,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/29/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 28,
+      "name": "Khak",
+      "logo": null,
+      "genre": "News",
+      "order": 187,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/28/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 27,
+      "name": "kidco",
+      "logo": null,
+      "genre": "Kids",
+      "order": 188,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/27/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 169,
+      "name": "Kirkuk TV",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/k/kirkuk-tv-169/square_any.png",
+      "genre": "Family",
+      "order": 189,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/169/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5424,
+      "name": "Komala Media Network",
+      "logo": null,
+      "genre": "News",
+      "order": 190,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5424/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 91,
+      "name": "KRD WWE",
+      "logo": null,
+      "genre": "Sports",
+      "order": 191,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/91/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 25,
+      "name": "KURD",
+      "logo": null,
+      "genre": "News",
+      "order": 192,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/25/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 23,
+      "name": "Kurdana",
+      "logo": null,
+      "genre": "News",
+      "order": 193,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/23/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 168,
+      "name": "Med Music TV",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/m/med-music-tv-168/square_any.png",
+      "genre": "Music",
+      "order": 194,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/168/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 150,
+      "name": "Minara",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/m/minara-150/square_any.png",
+      "genre": "News",
+      "order": 195,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/150/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 15,
+      "name": "Mix Kurdy",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/m/mix-kurdy-15/square_any.png",
+      "genre": "General",
+      "order": 196,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/15/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5423,
+      "name": "Naqshi Media",
+      "logo": null,
+      "genre": "Islamic",
+      "order": 197,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5423/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 11,
+      "name": "Nergz TV",
+      "logo": null,
+      "genre": "News",
+      "order": 198,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/11/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 72,
+      "name": "Nishtimany",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/n/nishtimany-72/square_any.png",
+      "genre": "News",
+      "order": 199,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/72/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5425,
+      "name": "Nuce TV",
+      "logo": null,
+      "genre": "News",
+      "order": 200,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5425/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 167,
+      "name": "Payam",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/p/payam-167/square_any.png",
+      "genre": "News",
+      "order": 201,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/167/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5430,
+      "name": "Peshang",
+      "logo": null,
+      "genre": "Islamic",
+      "order": 202,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5430/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Pesmerge",
+      "logo": null,
+      "genre": "News",
+      "order": 203,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/6/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5405,
+      "name": "Qallat",
+      "logo": null,
+      "genre": "General",
+      "order": 204,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5405/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 145,
+      "name": "Rasan",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/r/rasan-145/square_any.png",
+      "genre": "News",
+      "order": 205,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/145/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5408,
+      "name": "RED TV",
+      "logo": null,
+      "genre": "General",
+      "order": 206,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5408/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 166,
+      "name": "Rojava",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/r/rojava-166/square_any.png",
+      "genre": "News",
+      "order": 207,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/166/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 165,
+      "name": "Rojhelat TV",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/r/rojhelat-tv-165/square_any.png",
+      "genre": "News",
+      "order": 208,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/165/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 164,
+      "name": "Ronahi TV",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/r/ronahi-tv-164/square_any.png",
+      "genre": "News",
+      "order": 209,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/164/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5411,
+      "name": "Rozh",
+      "logo": null,
+      "genre": "General",
+      "order": 210,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5411/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 69,
+      "name": "SADA",
+      "logo": null,
+      "genre": "News",
+      "order": 211,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/69/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 163,
+      "name": "Sahar",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/s/sahar-163/square_any.png",
+      "genre": "Family",
+      "order": 212,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/163/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 68,
+      "name": "Saudia Sunnah",
+      "logo": null,
+      "genre": "Islamic",
+      "order": 213,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/68/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 67,
+      "name": "Shams",
+      "logo": null,
+      "genre": "News",
+      "order": 214,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/67/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5416,
+      "name": "Slemani",
+      "logo": null,
+      "genre": "General",
+      "order": 215,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5416/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "SORAN Entertainment",
+      "logo": null,
+      "genre": "Series",
+      "order": 216,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/4/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 143,
+      "name": "Srusht",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/s/srusht-143/square_any.png",
+      "genre": "News",
+      "order": 217,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/143/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 181,
+      "name": "Sterk TV",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/s/sterk-tv-181/square_any.webp",
+      "genre": "News",
+      "order": 218,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/181/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 142,
+      "name": "Tasawf",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/t/tasawf-142/square_any.png",
+      "genre": "Islamic",
+      "order": 219,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/142/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 184,
+      "name": "TRT Kurdi",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/t/trt-kurdi-184/square_any.png",
+      "genre": "Family",
+      "order": 220,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/184/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 141,
+      "name": "U2 TV",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/u/u2-tv-141/square_any.png",
+      "genre": "News",
+      "order": 221,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/141/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Walla TV",
+      "logo": null,
+      "genre": "News",
+      "order": 222,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/3/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 65,
+      "name": "Welat TV",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/w/welat-tv-65/square_any.png",
+      "genre": "News",
+      "order": 223,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/65/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5420,
+      "name": "Xabir",
+      "logo": null,
+      "genre": "News",
+      "order": 224,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5420/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 137,
+      "name": "Zhyar",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/z/zhyar-137/square_any.png",
+      "genre": "News",
+      "order": 225,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/137/play-url",
+      "variants": [
+        "hd"
+      ]
+    }
+  ],
+  "meta": {
+    "request_id": "87a5c3bc2c9e7b1916ad9a402fbae2d1",
+    "api_version": 2,
+    "pagination": {
+      "current_page": 1,
+      "per_page": 5000,
+      "total": 225,
+      "last_page": 1
+    },
+    "default_format": null
+  }
+}
