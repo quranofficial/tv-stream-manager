@@ -69,6 +69,38 @@ public class MainActivity extends Activity {
     if(shown==0){TextView empty=label("هیچ کەناڵێک نەدۆزرایەوە",14,MUTED);empty.setGravity(Gravity.CENTER);list.addView(empty);}
   }
   void loadLogo(String url,FrameLayout box,TextView fallback){new Thread(()->{try{HttpURLConnection c=(HttpURLConnection)new URL(url).openConnection();c.setConnectTimeout(6000);c.setReadTimeout(6000);android.graphics.Bitmap bm=android.graphics.BitmapFactory.decodeStream(c.getInputStream());c.disconnect();if(bm!=null)runOnUiThread(()->{ImageView iv=new ImageView(this);iv.setImageBitmap(bm);iv.setScaleType(ImageView.ScaleType.CENTER_CROP);box.removeAllViews();box.addView(iv,new FrameLayout.LayoutParams(-1,-1));});}catch(Exception ignored){}}).start();}
-  void relaySettings(){EditText input=new EditText(this);input.setSingleLine(true);input.setTextColor(WHITE);input.setHintTextColor(MUTED);input.setHint("لینکی نموونەی کەناڵ لە Telegram bot");input.setText(prefs.getString("relay_sample",""));new AlertDialog.Builder(this).setTitle("بەستەری پەخش").setMessage("لینکی تەواوی یەک کەناڵ لە Telegram bot لێرە دابنێ. ئەپەکە ID ـی کەناڵ دەگۆڕێت بۆ کەناڵەکانی تر.").setView(input).setPositiveButton("پاشەکەوت", (d,w)->{String sample=input.getText().toString().trim();if(!sample.matches("https?://.+/stream/\\d+\\.ts\\?.+")){new AlertDialog.Builder(this).setMessage("لینکەکە پێویستە شێوەی /stream/196.ts?key=... هەبێت").setPositiveButton("باشە",null).show();return;}prefs.edit().putString("relay_sample",sample).apply();}).setNegativeButton("داخستن",null).show();}
-  void playChannel(JSONObject c){String sample=prefs.getString("relay_sample","");if(sample.isEmpty()){relaySettings();return;}String id=c.optString("id");String url=sample.replaceFirst("/stream/\\d+\\.ts","/stream/"+id+".ts");Intent i=new Intent(this,PlayerActivity.class);i.putExtra("title",c.optString("name"));i.putExtra("url",url);startActivity(i);}
+  void relaySettings(){
+    new AlertDialog.Builder(this)
+      .setTitle("پەیوەندی بە ستریم")
+      .setMessage("ئەپەکە بە شێوەی ئۆتۆماتیکی نوێترین لینکی Live لە GitHub Actions وەردەگرێت. پێویست ناکات هیچ لینکێک بە دەستی دابنێیت.\n\nتکایە دڵنیابە Telegram Bot workflow چالاکە.")
+      .setPositiveButton("باشە",null).show();
+  }
+  void playChannel(JSONObject channel){
+    String id=channel.optString("id");
+    String title=channel.optString("name");
+    Toast.makeText(this,"وەرگرتنی لینکی Live بۆ "+title+"...",Toast.LENGTH_SHORT).show();
+    new Thread(()->{
+      HttpURLConnection conn=null;
+      try{
+        URL configUrl=new URL("https://raw.githubusercontent.com/quranofficial/tv-stream-manager/main/runtime.json?nocache="+System.currentTimeMillis());
+        conn=(HttpURLConnection)configUrl.openConnection();
+        conn.setConnectTimeout(12000);conn.setReadTimeout(12000);
+        conn.setRequestProperty("Cache-Control","no-cache");
+        int code=conn.getResponseCode();
+        if(code!=200)throw new Exception("لینکی Live ئامادە نییە. سەرەتا Telegram TV Bot لە GitHub Actions Run بکە.");
+        ByteArrayOutputStream out=new ByteArrayOutputStream();InputStream in=conn.getInputStream();byte[] buf=new byte[4096];int n;while((n=in.read(buf))>0)out.write(buf,0,n);
+        JSONObject config=new JSONObject(out.toString("UTF-8"));
+        String base=config.optString("base_url","").replaceAll("/+$","");
+        String key=config.optString("access_key","");
+        if(base.isEmpty()||key.isEmpty())throw new Exception("زانیاریی ستریم تەواو نییە؛ Workflow دووبارە Run بکە.");
+        String streamUrl=base+"/stream/"+id+".ts?key="+key;
+        runOnUiThread(()->{
+          Intent intent=new Intent(MainActivity.this,PlayerActivity.class);
+          intent.putExtra("title",title);intent.putExtra("url",streamUrl);
+          startActivity(intent);
+        });
+      }catch(Exception e){String message=e.getMessage()==null?"هەڵە لە پەیوەندی بە ستریم":e.getMessage();runOnUiThread(()->new AlertDialog.Builder(MainActivity.this).setTitle("پەخش ئامادە نییە").setMessage(message+"\n\nGitHub → Actions → Telegram TV Bot → Run workflow").setPositiveButton("باشە",null).show());}
+      finally{if(conn!=null)conn.disconnect();}
+    }).start();
+  }
 }
