@@ -43,7 +43,7 @@ public class MainActivity extends Activity {
         URL u=new URL(BASE+path); HttpURLConnection c=(HttpURLConnection)u.openConnection();c.setRequestMethod("POST");c.setConnectTimeout(15000);c.setReadTimeout(20000);c.setDoOutput(true);c.setRequestProperty("Content-Type","application/json");c.setRequestProperty("apikey",KEY);if(bearer!=null&&!bearer.isEmpty())c.setRequestProperty("Authorization","Bearer "+bearer);
         c.getOutputStream().write(data.toString().getBytes(StandardCharsets.UTF_8));int code=c.getResponseCode();InputStream is=code<400?c.getInputStream():c.getErrorStream();ByteArrayOutputStream out=new ByteArrayOutputStream();byte[] b=new byte[4096];int n;while((n=is.read(b))>0)out.write(b,0,n);JSONObject o=new JSONObject(out.toString("UTF-8"));runOnUiThread(()->{if(code>=200&&code<300)done.ok(o);else done.fail(o.optString("msg",o.optString("error","HTTP "+code)));});c.disconnect();
     }catch(Exception e){runOnUiThread(()->done.fail(e.getMessage()==null?"Network error":e.getMessage()));}}).start();}
-    JSONObject obj(String... kv){JSONObject o=new JSONObject();try{for(int i=0;i<kv.length;i+=2)o.put(kv[i],kv[i+1]);}catch(Exception ignored){}return o;}
+    JSONObject obj(String... kv){JSONObject o=new JSONObject();try{for(int i=0;i<kv.length;i+=2){String k=kv[i],v=kv[i+1];if(k.equals("create_user"))o.put(k,Boolean.parseBoolean(v));else if(k.equals("valid_days"))o.put(k,Integer.parseInt(v));else o.put(k,v);}}catch(Exception ignored){}return o;}
     void home(){shell("Kurdish TV");body.addView(text("بەخێربێیت — ٢٢٥ کەناڵ",18));
         body.addView(button("چوونەژوورەوە بە کۆدی Login",()->codeLogin()));
         body.addView(button("چوونەژوورەوەی Admin",()->adminEmail()));
