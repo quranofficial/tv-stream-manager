@@ -2,12 +2,11 @@ name: Telegram TV Bot
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "7 */6 * * *"
 
+# Never cancel a healthy bot run to make room for another dispatch.
 concurrency:
-  group: tv-telegram-bot
-  cancel-in-progress: true
+  group: telegram-tv-bot
+  cancel-in-progress: false
 
 permissions:
   contents: write
@@ -17,9 +16,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 350
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
@@ -35,10 +36,14 @@ jobs:
           cloudflared --version
 
       - name: Install Python dependencies
-        run: pip install -r requirements.txt
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
       - name: Start temporary public tunnel
+        shell: bash
         run: |
+          set -euo pipefail
           cloudflared tunnel --url http://127.0.0.1:8080 --no-autoupdate \
             --loglevel info > /tmp/cloudflared.log 2>&1 &
           for i in $(seq 1 60); do
@@ -53,7 +58,7 @@ jobs:
             sleep 2
           done
           echo "Cloudflare tunnel did not provide a public URL."
-          cat /tmp/cloudflared.log
+          tail -n 80 /tmp/cloudflared.log
           exit 1
 
       - name: Publish live stream connection for Android app
@@ -95,13 +100,28 @@ jobs:
           PY
 
       - name: Run Telegram bot and combined stream server
+        shell: bash
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-        run: python bot.py
+        run: |
+          set -euo pipefail
+          mkdir -p logs
+          python -u bot.py 2>&1 | tee -a logs/bot.log
 
       - name: Show tunnel diagnostics
         if: always()
         run: |
           if [ -f /tmp/cloudflared.log ]; then
-            tail -n 40 /tmp/cloudflared.log
+            tail -n 80 /tmp/cloudflared.log
           fi
+
+      - name: Upload bot and tunnel logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: telegram-tv-bot-logs-${{ github.run_id }}
+          path: |
+            logs/
+            /tmp/cloudflared.log
+          if-no-files-found: ignore
+          retention-days: 14
