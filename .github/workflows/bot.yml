@@ -10,7 +10,7 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   bot:
@@ -55,6 +55,44 @@ jobs:
           echo "Cloudflare tunnel did not provide a public URL."
           cat /tmp/cloudflared.log
           exit 1
+
+      - name: Publish live stream connection for Android app
+        env:
+          GH_TOKEN: ${{ github.token }}
+          STREAM_PUBLIC_BASE: ${{ env.STREAM_PUBLIC_BASE }}
+          STREAM_ACCESS_KEY: ${{ env.STREAM_ACCESS_KEY }}
+        run: |
+          python - <<'PY'
+          import base64, json, os, urllib.request
+          path = "runtime.json"
+          api = "https://api.github.com/repos/${{ github.repository }}/contents/" + path
+          headers = {
+              "Authorization": "Bearer " + os.environ["GH_TOKEN"],
+              "Accept": "application/vnd.github+json",
+              "X-GitHub-Api-Version": "2022-11-28",
+          }
+          try:
+              req = urllib.request.Request(api, headers=headers)
+              with urllib.request.urlopen(req) as response:
+                  sha = json.load(response).get("sha")
+          except Exception:
+              sha = None
+          payload = {
+              "base_url": os.environ["STREAM_PUBLIC_BASE"],
+              "access_key": os.environ["STREAM_ACCESS_KEY"],
+              "updated_at": __import__("datetime").datetime.now(__import__("datetime").timezone.utc).isoformat(),
+          }
+          body = {
+              "message": "Update live stream endpoint for Android app",
+              "content": base64.b64encode(json.dumps(payload).encode()).decode(),
+              "branch": "main",
+          }
+          if sha:
+              body["sha"] = sha
+          req = urllib.request.Request(api, data=json.dumps(body).encode(), headers={**headers, "Content-Type":"application/json"}, method="PUT")
+          with urllib.request.urlopen(req) as response:
+              print("Android live endpoint published.")
+          PY
 
       - name: Run Telegram bot and combined stream server
         env:
