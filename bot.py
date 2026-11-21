@@ -61,83 +61,104 @@ async def _manifest_ok(session, url):
         return False, type(exc).__name__
 
 
-async def _ffmpeg_smoke_test(video_url, audio_url, cid, name, slug):
-    cmd = [
-        "ffmpeg", "-hide_banner", "-loglevel", "error",
-        "-rw_timeout", "20000000",
-        "-allowed_extensions", "ALL", "-extension_picky", "0", "-i", video_url,
-        "-rw_timeout", "20000000",
-        "-allowed_extensions", "ALL", "-extension_picky", "0", "-i", audio_url,
-        "-map", "0:v:0", "-map", "1:a:0",
-        "-t", "4", "-c", "copy", "-f", "mpegts", "pipe:1",
-    ]
+async def _ffmpeg_smoke_test(video_url, audio_url, cid, name, slug, muxed=False):
+    common = ["ffmpeg", "-hide_banner", "-loglevel", "error", "-rw_timeout", "20000000",
+              "-allowed_extensions", "ALL", "-extension_picky", "0", "-i"]
+    if muxed:
+        cmd = common + [video_url, "-map", "0:v:0", "-map", "0:a:0",
+                        "-t", "4", "-c", "copy", "-f", "mpegts", "pipe:1"]
+    else:
+        cmd = common + [video_url, "-rw_timeout", "20000000",
+                        "-allowed_extensions", "ALL", "-extension_picky", "0", "-i", audio_url,
+                        "-map", "0:v:0", "-map", "1:a:0",
+                        "-t", "4", "-c", "copy", "-f", "mpegts", "pipe:1"]
     try:
         proc = await asyncio.create_subprocess_exec(
-            *cmd, stdout=asyncio.subprocess.DEVNULL,
-            stderr=asyncio.subprocess.PIPE
+            *cmd, stdout=asyncio.subprocess.DEVNULL, stderr=asyncio.subprocess.PIPE
         )
         _, stderr = await asyncio.wait_for(proc.communicate(), timeout=35)
         if proc.returncode == 0:
-            log.info("FFmpeg smoke test passed for channel %s (%s), slug=%s", cid, name, slug)
+            log.info("FFmpeg test passed: channel=%s name=%s slug=%s mode=%s",
+                     cid, name, slug, "muxed" if muxed else "separate")
             return True
-        detail = stderr.decode("utf-8", errors="replace").strip()[-1200:]
-        log.warning(
-            "FFmpeg smoke test failed for channel %s (%s), slug=%s: %s",
-            cid, name, slug, detail or "no FFmpeg error output"
-        )
+        log.warning("FFmpeg test failed: channel=%s slug=%s mode=%s error=%s",
+                    cid, slug, "muxed" if muxed else "separate",
+                    stderr.decode("utf-8", errors="replace").strip()[-1000:])
         return False
-    except asyncio.TimeoutError:
-        proc.kill()
-        await proc.wait()
-        log.warning("FFmpeg smoke test timed out for channel %s (%s), slug=%s", cid, name, slug)
-        return False
-    except (FileNotFoundError, OSError) as exc:
-        log.error("Could not run FFmpeg smoke test: %s", exc)
+    except (asyncio.TimeoutError, FileNotFoundError, OSError) as exc:
+        log.warning("FFmpeg test error for channel %s slug=%s: %s", cid, slug, exc)
+        if 'proc' in locals() and proc.returncode is None:
+            proc.kill()
+            await proc.wait()
         return False
 
 
-async def resolve_slug(channel):
+def source_candidates(channel):
     cid = str(channel["id"])
-    if cid in SLUG_CACHE:
-        return SLUG_CACHE[cid]
-    if cid in OVERRIDES:
-        SLUG_CACHE[cid] = OVERRIDES[cid]
-        return OVERRIDES[cid]
-
+    # Verified naming patterns supplied by the project owner; test before use.
+    known = {
+        "197": [("ava_4k", "separate")],
+        "198": [("rudaw_4k", "separate")],
+        "180": [("kurdmax_sound2", "muxed"), ("kurdmax", "muxed")],
+        "179": [("kurdmax", "muxed"), ("kurdmax_sound2", "muxed")],
+        "178": [("kurdmax_show_sound2", "muxed"), ("kurdmax_show", "muxed")],
+        "177": [("kurdmax_show", "muxed"), ("kurdmax_show_sound2", "muxed")],
+    }
+    entries = known.get(cid, [])
     name = channel["name"].strip()
     lower_words = re.sub(r"[^a-z0-9]+", " ", name.lower()).strip()
     preserve_words = re.sub(r"[^A-Za-z0-9]+", " ", name).strip()
-    candidates = list(dict.fromkeys(x for x in (
-        lower_words.replace(" ", "_"),
-        lower_words.replace(" ", ""),
-        lower_words.replace(" ", "-"),
-        preserve_words.replace(" ", "_"),
-        preserve_words.replace(" ", ""),
-        preserve_words.replace(" ", "-"),
+    generated = list(dict.fromkeys(x for x in (
+        lower_words.replace(" ", "_"), lower_words.replace(" ", ""),
+        lower_words.replace(" ", "-"), preserve_words.replace(" ", "_"),
+        preserve_words.replace(" ", ""), preserve_words.replace(" ", "-"),
     ) if x))
+    entries += [(slug, "separate") for slug in generated]
+    seen = set()
+    for slug, mode in entries:
+        if (slug, mode) not in seen:
+            seen.add((slug, mode))
+            yield slug, mode
 
+
+async def resolve_source(channel):
+    cid = str(channel["id"])
+    if cid in SLUG_CACHE:
+        return SLUG_CACHE[cid]
     async with aiohttp.ClientSession(
-        headers={"User-Agent": "Mozilla/5.0 TVStreamManager/1.0"}
+        headers={"User-Agent": "Mozilla/5.0 TVStreamManager/2.0"}
     ) as session:
-        for candidate in candidates:
-            video_url = f"{BASE.rstrip('/')}/{candidate}/tracks-v1/index.fmp4.m3u8"
-            audio_url = f"{BASE.rstrip('/')}/{candidate}/tracks-a1/index.fmp4.m3u8"
-            video_result, audio_result = await asyncio.gather(
-                _manifest_ok(session, video_url),
-                _manifest_ok(session, audio_url),
-            )
-            log.info(
-                "Slug probe channel %s (%s): %s video=%s audio=%s",
-                cid, name, candidate, video_result[1], audio_result[1]
-            )
-            if video_result[0] and audio_result[0]:
-                if await _ffmpeg_smoke_test(video_url, audio_url, cid, name, candidate):
-                    SLUG_CACHE[cid] = candidate
-                    log.info("Resolved channel %s (%s) to upstream slug %s", cid, name, candidate)
-                    return candidate
-
-    log.error("No valid video+audio slug found for channel %s (%s)", cid, name)
+        for slug, mode in source_candidates(channel):
+            if mode == "muxed":
+                url = f"{BASE.rstrip('/')}/{slug}/tracks-v1a1/mono.ts.m3u8"
+                ok, status = await _manifest_ok(session, url)
+                log.info("Source probe channel=%s slug=%s muxed=%s", cid, slug, status)
+                if ok and await _ffmpeg_smoke_test(url, None, cid, channel["name"], slug, True):
+                    result = {"mode": "muxed", "url": url, "slug": slug}
+                    SLUG_CACHE[cid] = result
+                    return result
+            else:
+                video = f"{BASE.rstrip('/')}/{slug}/tracks-v1/index.fmp4.m3u8"
+                audio_options = [
+                    f"{BASE.rstrip('/')}/{slug}/tracks-a1/index.fmp4.m3u8",
+                    f"{BASE.rstrip('/')}/{slug}/tracks-v1a1/mono.ts.m3u8",
+                ]
+                vok, vs = await _manifest_ok(session, video)
+                for audio in audio_options:
+                    aok, ast = await _manifest_ok(session, audio)
+                    log.info("Source probe channel=%s slug=%s video=%s audio=%s",
+                             cid, slug, vs, ast)
+                    if vok and aok and await _ffmpeg_smoke_test(video, audio, cid, channel["name"], slug):
+                        result = {"mode": "separate", "video": video, "audio": audio, "slug": slug}
+                        SLUG_CACHE[cid] = result
+                        return result
+    log.error("No working source found for channel %s (%s)", cid, channel["name"])
     return None
+
+
+async def resolve_slug(channel):
+    source = await resolve_source(channel)
+    return source["slug"] if source else None
 
 
 def channel_page(page=0, query=""):
@@ -170,23 +191,29 @@ async def stream_handler(request):
     if channel is None:
         raise web.HTTPNotFound(text="Unknown channel")
 
-    slug = await resolve_slug(channel)
-    if not slug:
+    source = await resolve_source(channel)
+    if not source:
         raise web.HTTPBadGateway(
-            text="Could not find a valid upstream video+audio source for this channel. Check Actions logs."
+            text="No tested working source was found for this channel. Check Actions logs."
         )
-    video_url = f"{BASE.rstrip('/')}/{slug}/tracks-v1/index.fmp4.m3u8"
-    audio_url = f"{BASE.rstrip('/')}/{slug}/tracks-a1/index.fmp4.m3u8"
-    cmd = [
-        "ffmpeg", "-hide_banner", "-loglevel", "error",
-        "-rw_timeout", "20000000",
-        "-allowed_extensions", "ALL", "-extension_picky", "0", "-i", video_url,
-        "-rw_timeout", "20000000",
-        "-allowed_extensions", "ALL", "-extension_picky", "0", "-i", audio_url,
-        "-map", "0:v:0", "-map", "1:a:0",
-        "-c", "copy", "-mpegts_flags", "+resend_headers",
-        "-f", "mpegts", "pipe:1",
-    ]
+    if source["mode"] == "muxed":
+        cmd = [
+            "ffmpeg", "-hide_banner", "-loglevel", "error",
+            "-rw_timeout", "20000000", "-allowed_extensions", "ALL",
+            "-extension_picky", "0", "-i", source["url"],
+            "-map", "0:v:0", "-map", "0:a:0", "-c", "copy",
+            "-mpegts_flags", "+resend_headers", "-f", "mpegts", "pipe:1",
+        ]
+    else:
+        cmd = [
+            "ffmpeg", "-hide_banner", "-loglevel", "error",
+            "-rw_timeout", "20000000", "-allowed_extensions", "ALL",
+            "-extension_picky", "0", "-i", source["video"],
+            "-rw_timeout", "20000000", "-allowed_extensions", "ALL",
+            "-extension_picky", "0", "-i", source["audio"],
+            "-map", "0:v:0", "-map", "1:a:0", "-c", "copy",
+            "-mpegts_flags", "+resend_headers", "-f", "mpegts", "pipe:1",
+        ]
     log.info("Starting combined relay for channel %s (%s)", cid, channel["name"])
     try:
         proc = await asyncio.create_subprocess_exec(
