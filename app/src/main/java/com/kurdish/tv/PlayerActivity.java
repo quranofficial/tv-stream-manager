@@ -203,7 +203,7 @@ public class PlayerActivity extends Activity {
   }
   private void playUrl(String url){
     if(player!=null){player.release();player=null;}
-    loading.setVisibility(View.VISIBLE);playButton.setText("Ⅱ");
+    loading.setVisibility(View.VISIBLE);stateText.setVisibility(View.VISIBLE);playButton.setText("Ⅱ");
     DefaultHttpDataSource.Factory httpFactory=new DefaultHttpDataSource.Factory()
       .setUserAgent("Mozilla/5.0 TVStreamManager/2.0")
       .setConnectTimeoutMs(20000)
@@ -225,14 +225,14 @@ public class PlayerActivity extends Activity {
     }
     player.addListener(new Player.Listener(){
       @Override public void onPlaybackStateChanged(int s){
-        if(s==Player.STATE_BUFFERING){loading.setVisibility(View.VISIBLE);stateText.setText("بارکردنی پەخش...");}
-        else if(s==Player.STATE_READY){loading.setVisibility(View.GONE);stateText.setText(relayAttempted?"● پەخش لە ڕێگەی VLC Relay":"● پەخشی ڕاستەوخۆی v1a1");}
-        else if(s==Player.STATE_ENDED){loading.setVisibility(View.GONE);stateText.setText("پەخش کۆتایی هات");}
+        if(s==Player.STATE_BUFFERING){loading.setVisibility(View.VISIBLE);stateText.setVisibility(View.VISIBLE);stateText.setText("بارکردنی پەخش...");}
+        else if(s==Player.STATE_READY){loading.setVisibility(View.GONE);stateText.setVisibility(View.GONE);}
+        else if(s==Player.STATE_ENDED){loading.setVisibility(View.GONE);stateText.setVisibility(View.GONE);}
       }
       @Override public void onPlayerError(PlaybackException e){
         if(directAttempted&&!relayAttempted){playRelay("پەخشی ڕاستەوخۆ کار نەکرد؛ گۆڕین بۆ Relay");}
         else{
-          loading.setVisibility(View.GONE);
+          loading.setVisibility(View.GONE);stateText.setVisibility(View.VISIBLE);
           String detail=PlaybackException.getErrorCodeName(e.errorCode);
           Throwable cause=e.getCause();
           if(cause!=null&&cause.getMessage()!=null)detail+=": "+cause.getMessage();
