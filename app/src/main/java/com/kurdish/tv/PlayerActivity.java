@@ -12,6 +12,8 @@ import org.json.JSONObject;
 import java.io.*;
 import java.net.*;
 import androidx.media3.common.MediaItem;
+import androidx.media3.common.MimeTypes;
+import androidx.media3.exoplayer.hls.HlsMediaSource;
 import androidx.media3.common.PlaybackException;
 import androidx.media3.common.Player;
 import androidx.media3.exoplayer.ExoPlayer;
@@ -150,7 +152,16 @@ public class PlayerActivity extends Activity {
       .setMediaSourceFactory(new DefaultMediaSourceFactory(this).setDataSourceFactory(httpFactory))
       .build();
     playerView.setPlayer(player);
-    player.setMediaItem(MediaItem.fromUri(url));
+    MediaItem item=new MediaItem.Builder().setUri(url)
+      .setMimeType(url.toLowerCase(java.util.Locale.ROOT).contains(".m3u8")
+        ? MimeTypes.APPLICATION_M3U8 : MimeTypes.VIDEO_MP2T)
+      .build();
+    if(url.toLowerCase(java.util.Locale.ROOT).contains(".m3u8")){
+      player.setMediaSource(new HlsMediaSource.Factory(httpFactory)
+        .setAllowChunklessPreparation(false).createMediaSource(item));
+    }else{
+      player.setMediaItem(item);
+    }
     player.addListener(new Player.Listener(){
       @Override public void onPlaybackStateChanged(int s){
         if(s==Player.STATE_BUFFERING){loading.setVisibility(View.VISIBLE);stateText.setText("بارکردنی پەخش...");}
@@ -159,7 +170,14 @@ public class PlayerActivity extends Activity {
       }
       @Override public void onPlayerError(PlaybackException e){
         if(directAttempted&&!relayAttempted){playRelay("پەخشی ڕاستەوخۆ کار نەکرد؛ گۆڕین بۆ Relay");}
-        else{loading.setVisibility(View.GONE);stateText.setText("v1a1 و VLC Relay کار ناکەن؛ پێویستە ئەم کەناڵە بۆ v1+a1 ڕێکبخرێت");showControls();}
+        else{
+          loading.setVisibility(View.GONE);
+          String detail=e.errorCodeName;
+          Throwable cause=e.getCause();
+          if(cause!=null&&cause.getMessage()!=null)detail+=": "+cause.getMessage();
+          stateText.setText("پلەیەری ئەپ نەتوانی پەخش بکات. هەڵە: "+detail);
+          showControls();
+        }
       }
       @Override public void onIsPlayingChanged(boolean playing){playButton.setText(playing?"Ⅱ":"▶");}
     });
