@@ -41,8 +41,7 @@ public class MainActivity extends Activity {
     ScrollView scroll=new ScrollView(this);scroll.setFillViewport(true);LinearLayout page=new LinearLayout(this);page.setOrientation(1);page.setPadding(dp(16),dp(10),dp(16),dp(28));scroll.addView(page);root.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));
     LinearLayout hero=new LinearLayout(this);hero.setOrientation(1);hero.setPadding(dp(18),dp(18),dp(18),dp(18));hero.setBackground(shape(0xff12313a,22));
     hero.addView(pill("●  پەخشی ڕاستەوخۆ"));
-    TextView welcome=label("هەموو کەناڵەکانت،
-لە یەک شوێن",25,WHITE);welcome.setTypeface(null,Typeface.BOLD);welcome.setPadding(0,dp(12),0,dp(5));hero.addView(welcome);
+    TextView welcome=label("هەموو کەناڵەکانت،\nلە یەک شوێن",25,WHITE);welcome.setTypeface(null,Typeface.BOLD);welcome.setPadding(0,dp(12),0,dp(5));hero.addView(welcome);
     hero.addView(label(channels.length()+" کەناڵ بەردەستن • بەبێ Login",13,0xffb8d5d7));page.addView(hero);
     LinearLayout searchRow=new LinearLayout(this);searchRow.setGravity(Gravity.CENTER_VERTICAL);searchRow.setPadding(0,dp(16),0,dp(12));
     search=new EditText(this);search.setSingleLine(true);search.setTextColor(WHITE);search.setHintTextColor(MUTED);search.setHint("گەڕان بە ناوی کەناڵ...");search.setTextSize(14);search.setPadding(dp(14),dp(10),dp(14),dp(10));search.setBackground(shape(CARD,15));searchRow.addView(search,new LinearLayout.LayoutParams(0,dp(48),1));
