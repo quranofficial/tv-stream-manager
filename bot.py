@@ -61,6 +61,41 @@ async def _manifest_ok(session, url):
         return False, type(exc).__name__
 
 
+async def _ffmpeg_smoke_test(video_url, audio_url, cid, name, slug):
+    cmd = [
+        "ffmpeg", "-hide_banner", "-loglevel", "error",
+        "-rw_timeout", "20000000",
+        "-allowed_extensions", "ALL", "-extension_picky", "0", "-i", video_url,
+        "-rw_timeout", "20000000",
+        "-allowed_extensions", "ALL", "-extension_picky", "0", "-i", audio_url,
+        "-map", "0:v:0", "-map", "1:a:0",
+        "-t", "4", "-c", "copy", "-f", "mpegts", "pipe:1",
+    ]
+    try:
+        proc = await asyncio.create_subprocess_exec(
+            *cmd, stdout=asyncio.subprocess.DEVNULL,
+            stderr=asyncio.subprocess.PIPE
+        )
+        _, stderr = await asyncio.wait_for(proc.communicate(), timeout=35)
+        if proc.returncode == 0:
+            log.info("FFmpeg smoke test passed for channel %s (%s), slug=%s", cid, name, slug)
+            return True
+        detail = stderr.decode("utf-8", errors="replace").strip()[-1200:]
+        log.warning(
+            "FFmpeg smoke test failed for channel %s (%s), slug=%s: %s",
+            cid, name, slug, detail or "no FFmpeg error output"
+        )
+        return False
+    except asyncio.TimeoutError:
+        proc.kill()
+        await proc.wait()
+        log.warning("FFmpeg smoke test timed out for channel %s (%s), slug=%s", cid, name, slug)
+        return False
+    except (FileNotFoundError, OSError) as exc:
+        log.error("Could not run FFmpeg smoke test: %s", exc)
+        return False
+
+
 async def resolve_slug(channel):
     cid = str(channel["id"])
     if cid in SLUG_CACHE:
@@ -96,9 +131,10 @@ async def resolve_slug(channel):
                 cid, name, candidate, video_result[1], audio_result[1]
             )
             if video_result[0] and audio_result[0]:
-                SLUG_CACHE[cid] = candidate
-                log.info("Resolved channel %s (%s) to upstream slug %s", cid, name, candidate)
-                return candidate
+                if await _ffmpeg_smoke_test(video_url, audio_url, cid, name, candidate):
+                    SLUG_CACHE[cid] = candidate
+                    log.info("Resolved channel %s (%s) to upstream slug %s", cid, name, candidate)
+                    return candidate
 
     log.error("No valid video+audio slug found for channel %s (%s)", cid, name)
     return None
