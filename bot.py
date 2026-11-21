@@ -230,12 +230,14 @@ async def stream_handler(request):
         )
     video_input = source["url"] if source["mode"] == "muxed" else source["video"]
     video_codec = await _probe_video_codec(video_input)
-    # Force H.264 for Android devices known to fail HEVC decoding on these channels.
-    # Other channels are transcoded only when ffprobe positively detects HEVC.
-    transcode_video = video_codec in {"hevc", "h265"} or cid in {"195", "196", "198"}
+    # The Android app uses this User-Agent and needs broadly supported H.264/AAC.
+    # VLC clients keep the original stream-copy behavior unless HEVC is detected.
+    android_client = "TVStreamManager" in request.headers.get("User-Agent", "")
+    transcode_video = android_client or video_codec in {"hevc", "h265"} or cid in {"195", "196", "198"}
+    transcode_audio = android_client
     log.info(
-        "Relay video codec: channel=%s codec=%s video_transcode=%s",
-        cid, video_codec or "unknown", transcode_video,
+        "Relay codecs: channel=%s input_video=%s android_client=%s video_transcode=%s audio_transcode=%s",
+        cid, video_codec or "unknown", android_client, transcode_video, transcode_audio,
     )
 
     cmd = [
@@ -261,8 +263,11 @@ async def stream_handler(request):
         ]
     else:
         cmd += ["-c:v", "copy"]
+    if transcode_audio:
+        cmd += ["-c:a", "aac", "-b:a", "128k", "-ac", "2", "-ar", "48000"]
+    else:
+        cmd += ["-c:a", "copy"]
     cmd += [
-        "-c:a", "copy",
         "-mpegts_flags", "+resend_headers",
         "-f", "mpegts", "pipe:1",
     ]
