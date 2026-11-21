@@ -51,8 +51,33 @@ public class MainActivity extends Activity {
         body.addView(text("هەموو کۆدەکان لە سێرڤەر پشتڕاست دەکرێنەوە.",13));
     }
     void codeLogin(){shell("Login");body.addView(text("کۆدی تایبەتی خۆت بنووسە",16));field=edit("12 پیت/ژمارە");body.addView(field);body.addView(button("چوونەژوورەوە",()->{String code=field.getText().toString().trim().toUpperCase();request("/functions/v1/tv-access",obj("action","redeem","code",code,"device_id",deviceId),KEY,new Done(){public void ok(JSONObject o){sessionToken=o.optString("session_token");prefs.edit().putString("session",sessionToken).apply();channelPage("");}public void fail(String e){msg(e);}});}));body.addView(button("گەڕانەوە",()->home()));}
-    void adminEmail(){shell("Admin Login");body.addView(text("ئیمەیڵی Admin",16));field=edit("email");field.setInputType(33);body.addView(field);body.addView(button("ناردنی کۆدی OTP",()->{String email=field.getText().toString().trim();request("/auth/v1/otp",obj("email",email,"create_user","false"),"",new Done(){public void ok(JSONObject o){otpVerify(email);}public void fail(String e){msg(e);}});}));}
-    void otpVerify(String email){shell("پشتڕاستکردنەوەی ئیمەیڵ");body.addView(text("کۆدی نێردراو بۆ "+email,15));field=edit("کۆدی OTP");body.addView(field);body.addView(button("پشتڕاستکردنەوە",()->{request("/auth/v1/verify",obj("email",email,"token",field.getText().toString().trim(),"type","email"),"",new Done(){public void ok(JSONObject o){adminToken=o.optString("access_token");request("/functions/v1/claim-tv-admin",new JSONObject(),adminToken,new Done(){public void ok(JSONObject x){adminPanel();}public void fail(String e){msg(e);}});}public void fail(String e){msg(e);}});}));}
+    void adminEmail(){
+        shell("Admin Login");
+        body.addView(text("چوونەژوورەوە بە ئیمەیڵ و وشەی نهێنی Supabase",16));
+        field=edit("ئیمەیڵ");
+        field.setInputType(33);
+        body.addView(field);
+        EditText password=edit("وشەی نهێنی");
+        password.setInputType(129);
+        body.addView(password);
+        body.addView(button("چوونەژوورەوە",()->{
+            String email=field.getText().toString().trim();
+            String pass=password.getText().toString();
+            if(email.isEmpty()||pass.isEmpty()){msg("ئیمەیڵ و وشەی نهێنی پڕ بکەرەوە");return;}
+            request("/auth/v1/token?grant_type=password",obj("email",email,"password",pass),"",new Done(){
+                public void ok(JSONObject o){
+                    adminToken=o.optString("access_token");
+                    if(adminToken.isEmpty()){msg("Access token وەرنەگیرا");return;}
+                    request("/functions/v1/claim-tv-admin",new JSONObject(),adminToken,new Done(){
+                        public void ok(JSONObject x){adminPanel();}
+                        public void fail(String e){msg(e);}
+                    });
+                }
+                public void fail(String e){msg(e);}
+            });
+        }));
+        body.addView(button("گەڕانەوە",()->home()));
+    }
     void adminPanel(){shell("Admin Panel");body.addView(button("دروستکردنی کۆدی نوێ",()->createCode()));body.addView(button("بینینی کۆدەکان",()->listCodes()));body.addView(button("کەناڵەکان",()->channelPage("")));body.addView(button("چوونەدەرەوە",()->home()));}
     void createCode(){shell("دروستکردنی کۆد");EditText label=edit("ناوی بەکارهێنەر / تێبینی");body.addView(label);EditText days=edit("ماوە بە ڕۆژ (30)");days.setInputType(2);body.addView(days);body.addView(button("دروستکردن",()->{JSONObject o=obj("action","create","label",label.getText().toString(),"valid_days",days.getText().toString().isEmpty()?"30":days.getText().toString());request("/functions/v1/tv-access",o,adminToken,new Done(){public void ok(JSONObject r){String code=r.optString("code");new AlertDialog.Builder(MainActivity.this).setTitle("کۆدی Login").setMessage(code+"\n\nئەم کۆدە تەنها یەکجار و بۆ یەک ئامێرە.").setPositiveButton("کۆپی", (d,w)->{((android.content.ClipboardManager)getSystemService(CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("TV code",code));}).setNegativeButton("داخستن",null).show();}public void fail(String e){msg(e);}});}));}
     void listCodes(){request("/functions/v1/tv-access",obj("action","list"),adminToken,new Done(){public void ok(JSONObject o){JSONArray a=o.optJSONArray("codes");shell("کۆدەکان");if(a==null)return;for(int i=0;i<a.length();i++){JSONObject x=a.optJSONObject(i);String id=x.optString("id");String line=x.optString("label","بێ ناو")+" • "+(x.optBoolean("is_active")?"چالاک":"ناچالاک")+" • "+x.optString("expires_at");body.addView(text(line,13));body.addView(button("ناچالاککردن",()->request("/functions/v1/tv-access",obj("action","revoke","code_id",id),adminToken,new Done(){public void ok(JSONObject z){listCodes();}public void fail(String e){msg(e);}})));}}public void fail(String e){msg(e);}});}
