@@ -121,7 +121,7 @@ public class PlayerActivity extends Activity {
     for(int i=0;i<channelItems.length();i++){
       JSONObject item=channelItems.optJSONObject(i);if(item==null)continue;
       String id=item.optString("id"),name=item.optString("name","TV"),genre=item.optString("genre","Live");
-      TextView row=txt((id.equals(currentChannelId)?"●  ":"   ")+name+"\\n      "+genre,14,id.equals(currentChannelId)?ACCENT:WHITE);
+      TextView row=txt((id.equals(currentChannelId)?"●  ":"   ")+name+"\n      "+genre,14,id.equals(currentChannelId)?ACCENT:WHITE);
       row.setGravity(Gravity.CENTER_VERTICAL);row.setPadding(dp(12),dp(10),dp(8),dp(10));
       row.setBackground(bg(id.equals(currentChannelId)?0xff174b4a:0xff17263a,14));
       LinearLayout.LayoutParams rp=lp(-1,58);rp.bottomMargin=dp(7);channelList.addView(row,rp);
