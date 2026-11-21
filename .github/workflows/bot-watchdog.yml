@@ -1,6 +1,16 @@
 name: Telegram TV Bot Watchdog
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/bot.yml"
+      - ".github/workflows/bot-watchdog.yml"
+      - "bot.py"
+      - "requirements.txt"
+      - "channels.json"
+      - "stream_keys.json"
+      - "stream_modes.json"
   schedule:
     - cron: "*/15 * * * *"
   workflow_dispatch:
