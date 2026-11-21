@@ -95,7 +95,8 @@ async def _ffmpeg_smoke_test(video_url, audio_url, cid, name, slug, muxed=False)
 
 def source_candidates(channel):
     cid = str(channel["id"])
-    # Try muxed v1a1 first for every channel, then separate v1 + a1.
+    # Default for EVERY channel: test muxed v1a1 only.
+    # Move a channel to separate v1+a1 only after the user confirms v1a1 fails.
     known = {
         "197": ["ava_4k"], "198": ["rudaw_4k"],
         "195": ["k24_4k"], "194": ["kurdsat_4k"],
@@ -107,6 +108,8 @@ def source_candidates(channel):
         "178": ["kurdmax_show_sound2", "kurdmax_show"],
         "177": ["kurdmax_show", "kurdmax_show_sound2"],
     }
+    # Ava Sport was previously verified with separate video/audio playlists.
+    separate_ids = {"196"}
     name = channel["name"].strip()
     lower_words = re.sub(r"[^a-z0-9]+", " ", name.lower()).strip()
     preserve_words = re.sub(r"[^A-Za-z0-9]+", " ", name).strip()
@@ -115,12 +118,13 @@ def source_candidates(channel):
         lower_words.replace(" ", "-"), preserve_words.replace(" ", "_"),
         preserve_words.replace(" ", ""), preserve_words.replace(" ", "-"),
     ]
+    override = OVERRIDES.get(cid)
     slugs = list(dict.fromkeys(
-        slug for slug in list(known.get(cid, [])) + generated if slug
+        slug for slug in ([override] if override else []) + known.get(cid, []) + generated if slug
     ))
+    mode = "separate" if cid in separate_ids else "muxed"
     for slug in slugs:
-        yield slug, "muxed"
-        yield slug, "separate"
+        yield slug, mode
 
 
 async def resolve_source(channel):
@@ -350,7 +354,7 @@ async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
             return
         await query.message.reply_text(
-            f"⏳ سەرچاوەی {channel['name']} دەپشکنرێت؛ سەرەتا v1a1، پاشان v1+a1...",
+            f"⏳ سەرچاوەی {channel['name']} دەپشکنرێت؛ تەنها v1a1 دەپشکنرێت...",
             disable_web_page_preview=True,
         )
         source = await resolve_source(channel)
