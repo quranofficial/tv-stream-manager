@@ -32,6 +32,9 @@ public class MainActivity extends Activity {
   @Override public void onCreate(Bundle b){super.onCreate(b);getWindow().setStatusBarColor(BG);getWindow().setNavigationBarColor(BG);getWindow().getDecorView().setSystemUiVisibility(0);prefs=getSharedPreferences("kurdish_tv",0);fav.addAll(prefs.getStringSet("favorites",new HashSet<>()));try{InputStream in=getAssets().open("channels.json");ByteArrayOutputStream out=new ByteArrayOutputStream();byte[] buf=new byte[8192];int n;while((n=in.read(buf))>0)out.write(buf,0,n);channels=new JSONObject(out.toString("UTF-8")).getJSONArray("data");}catch(Exception e){}showHome();showLastCrash();}
   GradientDrawable strokeHome(int color,int line,int radius){GradientDrawable d=shape(color,radius);d.setStroke(dp(1),line);return d;}
   void showLastCrash(){String report=getSharedPreferences("crash_report",0).getString("last_crash",null);if(report==null||report.isEmpty())return;new AlertDialog.Builder(this).setTitle("Crash report").setMessage("ئەمە هۆکاری داخستنی جارەکەی پێشووترە. تکایە Copy بکە و بۆم بینێرە.\\n\\n"+report).setPositiveButton("Copy", (d,w)->{((android.content.ClipboardManager)getSystemService(CLIPBOARD_SERVICE)).setPrimaryClip(android.content.ClipData.newPlainText("Crash report",report));Toast.makeText(this,"Crash report کۆپی کرا",Toast.LENGTH_SHORT).show();}).setNegativeButton("داخستن",null).show();}
+  TextView navItem(String icon,String title,boolean active){
+    TextView t=label(icon+"\n"+title,11,active?ACCENT:MUTED);t.setGravity(Gravity.CENTER);t.setTypeface(null,active?Typeface.BOLD:Typeface.NORMAL);return t;
+  }
   TextView textButton(String s,Runnable r){TextView t=label(s,14,WHITE);t.setGravity(Gravity.CENTER);t.setPadding(dp(14),dp(10),dp(14),dp(10));t.setBackground(shape(CARD,14));t.setOnClickListener(v->r.run());return t;}
   void showHome(){
     root=new LinearLayout(this);root.setOrientation(1);root.setBackground(gradient(0xff07101d,0xff10243a,0));setContentView(root);
@@ -41,7 +44,13 @@ public class MainActivity extends Activity {
     TextView title=label("KURDISH TV",21,WHITE);title.setTypeface(null,Typeface.BOLD);titleBox.addView(title);titleBox.addView(label("LIVE • کەناڵە کوردییەکان",10,MUTED));top.addView(titleBox,new LinearLayout.LayoutParams(0,-2,1));
     TextView settings=label("⚙",22,WHITE);settings.setGravity(Gravity.CENTER);settings.setBackground(shape(CARD,14));top.addView(settings,new LinearLayout.LayoutParams(dp(44),dp(44)));settings.setOnClickListener(v->relaySettings());
     root.addView(top);
-    ScrollView scroll=new ScrollView(this);scroll.setFillViewport(true);LinearLayout page=new LinearLayout(this);page.setOrientation(1);page.setPadding(dp(16),dp(10),dp(16),dp(28));scroll.addView(page);root.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));
+    ScrollView scroll=new ScrollView(this);scroll.setFillViewport(true);scroll.setClipToPadding(false);LinearLayout page=new LinearLayout(this);page.setOrientation(1);page.setPadding(dp(16),dp(10),dp(16),dp(28));scroll.addView(page);root.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));
+    LinearLayout nav=new LinearLayout(this);nav.setGravity(Gravity.CENTER);nav.setPadding(dp(10),dp(8),dp(10),dp(8));nav.setBackgroundColor(0xff0a1524);
+    TextView navHome=navItem("⌂","سەرەکی",true);TextView navChannels=navItem("▦","کەناڵەکان",false);TextView navFav=navItem("★","دڵخوازەکان",false);
+    nav.addView(navHome,new LinearLayout.LayoutParams(0,dp(54),1));nav.addView(navChannels,new LinearLayout.LayoutParams(0,dp(54),1));nav.addView(navFav,new LinearLayout.LayoutParams(0,dp(54),1));root.addView(nav,new LinearLayout.LayoutParams(-1,-2));
+    navHome.setOnClickListener(v->{onlyFav=false;genreFilter="هەمووی";if(search!=null)search.setText("");scroll.smoothScrollTo(0,0);});
+    navChannels.setOnClickListener(v->{onlyFav=false;showHome();root.post(()->{});});
+    navFav.setOnClickListener(v->{onlyFav=true;showHome();});
     LinearLayout hero=new LinearLayout(this);hero.setOrientation(1);hero.setPadding(dp(20),dp(22),dp(20),dp(22));hero.setBackground(gradient(0xff087f79,0xff183451,24));
     hero.addView(pill("●  پەخشی ڕاستەوخۆ"));
     TextView welcome=label("گەشتێکی نوێ بۆ\nجیهانی تەلەڤیزیۆن",25,WHITE);welcome.setTypeface(null,Typeface.BOLD);welcome.setPadding(0,dp(12),0,dp(5));hero.addView(welcome);
