@@ -29,7 +29,10 @@ public class PlayerActivity extends Activity {
   private TextView stateText, playButton, muteButton, lockButton, fitButton, liveBadge;
   private ProgressBar loading;
   private LinearLayout topBar, bottomPanel, extraPanel, channelPanel, channelList;
-  private FrameLayout drawerLayer;\n  private JSONArray channelItems=new JSONArray();\n  private String runtimeBase="", runtimeKey="", currentChannelId="";\n  private boolean drawerVisible=false;
+  private FrameLayout drawerLayer;
+  private JSONArray channelItems=new JSONArray();
+  private String runtimeBase="", runtimeKey="", currentChannelId="";
+  private boolean drawerVisible=false;
   private SeekBar volumeSeek, brightnessSeek;
   private Handler handler=new Handler(Looper.getMainLooper());
   private Runnable hideRunnable;
@@ -51,7 +54,11 @@ public class PlayerActivity extends Activity {
     channelTitle=getIntent().getStringExtra("title");streamUrl=getIntent().getStringExtra("url");
     if(channelTitle==null)channelTitle="Live TV";if(streamUrl==null)streamUrl="";
     sourceApiUrl=getIntent().getStringExtra("source_api_url");
-    relayUrl=getIntent().getStringExtra("relay_url");\n    runtimeBase=getIntent().getStringExtra("runtime_base");if(runtimeBase==null)runtimeBase="";\n    runtimeKey=getIntent().getStringExtra("runtime_key");if(runtimeKey==null)runtimeKey="";\n    currentChannelId=getIntent().getStringExtra("channel_id");if(currentChannelId==null)currentChannelId="";\n    try{channelItems=new JSONArray(getIntent().getStringExtra("channels_json"));}catch(Exception ignored){}
+    relayUrl=getIntent().getStringExtra("relay_url");
+    runtimeBase=getIntent().getStringExtra("runtime_base");if(runtimeBase==null)runtimeBase="";
+    runtimeKey=getIntent().getStringExtra("runtime_key");if(runtimeKey==null)runtimeKey="";
+    currentChannelId=getIntent().getStringExtra("channel_id");if(currentChannelId==null)currentChannelId="";
+    try{channelItems=new JSONArray(getIntent().getStringExtra("channels_json"));}catch(Exception ignored){}
     if(relayUrl==null||relayUrl.isEmpty())relayUrl=streamUrl;
     getWindow().setStatusBarColor(Color.BLACK);getWindow().setNavigationBarColor(Color.BLACK);
     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -69,7 +76,8 @@ public class PlayerActivity extends Activity {
     TextView title=txt(channelTitle,17,WHITE);title.setGravity(Gravity.CENTER_VERTICAL);title.setTypeface(null,Typeface.BOLD);
     TextView sub=txt("VLC RELAY  •  COMBINED STREAM",9,0xffc0cbd9);sub.setGravity(Gravity.CENTER_VERTICAL);
     titleBox.addView(title);titleBox.addView(sub);topBar.addView(titleBox,new LinearLayout.LayoutParams(0,-2,1));
-    TextView channelsButton=control("☷");LinearLayout.LayoutParams chp=lp(48,44);chp.leftMargin=dp(8);topBar.addView(channelsButton,chp);channelsButton.setOnClickListener(v->toggleChannelDrawer());\n    liveBadge=txt("●  LIVE",11,ACCENT);liveBadge.setPadding(dp(12),dp(8),dp(12),dp(8));liveBadge.setBackground(bg(0xdd123a37,24));topBar.addView(liveBadge);
+    TextView channelsButton=control("☷");LinearLayout.LayoutParams chp=lp(48,44);chp.leftMargin=dp(8);topBar.addView(channelsButton,chp);channelsButton.setOnClickListener(v->toggleChannelDrawer());
+    liveBadge=txt("●  LIVE",11,ACCENT);liveBadge.setPadding(dp(12),dp(8),dp(12),dp(8));liveBadge.setBackground(bg(0xdd123a37,24));topBar.addView(liveBadge);
     overlay.addView(topBar,lp(-1,62));
     View spacer=new View(this);overlay.addView(spacer,new LinearLayout.LayoutParams(1,0,1));
     LinearLayout center=new LinearLayout(this);center.setGravity(Gravity.CENTER);center.setOrientation(1);
@@ -113,7 +121,8 @@ public class PlayerActivity extends Activity {
     for(int i=0;i<channelItems.length();i++){
       JSONObject item=channelItems.optJSONObject(i);if(item==null)continue;
       String id=item.optString("id"),name=item.optString("name","TV"),genre=item.optString("genre","Live");
-      TextView row=txt((id.equals(currentChannelId)?"●  ":"   ")+name+"\n      "+genre,14,id.equals(currentChannelId)?ACCENT:WHITE);
+      TextView row=txt((id.equals(currentChannelId)?"●  ":"   ")+name+"
+      "+genre,14,id.equals(currentChannelId)?ACCENT:WHITE);
       row.setGravity(Gravity.CENTER_VERTICAL);row.setPadding(dp(12),dp(10),dp(8),dp(10));
       row.setBackground(bg(id.equals(currentChannelId)?0xff174b4a:0xff17263a,14));
       LinearLayout.LayoutParams rp=lp(-1,58);rp.bottomMargin=dp(7);channelList.addView(row,rp);
