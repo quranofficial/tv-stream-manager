@@ -15,6 +15,8 @@ import androidx.media3.common.MediaItem;
 import androidx.media3.common.PlaybackException;
 import androidx.media3.common.Player;
 import androidx.media3.exoplayer.ExoPlayer;
+import androidx.media3.datasource.DefaultHttpDataSource;
+import androidx.media3.exoplayer.source.DefaultMediaSourceFactory;
 import androidx.media3.ui.AspectRatioFrameLayout;
 import androidx.media3.ui.PlayerView;
 
@@ -139,7 +141,15 @@ public class PlayerActivity extends Activity {
   private void playUrl(String url){
     if(player!=null){player.release();player=null;}
     loading.setVisibility(View.VISIBLE);playButton.setText("Ⅱ");
-    player=new ExoPlayer.Builder(this).build();playerView.setPlayer(player);
+    DefaultHttpDataSource.Factory httpFactory=new DefaultHttpDataSource.Factory()
+      .setUserAgent("Mozilla/5.0 TVStreamManager/2.0")
+      .setConnectTimeoutMs(20000)
+      .setReadTimeoutMs(30000)
+      .setAllowCrossProtocolRedirects(true);
+    player=new ExoPlayer.Builder(this)
+      .setMediaSourceFactory(new DefaultMediaSourceFactory(this).setDataSourceFactory(httpFactory))
+      .build();
+    playerView.setPlayer(player);
     player.setMediaItem(MediaItem.fromUri(url));
     player.addListener(new Player.Listener(){
       @Override public void onPlaybackStateChanged(int s){
