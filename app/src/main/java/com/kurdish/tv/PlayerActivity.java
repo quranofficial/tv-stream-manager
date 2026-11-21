@@ -61,7 +61,7 @@ public class PlayerActivity extends Activity {
     TextView back=control("‹");topBar.addView(back,lp(44,44));back.setOnClickListener(v->finish());
     LinearLayout titleBox=new LinearLayout(this);titleBox.setOrientation(1);titleBox.setPadding(dp(12),0,0,0);
     TextView title=txt(channelTitle,17,WHITE);title.setGravity(Gravity.CENTER_VERTICAL);title.setTypeface(null,Typeface.BOLD);
-    TextView sub=txt("KURDISH TV  •  LIVE STREAM",9,0xffc0cbd9);sub.setGravity(Gravity.CENTER_VERTICAL);
+    TextView sub=txt("AUTO SOURCE  •  v1a1 / VLC RELAY",9,0xffc0cbd9);sub.setGravity(Gravity.CENTER_VERTICAL);
     titleBox.addView(title);titleBox.addView(sub);topBar.addView(titleBox,new LinearLayout.LayoutParams(0,-2,1));
     liveBadge=txt("●  LIVE",11,ACCENT);liveBadge.setPadding(dp(12),dp(8),dp(12),dp(8));liveBadge.setBackground(bg(0xdd123a37,24));topBar.addView(liveBadge);
     overlay.addView(topBar,lp(-1,62));
@@ -81,7 +81,7 @@ public class PlayerActivity extends Activity {
     brightnessSeek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){public void onProgressChanged(SeekBar s,int p,boolean u){WindowManager.LayoutParams a=getWindow().getAttributes();a.screenBrightness=Math.max(.02f,p/100f);getWindow().setAttributes(a);}public void onStartTrackingTouch(SeekBar s){}public void onStopTrackingTouch(SeekBar s){}});
     bottomPanel=new LinearLayout(this);bottomPanel.setGravity(Gravity.CENTER_VERTICAL);bottomPanel.setPadding(dp(18),dp(10),dp(18),dp(14));bottomPanel.setBackgroundColor(0xdd091321);
     playButton=control("Ⅱ");bottomPanel.addView(playButton,lp(50,46));playButton.setOnClickListener(v->{if(player==null)return;if(player.isPlaying())player.pause();else player.play();});
-    TextView label=txt("پەخشی ڕاستەوخۆ",12,0xffc0cbd9);label.setGravity(Gravity.CENTER_VERTICAL);label.setPadding(dp(13),0,0,0);bottomPanel.addView(label,new LinearLayout.LayoutParams(0,-2,1));
+    TextView label=txt("v1a1  →  VLC Relay",12,0xffc0cbd9);label.setGravity(Gravity.CENTER_VERTICAL);label.setPadding(dp(13),0,0,0);bottomPanel.addView(label,new LinearLayout.LayoutParams(0,-2,1));
     muteButton=control("🔊");bottomPanel.addView(muteButton,lp(48,46));muteButton.setOnClickListener(v->{muted=!muted;if(player!=null)player.setVolume(muted?0f:(volumeSeek.getProgress()/100f));muteButton.setText(muted?"×":"🔊");});
     fitButton=control("▣");LinearLayout.LayoutParams fp=lp(48,46);fp.leftMargin=dp(8);bottomPanel.addView(fitButton,fp);fitButton.setOnClickListener(v->{fitMode=fitMode==AspectRatioFrameLayout.RESIZE_MODE_FIT?AspectRatioFrameLayout.RESIZE_MODE_ZOOM:fitMode==AspectRatioFrameLayout.RESIZE_MODE_ZOOM?AspectRatioFrameLayout.RESIZE_MODE_FILL:AspectRatioFrameLayout.RESIZE_MODE_FIT;playerView.setResizeMode(fitMode);fitButton.setText(fitMode==AspectRatioFrameLayout.RESIZE_MODE_FIT?"FIT":fitMode==AspectRatioFrameLayout.RESIZE_MODE_ZOOM?"ZOOM":"FILL");showControls();});
     TextView retry=control("↻");LinearLayout.LayoutParams rp=lp(48,46);rp.leftMargin=dp(8);bottomPanel.addView(retry,rp);retry.setOnClickListener(v->startStream());
@@ -95,7 +95,7 @@ public class PlayerActivity extends Activity {
   private void showControls(){if(controlsLocked)return;topBar.setVisibility(View.VISIBLE);bottomPanel.setVisibility(View.VISIBLE);extraPanel.setVisibility(View.VISIBLE);controlsVisible=true;handler.removeCallbacks(hideRunnable);hideRunnable=()->{if(!controlsLocked){topBar.setVisibility(View.GONE);bottomPanel.setVisibility(View.GONE);extraPanel.setVisibility(View.GONE);controlsVisible=false;}};handler.postDelayed(hideRunnable,6500);}
   private void startStream(){
     directAttempted=false;relayAttempted=false;
-    loading.setVisibility(View.VISIBLE);stateText.setText("پشکنینی لینکی ڕاستەوخۆ...");
+    loading.setVisibility(View.VISIBLE);stateText.setText("پشکنینی سەرچاوەی v1a1...");
     if(sourceApiUrl==null||sourceApiUrl.isEmpty()){playRelay("لینکی ڕاستەوخۆ بەردەست نییە");return;}
     new Thread(()->{
       HttpURLConnection conn=null;
@@ -124,7 +124,7 @@ public class PlayerActivity extends Activity {
   private void playDirect(String url){
     if(isFinishing())return;
     directAttempted=true;
-    stateText.setText("پەخشی ڕاستەوخۆ دەپشکنرێت...");
+    stateText.setText("پەخشی ڕاستەوخۆی v1a1 دەپشکنرێت...");
     playUrl(url);
   }
   private void playRelay(String reason){
@@ -144,12 +144,12 @@ public class PlayerActivity extends Activity {
     player.addListener(new Player.Listener(){
       @Override public void onPlaybackStateChanged(int s){
         if(s==Player.STATE_BUFFERING){loading.setVisibility(View.VISIBLE);stateText.setText("بارکردنی پەخش...");}
-        else if(s==Player.STATE_READY){loading.setVisibility(View.GONE);stateText.setText(relayAttempted?"● پەخش لە ڕێگەی Relay":"● پەخشی ڕاستەوخۆ");}
+        else if(s==Player.STATE_READY){loading.setVisibility(View.GONE);stateText.setText(relayAttempted?"● پەخش لە ڕێگەی VLC Relay":"● پەخشی ڕاستەوخۆی v1a1");}
         else if(s==Player.STATE_ENDED){loading.setVisibility(View.GONE);stateText.setText("پەخش کۆتایی هات");}
       }
       @Override public void onPlayerError(PlaybackException e){
         if(directAttempted&&!relayAttempted){playRelay("پەخشی ڕاستەوخۆ کار نەکرد؛ گۆڕین بۆ Relay");}
-        else{loading.setVisibility(View.GONE);stateText.setText("هەردوو شێوازی پەخش سەرکەوتوو نەبوون — دووبارە هەوڵ بدە");showControls();}
+        else{loading.setVisibility(View.GONE);stateText.setText("v1a1 و VLC Relay کار ناکەن؛ پێویستە ئەم کەناڵە بۆ v1+a1 ڕێکبخرێت");showControls();}
       }
       @Override public void onIsPlayingChanged(boolean playing){playButton.setText(playing?"Ⅱ":"▶");}
     });
