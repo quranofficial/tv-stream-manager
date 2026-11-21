@@ -30,6 +30,9 @@ public class PlayerActivity extends Activity {
   private ProgressBar loading;
   private LinearLayout topBar, bottomPanel, extraPanel, channelPanel, channelList;
   private FrameLayout drawerLayer;
+  private EditText drawerSearch;
+  private TextView drawerFavFilter;
+  private boolean drawerFavoritesOnly=false;
   private JSONArray channelItems=new JSONArray();
   private String runtimeBase="", runtimeKey="", currentChannelId="";
   private boolean drawerVisible=false;
@@ -116,18 +119,40 @@ public class PlayerActivity extends Activity {
     LinearLayout head=new LinearLayout(this);head.setGravity(Gravity.CENTER_VERTICAL);
     TextView heading=txt("لیستی کەناڵەکان",18,WHITE);heading.setTypeface(null,Typeface.BOLD);head.addView(heading,new LinearLayout.LayoutParams(0,-2,1));
     TextView close=control("×");head.addView(close,lp(42,42));close.setOnClickListener(v->toggleChannelDrawer());channelPanel.addView(head);
-    TextView hint=txt("کەناڵێک هەڵبژێرە بۆ گۆڕینی پەخش",11,MUTED);hint.setGravity(Gravity.CENTER_VERTICAL);hint.setPadding(0,dp(7),0,dp(12));channelPanel.addView(hint);
+    TextView hint=txt("گەڕان و هەڵبژاردنی کەناڵ",11,MUTED);hint.setGravity(Gravity.CENTER_VERTICAL);hint.setPadding(0,dp(7),0,dp(8));channelPanel.addView(hint);
+    drawerSearch=new EditText(this);drawerSearch.setSingleLine(true);drawerSearch.setTextColor(WHITE);drawerSearch.setHintTextColor(MUTED);drawerSearch.setHint("گەڕان بە ناو یان جۆری کەناڵ...");drawerSearch.setTextSize(13);drawerSearch.setPadding(dp(13),dp(9),dp(13),dp(9));drawerSearch.setBackground(stroke(0xff17263a,0xff30445d,13));channelPanel.addView(drawerSearch,lp(-1,46));
+    drawerFavFilter=txt("☆  تەنها دڵخوازەکان",12,ACCENT);drawerFavFilter.setGravity(Gravity.CENTER_VERTICAL);drawerFavFilter.setPadding(dp(4),dp(10),dp(4),dp(10));channelPanel.addView(drawerFavFilter);drawerFavFilter.setOnClickListener(v->{drawerFavoritesOnly=!drawerFavoritesOnly;drawerFavFilter.setText(drawerFavoritesOnly?"★  هەموو دڵخوازەکان":"☆  تەنها دڵخوازەکان");renderChannelDrawer();});
     ScrollView scroll=new ScrollView(this);channelList=new LinearLayout(this);channelList.setOrientation(1);scroll.addView(channelList);channelPanel.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));
+    drawerSearch.addTextChangedListener(new android.text.TextWatcher(){public void beforeTextChanged(CharSequence s,int st,int count,int after){}public void onTextChanged(CharSequence s,int st,int before,int count){renderChannelDrawer();}public void afterTextChanged(android.text.Editable e){}});
+    renderChannelDrawer();
+    root.addView(drawerLayer,new FrameLayout.LayoutParams(-1,-1));
+  }
+  private void renderChannelDrawer(){
+    if(channelList==null)return;
+    channelList.removeAllViews();
+    String query=drawerSearch==null?"":drawerSearch.getText().toString().trim().toLowerCase(java.util.Locale.ROOT);
+    android.content.SharedPreferences prefs=getSharedPreferences("kurdish_tv",0);
+    java.util.Set<String> favorites=prefs.getStringSet("favorites",new java.util.HashSet<>());
+    int shown=0;
     for(int i=0;i<channelItems.length();i++){
       JSONObject item=channelItems.optJSONObject(i);if(item==null)continue;
       String id=item.optString("id"),name=item.optString("name","TV"),genre=item.optString("genre","Live");
-      TextView row=txt((id.equals(currentChannelId)?"●  ":"   ")+name+"\n      "+genre,14,id.equals(currentChannelId)?ACCENT:WHITE);
-      row.setGravity(Gravity.CENTER_VERTICAL);row.setPadding(dp(12),dp(10),dp(8),dp(10));
+      if(drawerFavoritesOnly&&!favorites.contains(id))continue;
+      if(!name.toLowerCase(java.util.Locale.ROOT).contains(query)&&!genre.toLowerCase(java.util.Locale.ROOT).contains(query))continue;
+      shown++;
+      LinearLayout row=new LinearLayout(this);row.setGravity(Gravity.CENTER_VERTICAL);row.setPadding(dp(10),dp(5),dp(7),dp(5));
       row.setBackground(bg(id.equals(currentChannelId)?0xff174b4a:0xff17263a,14));
-      LinearLayout.LayoutParams rp=lp(-1,58);rp.bottomMargin=dp(7);channelList.addView(row,rp);
+      LinearLayout.LayoutParams rowParams=lp(-1,58);rowParams.bottomMargin=dp(7);channelList.addView(row,rowParams);
+      LinearLayout info=new LinearLayout(this);info.setOrientation(1);info.setGravity(Gravity.CENTER_VERTICAL);
+      TextView channelName=txt((id.equals(currentChannelId)?"●  ":"")+name,14,id.equals(currentChannelId)?ACCENT:WHITE);channelName.setGravity(Gravity.CENTER_VERTICAL);channelName.setTypeface(null,Typeface.BOLD);
+      TextView channelGenre=txt(genre+"  •  LIVE",10,MUTED);channelGenre.setGravity(Gravity.CENTER_VERTICAL);
+      info.addView(channelName);info.addView(channelGenre);row.addView(info,new LinearLayout.LayoutParams(0,-2,1));
+      TextView star=txt(favorites.contains(id)?"★":"☆",21,favorites.contains(id)?ACCENT:MUTED);row.addView(star,lp(40,44));
+      star.setOnClickListener(v->{java.util.Set<String> updated=new java.util.HashSet<>(getSharedPreferences("kurdish_tv",0).getStringSet("favorites",new java.util.HashSet<>()));if(!updated.add(id))updated.remove(id);getSharedPreferences("kurdish_tv",0).edit().putStringSet("favorites",updated).apply();renderChannelDrawer();});
+      info.setOnClickListener(v->selectChannel(id,name));
       row.setOnClickListener(v->selectChannel(id,name));
     }
-    root.addView(drawerLayer,new FrameLayout.LayoutParams(-1,-1));
+    if(shown==0){TextView empty=txt(drawerFavoritesOnly?"هێشتا کەناڵێکی دڵخوازت نییە":"هیچ کەناڵێک نەدۆزرایەوە",12,MUTED);channelList.addView(empty,lp(-1,54));}
   }
   private void toggleChannelDrawer(){
     if(drawerLayer==null)return;
