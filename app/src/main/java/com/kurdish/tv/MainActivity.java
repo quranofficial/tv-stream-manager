@@ -22,6 +22,7 @@ public class MainActivity extends Activity {
   EditText search;
   String genreFilter="هەمووی";
   boolean onlyFav=false;
+  boolean jumpToChannels=false;
   Set<String> fav=new HashSet<>();
 
   int dp(float n){return (int)(n*getResources().getDisplayMetrics().density+.5f);}
@@ -48,8 +49,8 @@ public class MainActivity extends Activity {
     LinearLayout nav=new LinearLayout(this);nav.setGravity(Gravity.CENTER);nav.setPadding(dp(10),dp(8),dp(10),dp(8));nav.setBackgroundColor(0xff0a1524);
     TextView navHome=navItem("⌂","سەرەکی",true);TextView navChannels=navItem("▦","کەناڵەکان",false);TextView navFav=navItem("★","دڵخوازەکان",false);
     nav.addView(navHome,new LinearLayout.LayoutParams(0,dp(54),1));nav.addView(navChannels,new LinearLayout.LayoutParams(0,dp(54),1));nav.addView(navFav,new LinearLayout.LayoutParams(0,dp(54),1));root.addView(nav,new LinearLayout.LayoutParams(-1,-2));
-    navHome.setOnClickListener(v->{onlyFav=false;genreFilter="هەمووی";if(search!=null)search.setText("");scroll.smoothScrollTo(0,0);});
-    navChannels.setOnClickListener(v->{onlyFav=false;showHome();root.post(()->{});});
+    navHome.setOnClickListener(v->{onlyFav=false;genreFilter="هەمووی";showHome();});
+    navChannels.setOnClickListener(v->{onlyFav=false;jumpToChannels=true;showHome();});
     navFav.setOnClickListener(v->{onlyFav=true;showHome();});
     LinearLayout hero=new LinearLayout(this);hero.setOrientation(1);hero.setPadding(dp(20),dp(22),dp(20),dp(22));hero.setBackground(gradient(0xff087f79,0xff183451,24));
     hero.addView(pill("●  پەخشی ڕاستەوخۆ"));
@@ -70,6 +71,7 @@ public class MainActivity extends Activity {
     Runnable filter=()->renderChannels();search.addTextChangedListener(new android.text.TextWatcher(){public void beforeTextChanged(CharSequence s,int st,int c,int a){}public void onTextChanged(CharSequence s,int st,int before,int count){renderChannels();}public void afterTextChanged(android.text.Editable e){}});
     renderChannels();
     TextView footer=label("Kurdish TV  •  Live Player",11,MUTED);footer.setGravity(Gravity.CENTER);footer.setPadding(0,dp(22),0,0);page.addView(footer);
+    if(jumpToChannels){scroll.post(()->scroll.smoothScrollTo(0,list.getTop()));jumpToChannels=false;}
   }
   void renderChannels(){if(list==null)return;list.removeAllViews();String q=search==null?"":search.getText().toString().toLowerCase(Locale.ROOT);int shown=0;
     for(int i=0;i<channels.length();i++){JSONObject c=channels.optJSONObject(i);if(c==null)continue;String id=c.optString("id"),name=c.optString("name"),genre=c.optString("genre","");if(onlyFav&&!fav.contains(id))continue;if(!genreFilter.equals("هەمووی")&&!genre.equalsIgnoreCase(genreFilter))continue;if(!name.toLowerCase(Locale.ROOT).contains(q)&&!genre.toLowerCase(Locale.ROOT).contains(q))continue;shown++;
