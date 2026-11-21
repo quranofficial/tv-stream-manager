@@ -47,8 +47,8 @@ public class MainActivity extends Activity {
     TextView welcome=label("گەشتێکی نوێ بۆ\nجیهانی تەلەڤیزیۆن",25,WHITE);welcome.setTypeface(null,Typeface.BOLD);welcome.setPadding(0,dp(12),0,dp(5));hero.addView(welcome);
     hero.addView(label(channels.length()+" کەناڵ بەردەستن • بەبێ Login",13,0xffc9e9e8));
     LinearLayout stats=new LinearLayout(this);stats.setPadding(0,dp(14),0,0);stats.setGravity(Gravity.CENTER_VERTICAL);
-    TextView stat1=label("◉  "+channels.length()+" کەناڵ",12,WHITE);stat1.setPadding(dp(12),dp(9),dp(12),dp(9));stat1.setBackground(shape(0x334ffffff,22));stats.addView(stat1);
-    TextView stat2=label("  ★ دڵخوازەکانت",12,WHITE);stat2.setPadding(dp(12),dp(9),dp(12),dp(9));stat2.setBackground(shape(0x334ffffff,22));LinearLayout.LayoutParams s2=new LinearLayout.LayoutParams(-2,-2);s2.leftMargin=dp(8);stats.addView(stat2,s2);hero.addView(stats);page.addView(hero);
+    TextView stat1=label("◉  "+channels.length()+" کەناڵ",12,WHITE);stat1.setPadding(dp(12),dp(9),dp(12),dp(9));stat1.setBackground(shape(0x334fffff,22));stats.addView(stat1);
+    TextView stat2=label("  ★ دڵخوازەکانت",12,WHITE);stat2.setPadding(dp(12),dp(9),dp(12),dp(9));stat2.setBackground(shape(0x334fffff,22));LinearLayout.LayoutParams s2=new LinearLayout.LayoutParams(-2,-2);s2.leftMargin=dp(8);stats.addView(stat2,s2);hero.addView(stats);page.addView(hero);
     LinearLayout searchRow=new LinearLayout(this);searchRow.setGravity(Gravity.CENTER_VERTICAL);searchRow.setPadding(0,dp(16),0,dp(12));
     search=new EditText(this);search.setSingleLine(true);search.setTextColor(WHITE);search.setTextDirection(View.TEXT_DIRECTION_RTL);search.setHintTextColor(MUTED);search.setHint("گەڕان بە ناوی کەناڵ...");search.setTextSize(14);search.setPadding(dp(14),dp(10),dp(14),dp(10));search.setBackground(strokeHome(CARD,0xff263b55,15));searchRow.addView(search,new LinearLayout.LayoutParams(0,dp(48),1));
     TextView go=label("⌕",27,ACCENT);go.setGravity(Gravity.CENTER);searchRow.addView(go,new LinearLayout.LayoutParams(dp(48),dp(48)));page.addView(searchRow);
