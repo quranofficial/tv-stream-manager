@@ -264,6 +264,26 @@ async def stream_handler(request):
                 await proc.wait()
 
 
+async def source_info_handler(request):
+    if ACCESS_KEY and request.query.get("key") != ACCESS_KEY:
+        raise web.HTTPForbidden(text="Invalid stream key")
+    cid = request.match_info["channel_id"]
+    channel = CHANNEL_BY_ID.get(cid)
+    if channel is None:
+        raise web.HTTPNotFound(text="Unknown channel")
+    source = await resolve_source(channel)
+    if not source:
+        raise web.HTTPBadGateway(text="No tested working source was found")
+    relay_url = f"{PUBLIC_BASE}/stream/{cid}.ts?key={ACCESS_KEY}"
+    payload = {"channel_id": cid, "name": channel["name"], "mode": source["mode"], "relay_url": relay_url}
+    if source["mode"] == "muxed":
+        payload["direct_url"] = source["url"]
+    else:
+        payload["video_url"] = source["video"]
+        payload["audio_url"] = source["audio"]
+    return web.json_response(payload, headers={"Cache-Control": "no-store"})
+
+
 async def health_handler(_request):
     return web.json_response({"status": "ok", "channels": len(CHANNELS)})
 
@@ -271,6 +291,7 @@ async def health_handler(_request):
 async def post_init(application: Application):
     server = web.Application()
     server.router.add_get("/stream/{channel_id}.ts", stream_handler)
+    server.router.add_get("/source/{channel_id}", source_info_handler)
     server.router.add_get("/health", health_handler)
     runner = web.AppRunner(server)
     await runner.setup()
