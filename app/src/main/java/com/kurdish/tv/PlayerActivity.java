@@ -172,7 +172,7 @@ public class PlayerActivity extends Activity {
         if(directAttempted&&!relayAttempted){playRelay("پەخشی ڕاستەوخۆ کار نەکرد؛ گۆڕین بۆ Relay");}
         else{
           loading.setVisibility(View.GONE);
-          String detail=e.errorCodeName;
+          String detail=PlaybackException.getErrorCodeName(e.errorCode);
           Throwable cause=e.getCause();
           if(cause!=null&&cause.getMessage()!=null)detail+=": "+cause.getMessage();
           stateText.setText("پلەیەری ئەپ نەتوانی پەخش بکات. هەڵە: "+detail);
