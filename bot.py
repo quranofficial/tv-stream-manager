@@ -71,9 +71,9 @@ async def stream_handler(request):
     cmd = [
         "ffmpeg", "-hide_banner", "-loglevel", "error",
         "-rw_timeout", "20000000",
-        "-allowed_extensions", "ALL", "-i", video_url,
+        "-allowed_extensions", "ALL", "-extension_picky", "0", "-i", video_url,
         "-rw_timeout", "20000000",
-        "-allowed_extensions", "ALL", "-i", audio_url,
+        "-allowed_extensions", "ALL", "-extension_picky", "0", "-i", audio_url,
         "-map", "0:v:0", "-map", "1:a:0",
         "-c", "copy", "-mpegts_flags", "+resend_headers",
         "-f", "mpegts", "pipe:1",
