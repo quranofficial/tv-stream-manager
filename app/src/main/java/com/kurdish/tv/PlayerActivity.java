@@ -8,6 +8,9 @@ import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.view.*;
 import android.widget.*;
+import org.json.JSONObject;
+import java.io.*;
+import java.net.*;
 import androidx.media3.common.MediaItem;
 import androidx.media3.common.PlaybackException;
 import androidx.media3.common.Player;
@@ -24,7 +27,8 @@ public class PlayerActivity extends Activity {
   private SeekBar volumeSeek, brightnessSeek;
   private Handler handler=new Handler(Looper.getMainLooper());
   private Runnable hideRunnable;
-  private String streamUrl, channelTitle;
+  private String streamUrl, channelTitle, sourceApiUrl, relayUrl;
+  private boolean directAttempted=false, relayAttempted=false;
   private boolean muted=false, controlsLocked=false, controlsVisible=true;
   private int fitMode=AspectRatioFrameLayout.RESIZE_MODE_FIT;
   private float oldBrightness=-1f;
@@ -40,6 +44,9 @@ public class PlayerActivity extends Activity {
     super.onCreate(b);
     channelTitle=getIntent().getStringExtra("title");streamUrl=getIntent().getStringExtra("url");
     if(channelTitle==null)channelTitle="Live TV";if(streamUrl==null)streamUrl="";
+    sourceApiUrl=getIntent().getStringExtra("source_api_url");
+    relayUrl=getIntent().getStringExtra("relay_url");
+    if(relayUrl==null||relayUrl.isEmpty())relayUrl=streamUrl;
     getWindow().setStatusBarColor(Color.BLACK);getWindow().setNavigationBarColor(Color.BLACK);
     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
@@ -87,14 +94,66 @@ public class PlayerActivity extends Activity {
   private void toggleControls(){if(controlsVisible){topBar.setVisibility(View.GONE);bottomPanel.setVisibility(View.GONE);extraPanel.setVisibility(View.GONE);controlsVisible=false;handler.removeCallbacks(hideRunnable);}else showControls();}
   private void showControls(){if(controlsLocked)return;topBar.setVisibility(View.VISIBLE);bottomPanel.setVisibility(View.VISIBLE);extraPanel.setVisibility(View.VISIBLE);controlsVisible=true;handler.removeCallbacks(hideRunnable);hideRunnable=()->{if(!controlsLocked){topBar.setVisibility(View.GONE);bottomPanel.setVisibility(View.GONE);extraPanel.setVisibility(View.GONE);controlsVisible=false;}};handler.postDelayed(hideRunnable,6500);}
   private void startStream(){
-    if(streamUrl.isEmpty()){stateText.setText("بەستەری پەخش بەردەست نییە");return;}
-    if(player!=null){player.release();player=null;}loading.setVisibility(View.VISIBLE);stateText.setText("پەیوەندی بە کەناڵ...");playButton.setText("Ⅱ");
-    player=new ExoPlayer.Builder(this).build();playerView.setPlayer(player);player.setMediaItem(MediaItem.fromUri(streamUrl));
+    directAttempted=false;relayAttempted=false;
+    loading.setVisibility(View.VISIBLE);stateText.setText("پشکنینی لینکی ڕاستەوخۆ...");
+    if(sourceApiUrl==null||sourceApiUrl.isEmpty()){playRelay("لینکی ڕاستەوخۆ بەردەست نییە");return;}
+    new Thread(()->{
+      HttpURLConnection conn=null;
+      try{
+        conn=(HttpURLConnection)new URL(sourceApiUrl).openConnection();
+        conn.setConnectTimeout(15000);conn.setReadTimeout(20000);
+        conn.setRequestProperty("Cache-Control","no-cache");
+        if(conn.getResponseCode()!=200)throw new Exception("Source lookup failed: "+conn.getResponseCode());
+        ByteArrayOutputStream out=new ByteArrayOutputStream();InputStream in=conn.getInputStream();
+        byte[] buf=new byte[4096];int n;while((n=in.read(buf))>0)out.write(buf,0,n);
+        JSONObject data=new JSONObject(out.toString("UTF-8"));
+        String mode=data.optString("mode","");
+        String direct=data.optString("direct_url","");
+        String relay=data.optString("relay_url",relayUrl);
+        if(relay!=null&&!relay.isEmpty())relayUrl=relay;
+        if("muxed".equals(mode)&&!direct.isEmpty()){
+          runOnUiThread(()->playDirect(direct));
+        }else{
+          runOnUiThread(()->playRelay("سەرچاوە جیاوازی دەنگ و ڤیدیۆیە؛ Relay دەست پێدەکات"));
+        }
+      }catch(Exception e){
+        runOnUiThread(()->playRelay("سەرچاوەکە نەدۆزرایەوە؛ Relay تاقی دەکرێتەوە"));
+      }finally{if(conn!=null)conn.disconnect();}
+    }).start();
+  }
+  private void playDirect(String url){
+    if(isFinishing())return;
+    directAttempted=true;
+    stateText.setText("پەخشی ڕاستەوخۆ دەپشکنرێت...");
+    playUrl(url);
+  }
+  private void playRelay(String reason){
+    if(isFinishing()||relayAttempted)return;
+    relayAttempted=true;
+    stateText.setText(reason+" — VLC Relay");
+    if(relayUrl==null||relayUrl.isEmpty()){
+      loading.setVisibility(View.GONE);stateText.setText("هیچ لینکی پەخش بەردەست نییە");return;
+    }
+    playUrl(relayUrl);
+  }
+  private void playUrl(String url){
+    if(player!=null){player.release();player=null;}
+    loading.setVisibility(View.VISIBLE);playButton.setText("Ⅱ");
+    player=new ExoPlayer.Builder(this).build();playerView.setPlayer(player);
+    player.setMediaItem(MediaItem.fromUri(url));
     player.addListener(new Player.Listener(){
-      @Override public void onPlaybackStateChanged(int s){if(s==Player.STATE_BUFFERING){loading.setVisibility(View.VISIBLE);stateText.setText("بارکردنی پەخش...");}else if(s==Player.STATE_READY){loading.setVisibility(View.GONE);stateText.setText("● پەخش دەکرێت");}else if(s==Player.STATE_ENDED){loading.setVisibility(View.GONE);stateText.setText("پەخش کۆتایی هات");}}
-      @Override public void onPlayerError(PlaybackException e){loading.setVisibility(View.GONE);stateText.setText("پەخش نەکرا — دووبارە هەوڵ بدە");showControls();}
+      @Override public void onPlaybackStateChanged(int s){
+        if(s==Player.STATE_BUFFERING){loading.setVisibility(View.VISIBLE);stateText.setText("بارکردنی پەخش...");}
+        else if(s==Player.STATE_READY){loading.setVisibility(View.GONE);stateText.setText(relayAttempted?"● پەخش لە ڕێگەی Relay":"● پەخشی ڕاستەوخۆ");}
+        else if(s==Player.STATE_ENDED){loading.setVisibility(View.GONE);stateText.setText("پەخش کۆتایی هات");}
+      }
+      @Override public void onPlayerError(PlaybackException e){
+        if(directAttempted&&!relayAttempted){playRelay("پەخشی ڕاستەوخۆ کار نەکرد؛ گۆڕین بۆ Relay");}
+        else{loading.setVisibility(View.GONE);stateText.setText("هەردوو شێوازی پەخش سەرکەوتوو نەبوون — دووبارە هەوڵ بدە");showControls();}
+      }
       @Override public void onIsPlayingChanged(boolean playing){playButton.setText(playing?"Ⅱ":"▶");}
-    });player.prepare();player.play();
+    });
+    player.prepare();player.play();
   }
   @Override protected void onStop(){super.onStop();handler.removeCallbacksAndMessages(null);if(player!=null){player.release();player=null;}}
   @Override public void onWindowFocusChanged(boolean hasFocus){super.onWindowFocusChanged(hasFocus);if(hasFocus)hideSystemBars();}
