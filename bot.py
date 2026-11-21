@@ -95,38 +95,32 @@ async def _ffmpeg_smoke_test(video_url, audio_url, cid, name, slug, muxed=False)
 
 def source_candidates(channel):
     cid = str(channel["id"])
-    # Verified naming patterns supplied by the project owner; test before use.
+    # Try muxed v1a1 first for every channel, then separate v1 + a1.
     known = {
-        "197": [("ava_4k", "separate")],
-        "198": [("rudaw_4k", "separate")],
-        "195": [("k24_4k", "muxed")],
-        "194": [("kurdsat_4k", "muxed")],
-        "183": [("channel_8_4k", "muxed")],
-        "192": [("nrt", "muxed")],
-        "191": [("nrt_2_hd", "muxed")],
-        "190": [("nrt_3_kids_hd", "separate")],
-        "182": [("waar_4k", "muxed")],
-        "185": [("zagros_4k", "muxed")],
-        "180": [("kurdmax_sound2", "muxed"), ("kurdmax", "muxed")],
-        "179": [("kurdmax", "muxed"), ("kurdmax_sound2", "muxed")],
-        "178": [("kurdmax_show_sound2", "muxed"), ("kurdmax_show", "muxed")],
-        "177": [("kurdmax_show", "muxed"), ("kurdmax_show_sound2", "muxed")],
+        "197": ["ava_4k"], "198": ["rudaw_4k"],
+        "195": ["k24_4k"], "194": ["kurdsat_4k"],
+        "183": ["channel_8_4k"], "192": ["nrt"],
+        "191": ["nrt_2_hd"], "190": ["nrt_3_kids_hd"],
+        "182": ["waar_4k"], "185": ["zagros_4k"],
+        "180": ["kurdmax_sound2", "kurdmax"],
+        "179": ["kurdmax", "kurdmax_sound2"],
+        "178": ["kurdmax_show_sound2", "kurdmax_show"],
+        "177": ["kurdmax_show", "kurdmax_show_sound2"],
     }
-    entries = list(known.get(cid, []))
     name = channel["name"].strip()
     lower_words = re.sub(r"[^a-z0-9]+", " ", name.lower()).strip()
     preserve_words = re.sub(r"[^A-Za-z0-9]+", " ", name).strip()
-    generated = list(dict.fromkeys(x for x in (
+    generated = [
         lower_words.replace(" ", "_"), lower_words.replace(" ", ""),
         lower_words.replace(" ", "-"), preserve_words.replace(" ", "_"),
         preserve_words.replace(" ", ""), preserve_words.replace(" ", "-"),
-    ) if x))
-    entries += [(slug, "separate") for slug in generated]
-    seen = set()
-    for slug, mode in entries:
-        if (slug, mode) not in seen:
-            seen.add((slug, mode))
-            yield slug, mode
+    ]
+    slugs = list(dict.fromkeys(
+        slug for slug in list(known.get(cid, [])) + generated if slug
+    ))
+    for slug in slugs:
+        yield slug, "muxed"
+        yield slug, "separate"
 
 
 async def resolve_source(channel):
