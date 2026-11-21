@@ -13,6 +13,9 @@ on:
       - "stream_modes.json"
   schedule:
     - cron: "*/15 * * * *"
+  workflow_run:
+    workflows: ["Telegram TV Bot"]
+    types: [completed]
   workflow_dispatch:
 
 concurrency:
@@ -111,19 +114,8 @@ jobs:
               )
               raise SystemExit(0)
 
-          # Avoid repeated dispatches if the previous run has only just ended.
           if runs:
               latest = runs[0]
-              finished = latest.get("updated_at") or latest.get("created_at")
-              if finished:
-                  ended = datetime.datetime.fromisoformat(finished.replace("Z", "+00:00"))
-                  age = (datetime.datetime.now(datetime.timezone.utc) - ended).total_seconds()
-                  if age < 600:
-                      print(
-                          f"Last bot run ended {int(age)} seconds ago; "
-                          "waiting for the next watchdog interval."
-                      )
-                      raise SystemExit(0)
               print(
                   "No active bot run found. Last conclusion:",
                   latest.get("conclusion") or latest.get("status"),
