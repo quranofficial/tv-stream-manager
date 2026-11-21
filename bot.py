@@ -190,6 +190,31 @@ def channel_page(page=0, query=""):
     return InlineKeyboardMarkup(rows), len(items)
 
 
+async def _probe_video_codec(video_url):
+    """Return the input video codec; None means detection was unavailable."""
+    cmd = [
+        "ffprobe", "-v", "error", "-rw_timeout", "20000000",
+        "-select_streams", "v:0", "-show_entries", "stream=codec_name",
+        "-of", "default=noprint_wrappers=1:nokey=1", video_url,
+    ]
+    try:
+        proc = await asyncio.create_subprocess_exec(
+            *cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
+        )
+        stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=20)
+        if proc.returncode == 0:
+            codec = stdout.decode("utf-8", errors="replace").strip().lower()
+            return codec or None
+        log.warning("Could not detect video codec: %s",
+                    stderr.decode("utf-8", errors="replace").strip()[-500:])
+    except (asyncio.TimeoutError, FileNotFoundError, OSError) as exc:
+        log.warning("Video codec probe failed: %s", exc)
+        if 'proc' in locals() and proc.returncode is None:
+            proc.kill()
+            await proc.wait()
+    return None
+
+
 async def stream_handler(request):
     if ACCESS_KEY and request.query.get("key") != ACCESS_KEY:
         raise web.HTTPForbidden(text="Invalid stream key")
@@ -203,24 +228,42 @@ async def stream_handler(request):
         raise web.HTTPBadGateway(
             text="No tested working source was found for this channel. Check Actions logs."
         )
-    if source["mode"] == "muxed":
-        cmd = [
-            "ffmpeg", "-hide_banner", "-loglevel", "error",
-            "-rw_timeout", "20000000", "-allowed_extensions", "ALL",
-            "-extension_picky", "0", "-i", source["url"],
-            "-map", "0:v:0", "-map", "0:a:0", "-c", "copy",
-            "-mpegts_flags", "+resend_headers", "-f", "mpegts", "pipe:1",
-        ]
-    else:
-        cmd = [
-            "ffmpeg", "-hide_banner", "-loglevel", "error",
-            "-rw_timeout", "20000000", "-allowed_extensions", "ALL",
-            "-extension_picky", "0", "-i", source["video"],
+    video_input = source["url"] if source["mode"] == "muxed" else source["video"]
+    video_codec = await _probe_video_codec(video_input)
+    transcode_video = video_codec in {"hevc", "h265"}
+    log.info(
+        "Relay video codec: channel=%s codec=%s video_transcode=%s",
+        cid, video_codec or "unknown", transcode_video,
+    )
+
+    cmd = [
+        "ffmpeg", "-hide_banner", "-loglevel", "error",
+        "-rw_timeout", "20000000", "-allowed_extensions", "ALL",
+        "-extension_picky", "0", "-i", video_input,
+    ]
+    if source["mode"] == "separate":
+        cmd += [
             "-rw_timeout", "20000000", "-allowed_extensions", "ALL",
             "-extension_picky", "0", "-i", source["audio"],
-            "-map", "0:v:0", "-map", "1:a:0", "-c", "copy",
-            "-mpegts_flags", "+resend_headers", "-f", "mpegts", "pipe:1",
+            "-map", "0:v:0", "-map", "1:a:0",
         ]
+    else:
+        cmd += ["-map", "0:v:0", "-map", "0:a:0"]
+
+    if transcode_video:
+        # Only HEVC/H.265 is converted; all other channels remain stream-copy.
+        cmd += [
+            "-c:v", "libx264", "-preset", "ultrafast",
+            "-tune", "zerolatency", "-crf", "23",
+            "-pix_fmt", "yuv420p",
+        ]
+    else:
+        cmd += ["-c:v", "copy"]
+    cmd += [
+        "-c:a", "copy",
+        "-mpegts_flags", "+resend_headers",
+        "-f", "mpegts", "pipe:1",
+    ]
     log.info("Starting combined relay for channel %s (%s)", cid, channel["name"])
     try:
         proc = await asyncio.create_subprocess_exec(
