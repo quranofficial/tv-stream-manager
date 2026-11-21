@@ -28,6 +28,31 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
+      - name: Checkout source for push-time validation
+        if: github.event_name == 'push'
+        uses: actions/checkout@v4
+
+      - name: Validate Python and JSON configuration
+        if: github.event_name == 'push'
+        run: |
+          python -m py_compile bot.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          for name in ("channels.json", "stream_keys.json", "stream_modes.json"):
+              path = Path(name)
+              if path.exists():
+                  json.loads(path.read_text(encoding="utf-8"))
+                  print(f"Valid JSON: {name}")
+          print("Python syntax and JSON configuration checks passed.")
+          PY
+
+      - name: Validate workflow YAML syntax
+        if: github.event_name == 'push'
+        run: |
+          ruby -e 'require "yaml"; ARGV.each { |f| YAML.load_file(f); puts "Valid YAML: #{f}" }' \
+            .github/workflows/bot.yml .github/workflows/bot-watchdog.yml
+
       - name: Check bot run and restart if it stopped
         env:
           GH_TOKEN: ${{ github.token }}
