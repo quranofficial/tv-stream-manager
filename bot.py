@@ -79,7 +79,7 @@ async def stream_handler(request):
     log.info("Starting combined relay for channel %s (%s)", cid, channel["name"])
     try:
         proc = await asyncio.create_subprocess_exec(
-            *cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.DEVNULL
+            *cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
         )
     except FileNotFoundError:
         raise web.HTTPServiceUnavailable(text="FFmpeg is not installed")
@@ -87,9 +87,11 @@ async def stream_handler(request):
     try:
         first = await asyncio.wait_for(proc.stdout.read(188 * 64), timeout=45)
         if not first:
-            await proc.wait()
+            _, err = await asyncio.wait_for(proc.communicate(), timeout=10)
+            detail = err.decode("utf-8", errors="replace").strip()[-1800:]
+            log.error("FFmpeg failed for channel %s (%s): %s", cid, channel["name"], detail or "no stderr output")
             raise web.HTTPBadGateway(
-                text="Could not read both tracks. The channel key may be incorrect or the source unavailable."
+                text="FFmpeg could not produce the combined stream. Check GitHub Actions logs for the FFmpeg error."
             )
         response = web.StreamResponse(
             status=200,
