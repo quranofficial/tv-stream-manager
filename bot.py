@@ -26,6 +26,10 @@ OVERRIDES = (
     json.loads(Path("stream_keys.json").read_text(encoding="utf-8"))
     if Path("stream_keys.json").exists() else {}
 )
+STREAM_MODES = (
+    json.loads(Path("stream_modes.json").read_text(encoding="utf-8"))
+    if Path("stream_modes.json").exists() else {}
+)
 
 
 def slug_for(channel):
@@ -108,8 +112,6 @@ def source_candidates(channel):
         "178": ["kurdmax_show_sound2", "kurdmax_show"],
         "177": ["kurdmax_show", "kurdmax_show_sound2"],
     }
-    # Ava Sport was previously verified with separate video/audio playlists.
-    separate_ids = {"196"}
     name = channel["name"].strip()
     lower_words = re.sub(r"[^a-z0-9]+", " ", name.lower()).strip()
     preserve_words = re.sub(r"[^A-Za-z0-9]+", " ", name).strip()
@@ -122,7 +124,7 @@ def source_candidates(channel):
     slugs = list(dict.fromkeys(
         slug for slug in ([override] if override else []) + known.get(cid, []) + generated if slug
     ))
-    mode = "separate" if cid in separate_ids else "muxed"
+    mode = "separate" if STREAM_MODES.get(cid) == "separate" else "muxed"
     for slug in slugs:
         yield slug, mode
 
