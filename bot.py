@@ -143,7 +143,6 @@ async def resolve_source(channel):
                 video = f"{BASE.rstrip('/')}/{slug}/tracks-v1/index.fmp4.m3u8"
                 audio_options = [
                     f"{BASE.rstrip('/')}/{slug}/tracks-a1/index.fmp4.m3u8",
-                    f"{BASE.rstrip('/')}/{slug}/tracks-v1a1/mono.ts.m3u8",
                 ]
                 vok, vs = await _manifest_ok(session, video)
                 for audio in audio_options:
@@ -329,13 +328,23 @@ async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "تونێڵی گشتی ئامادە نییە. تکایە GitHub Actions log بپشکنە و workflow دووبارە Run بکە."
             )
             return
-        link = f"{PUBLIC_BASE}/stream/{cid}.ts?key={ACCESS_KEY}"
         await query.message.reply_text(
-            f"📺 {channel['name']}\n\n"
-            f"🔊🎥 لینکی یەکگرتوو بۆ VLC:\n{link}\n\n"
-            "VLC → Open Network Stream → لینکەکە دابنێ.\n"
-            "⚠️ ئەم لینکە تەنها تا کاتی چالاکبوونی GitHub Actions کار دەکات. "
-            "سەرچاوەی دەنگ و ڤیدیۆی کەناڵەکە لە کاتی داواکاری بە شێوەی ئۆتۆماتیکی دەپشکنرێت.",
+            f"⏳ سەرچاوەی {channel['name']} دەپشکنرێت؛ سەرەتا v1a1، پاشان v1+a1...",
+            disable_web_page_preview=True,
+        )
+        source = await resolve_source(channel)
+        if not source:
+            await query.message.reply_text("❌ هیچ سەرچاوەیەکی کارا نەدۆزرایەوە.")
+            return
+        link = f"{PUBLIC_BASE}/stream/{cid}.ts?key={ACCESS_KEY}"
+        if source["mode"] == "muxed":
+            source_text = f"🔗 لینکی ڕاستەوخۆ (v1a1):\\n{source['url']}"
+        else:
+            source_text = ("🔗 ڤیدیۆ (v1):\\n" + source["video"] +
+                           "\\n\\n🔊 دەنگ (a1):\\n" + source["audio"])
+        await query.message.reply_text(
+            f"✅ سەرچاوەی کارا: {channel['name']}\\n🧪 شێواز: {source['mode']}\\n\\n"
+            f"{source_text}\\n\\n🎬 لینکی یەکگرتوو بۆ VLC:\\n{link}",
             disable_web_page_preview=True,
         )
 
