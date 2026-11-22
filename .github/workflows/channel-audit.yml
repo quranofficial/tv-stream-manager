@@ -45,8 +45,8 @@ jobs:
       - name: Send only failed channel names to Telegram
         if: always() && hashFiles('channel-test-report.json') != ''
         env:
-          BOT_TOKEN: \${{ secrets.BOT_TOKEN }}
-          AUDIT_CHAT_ID: \${{ vars.AUDIT_CHAT_ID }}
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          AUDIT_CHAT_ID: ${{ vars.AUDIT_CHAT_ID }}
         run: |
           python - <<'PY'
           import json, os, urllib.request, urllib.parse
@@ -73,7 +73,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: channel-source-audit-\${{ github.run_id }}
+          name: channel-source-audit-${{ github.run_id }}
           path: |
             channel-test-report.csv
             channel-test-report.json
