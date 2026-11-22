@@ -168,7 +168,61 @@ EXPLICIT_SOURCES = {
             "http://edge01.cdn.omxx.net/live/ku/ku/unit/gk_plus/tracks-a1/index.fmp4.m3u8",
             "http://edge01.cdn.omxx.net/live/ku/ku/unit/gk_plus/tracks-a1/mono.ts.m3u8"
         ]
-    }
+    },
+    "2634": {"mode": "muxed", "url": "http://edge01.cdn.omxx.net/live/ar/qa/bein/bein_sport_hd/tracks-v1a1/mono.ts.m3u8"},
+    "2635": {"mode": "muxed", "url": "http://edge01.cdn.omxx.net/live/ar/qa/bein/bein_sport_1_hd/tracks-v1a1/mono.ts.m3u8"},
+    "2636": {"mode": "muxed", "url": "http://edge01.cdn.omxx.net/live/ar/qa/bein/bein_sport_2_hd/tracks-v1a1/mono.ts.m3u8"},
+    "2637": {"mode": "muxed", "url": "http://edge01.cdn.omxx.net/live/ar/qa/bein/bein_sport_3_hd/tracks-v1a1/mono.ts.m3u8"},
+    "2638": {"mode": "muxed", "url": "http://edge01.cdn.omxx.net/live/ar/qa/bein/bein_sport_4_hd/tracks-v1a1/mono.ts.m3u8"},
+    "2639": {"mode": "muxed", "url": "http://edge01.cdn.omxx.net/live/ar/qa/bein/bein_sport_5_hd/tracks-v1a1/mono.ts.m3u8"},
+    "2640": {"mode": "muxed", "url": "http://edge01.cdn.omxx.net/live/ar/qa/bein/bein_sport_6_hd/tracks-v1a1/mono.ts.m3u8"},
+    "2641": {"mode": "muxed", "url": "http://edge01.cdn.omxx.net/live/ar/qa/bein/bein_sport_7_hd/tracks-v1a1/mono.ts.m3u8"},
+    "2642": {"mode": "muxed", "url": "http://edge01.cdn.omxx.net/live/ar/qa/bein/bein_sport_8_hd/tracks-v1a1/mono.ts.m3u8"},
+    "2643": {"mode": "muxed", "url": "http://edge01.cdn.omxx.net/live/ar/qa/bein/bein_sport_9_hd/tracks-v1a1/mono.ts.m3u8"},
+    "2644": {"mode": "muxed", "url": "http://edge01.cdn.omxx.net/live/ar/qa/bein/bein_sport_xtra_1_hd/tracks-v1a1/mono.ts.m3u8"},
+    "2645": {"mode": "muxed", "url": "http://edge01.cdn.omxx.net/live/ar/qa/bein/bein_sport_xtra_2_hd/tracks-v1a1/mono.ts.m3u8"},
+    "2646": {"mode": "muxed", "url": "http://edge01.cdn.omxx.net/live/ar/qa/bein/bein_sport_xtra_3_hd/tracks-v1a1/mono.ts.m3u8"},
+    "2647": {"mode": "muxed", "url": "http://edge01.cdn.omxx.net/live/ar/qa/bein/bein_sport_xtra_4_hd/tracks-v1a1/mono.ts.m3u8"},
+    "2648": {"mode": "muxed", "url": "http://edge01.cdn.omxx.net/live/ar/qa/bein/bein_sport_xtra_5_hd/tracks-v1a1/mono.ts.m3u8"},
+    "2649": {"mode": "muxed", "url": "http://edge01.cdn.omxx.net/live/ar/qa/bein/bein_sport_xtra_6_hd/tracks-v1a1/mono.ts.m3u8"},
+    "2650": {"mode": "muxed", "url": "http://edge01.cdn.omxx.net/live/ar/qa/bein/bein_sport_xtra_7_hd/tracks-v1a1/mono.ts.m3u8"},
+    "2651": {"mode": "muxed", "url": "http://edge01.cdn.omxx.net/live/ar/qa/bein/bein_sport_xtra_8_hd/tracks-v1a1/mono.ts.m3u8"},
+    "2652": {"mode": "muxed", "url": "http://edge01.cdn.omxx.net/live/ar/qa/bein/bein_sport_xtra_9_hd/tracks-v1a1/mono.ts.m3u8"},
+    "2675": {
+        "mode": "separate",
+        "video": "http://edge01.cdn.omxx.net/live/tr/tr/unit/beIN_Sports_1/tracks-v1/index.fmp4.m3u8",
+        "audio": "http://edge01.cdn.omxx.net/live/tr/tr/unit/beIN_Sports_1/tracks-a1/index.fmp4.m3u8",
+        "audio_options": ["http://edge01.cdn.omxx.net/live/tr/tr/unit/beIN_Sports_1/tracks-a1/index.fmp4.m3u8"]
+    },
+    "2676": {
+        "mode": "separate",
+        "video": "http://edge01.cdn.omxx.net/live/tr/tr/unit/beIN_Sports_2/tracks-v1/index.fmp4.m3u8",
+        "audio": "http://edge01.cdn.omxx.net/live/tr/tr/unit/beIN_Sports_2/tracks-a1/index.fmp4.m3u8",
+        "audio_options": ["http://edge01.cdn.omxx.net/live/tr/tr/unit/beIN_Sports_2/tracks-a1/index.fmp4.m3u8"]
+    },
+    "2677": {
+        "mode": "separate",
+        "video": "http://edge01.cdn.omxx.net/live/tr/tr/unit/beIN_Sports_3/tracks-v1/index.fmp4.m3u8",
+        "audio": "http://edge01.cdn.omxx.net/live/tr/tr/unit/beIN_Sports_3/tracks-a1/index.fmp4.m3u8",
+        "audio_options": ["http://edge01.cdn.omxx.net/live/tr/tr/unit/beIN_Sports_3/tracks-a1/index.fmp4.m3u8"]
+    },
+    "2678": {
+        "mode": "separate",
+        "video": "http://edge01.cdn.omxx.net/live/tr/tr/unit/beIN_Sports_4/tracks-v1/index.fmp4.m3u8",
+        "audio": "http://edge01.cdn.omxx.net/live/tr/tr/unit/beIN_Sports_4/tracks-a1/index.fmp4.m3u8",
+        "audio_options": ["http://edge01.cdn.omxx.net/live/tr/tr/unit/beIN_Sports_4/tracks-a1/index.fmp4.m3u8"]
+    },
+    "4352": {"mode": "muxed", "url": "http://edge01.cdn.omxx.net/live/ar/qa/bein/bein_sports_fhd/tracks-v1a1/mono.ts.m3u8"},
+    "5481": {"mode": "muxed", "url": "http://edge01.cdn.omxx.net/live/ar/qa/bein/bein_sport_1_fhd/tracks-v1a1/mono.ts.m3u8"},
+    "5482": {"mode": "muxed", "url": "http://edge01.cdn.omxx.net/live/ar/qa/bein/bein_sport_2_fhd/tracks-v1a1/mono.ts.m3u8"},
+    "5483": {"mode": "muxed", "url": "http://edge01.cdn.omxx.net/live/ar/qa/bein/bein_sport_3_fhd/tracks-v1a1/mono.ts.m3u8"},
+    "5484": {"mode": "muxed", "url": "http://edge01.cdn.omxx.net/live/ar/qa/bein/bein_sport_4_fhd/tracks-v1a1/mono.ts.m3u8"},
+    "5485": {"mode": "muxed", "url": "http://edge01.cdn.omxx.net/live/ar/qa/bein/bein_sport_5_fhd/tracks-v1a1/mono.ts.m3u8"},
+    "5486": {"mode": "muxed", "url": "http://edge01.cdn.omxx.net/live/ar/qa/bein/bein_sport_6_fhd/tracks-v1a1/mono.ts.m3u8"},
+    "5487": {"mode": "muxed", "url": "http://edge01.cdn.omxx.net/live/ar/qa/bein/bein_sport_7_fhd/tracks-v1a1/mono.ts.m3u8"},
+    "5488": {"mode": "muxed", "url": "http://edge01.cdn.omxx.net/live/ar/qa/bein/bein_sport_8_fhd/tracks-v1a1/mono.ts.m3u8"},
+    "5489": {"mode": "muxed", "url": "http://edge01.cdn.omxx.net/live/ar/qa/bein/bein_sport_9_fhd/tracks-v1a1/mono.ts.m3u8"},
+    "4353": {"mode": "muxed", "url": "http://edge01.cdn.omxx.net/live/ar/qa/bein/bein_sports_news/tracks-v1a1/mono.ts.m3u8"}
 }
 
 
