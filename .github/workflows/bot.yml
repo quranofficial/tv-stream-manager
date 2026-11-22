@@ -103,6 +103,9 @@ jobs:
         shell: bash
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          TV_ADMIN_IDS: ${{ secrets.TV_ADMIN_IDS }}
         run: |
           set -euo pipefail
           mkdir -p logs
