@@ -1,4 +1,4 @@
-name: SportVip
+name: Telegram TV Bot
 
 on:
   workflow_dispatch:
