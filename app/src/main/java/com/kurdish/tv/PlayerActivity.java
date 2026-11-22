@@ -40,7 +40,7 @@ public class PlayerActivity extends Activity {
   private Handler handler=new Handler(Looper.getMainLooper());
   private Runnable hideRunnable;
   private String streamUrl, channelTitle, sourceApiUrl, relayUrl;
-  private boolean directAttempted=false, relayAttempted=false;
+  private boolean directAttempted=false, relayAttempted=false, runtimeRefreshAttempted=false;
   private boolean muted=false, controlsLocked=false, controlsVisible=true;
   private int fitMode=AspectRatioFrameLayout.RESIZE_MODE_FIT;
   private float oldBrightness=-1f;
@@ -106,7 +106,7 @@ public class PlayerActivity extends Activity {
     lockButton=control("🔓");LinearLayout.LayoutParams lk=lp(48,46);lk.leftMargin=dp(8);bottomPanel.addView(lockButton,lk);lockButton.setOnClickListener(v->{controlsLocked=!controlsLocked;lockButton.setText(controlsLocked?"🔒":"🔓");if(controlsLocked){extraPanel.setVisibility(View.GONE);topBar.setVisibility(View.GONE);bottomPanel.setVisibility(View.GONE);controlsVisible=false;}else showControls();});
     overlay.addView(bottomPanel,lp(-1,68));
     playerView.setOnClickListener(v->{if(controlsLocked){controlsLocked=false;lockButton.setText("🔓");showControls();}else toggleControls();});
-    setContentView(root);buildChannelDrawer(root);startStream();showControls();
+    setContentView(root);buildChannelDrawer(root);refreshRuntime(()->startStream(),true);showControls();
   }
   private void buildChannelDrawer(FrameLayout root){
     drawerLayer=new FrameLayout(this);drawerLayer.setVisibility(View.GONE);
@@ -163,28 +163,72 @@ public class PlayerActivity extends Activity {
   }
   private void selectChannel(String id,String name){
     if(id.equals(currentChannelId)){toggleChannelDrawer();return;}
-    if(runtimeBase.isEmpty()||runtimeKey.isEmpty()){
-      Toast.makeText(this,"لینکی کەناڵ بەردەست نییە",Toast.LENGTH_SHORT).show();return;
-    }
-    currentChannelId=id;channelTitle=name;relayUrl=runtimeBase+"/stream/"+id+".ts?key="+runtimeKey;
+    currentChannelId=id;channelTitle=name;
     if(drawerLayer!=null)drawerLayer.setVisibility(View.GONE);drawerVisible=false;
-    // Update the title without rebuilding the player controls.
     if(topBar.getChildCount()>1&&topBar.getChildAt(1) instanceof LinearLayout){
       LinearLayout titleBox=(LinearLayout)topBar.getChildAt(1);
       if(titleBox.getChildCount()>0&&titleBox.getChildAt(0) instanceof TextView)((TextView)titleBox.getChildAt(0)).setText(name);
     }
-    relayAttempted=false;directAttempted=false;playRelay("گۆڕینی کەناڵ بۆ "+name);showControls();
+    runtimeRefreshAttempted=false;relayAttempted=false;directAttempted=false;
+    loading.setVisibility(View.VISIBLE);stateText.setVisibility(View.VISIBLE);
+    stateText.setText("وەرگرتنی لینکی نوێ بۆ "+name+"...");
+    refreshRuntime(()->playRelay("گۆڕینی کەناڵ بۆ "+name),true);showControls();
   }
   private void hideSystemBars(){getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN|View.SYSTEM_UI_FLAG_HIDE_NAVIGATION|View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY|View.SYSTEM_UI_FLAG_LAYOUT_STABLE|View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN|View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);}
   private void toggleControls(){if(controlsVisible){topBar.setVisibility(View.GONE);bottomPanel.setVisibility(View.GONE);extraPanel.setVisibility(View.GONE);controlsVisible=false;handler.removeCallbacks(hideRunnable);}else showControls();}
   private void showControls(){if(controlsLocked)return;topBar.setVisibility(View.VISIBLE);bottomPanel.setVisibility(View.VISIBLE);extraPanel.setVisibility(View.VISIBLE);controlsVisible=true;handler.removeCallbacks(hideRunnable);hideRunnable=()->{if(!controlsLocked&&!drawerVisible){topBar.setVisibility(View.GONE);bottomPanel.setVisibility(View.GONE);extraPanel.setVisibility(View.GONE);controlsVisible=false;}};handler.postDelayed(hideRunnable,6500);}
   private void startStream(){
-    directAttempted=false;relayAttempted=false;
-    loading.setVisibility(View.VISIBLE);
-    stateText.setText("پەخش بە شێوازی VLC Relay دەست پێدەکات...");
-    // The Android app always uses the combined MPEG-TS relay URL.
-    // Telegram bot messages and its direct/VLC links remain unchanged.
-    playRelay("پەخش بە لینکی یەکگرتووی VLC");
+    directAttempted=false;relayAttempted=false;runtimeRefreshAttempted=false;
+    loading.setVisibility(View.VISIBLE);stateText.setVisibility(View.VISIBLE);
+    stateText.setText("نوێکردنەوەی لینکی ستریم...");
+    refreshRuntime(()->playRelay("پەخش بە لینکی یەکگرتووی VLC"),true);
+  }
+  private void refreshRuntime(Runnable onSuccess,boolean showError){
+    new Thread(()->{
+      HttpURLConnection conn=null;
+      try{
+        URL url=new URL("https://raw.githubusercontent.com/quranofficial/tv-stream-manager/main/runtime.json?refresh="+System.currentTimeMillis());
+        conn=(HttpURLConnection)url.openConnection();
+        conn.setConnectTimeout(12000);conn.setReadTimeout(12000);
+        conn.setUseCaches(false);
+        conn.setRequestProperty("Cache-Control","no-cache, no-store, max-age=0");
+        conn.setRequestProperty("Pragma","no-cache");
+        int code=conn.getResponseCode();
+        if(code!=200)throw new Exception("نەتوانرا لینکی نوێی ستریم وەربگیرێت (HTTP "+code+")");
+        ByteArrayOutputStream out=new ByteArrayOutputStream();
+        try(InputStream in=conn.getInputStream()){byte[] buf=new byte[4096];int n;while((n=in.read(buf))>0)out.write(buf,0,n);}
+        JSONObject config=new JSONObject(out.toString("UTF-8"));
+        String base=config.optString("base_url","").trim().replaceAll("/+$","");
+        String key=config.optString("access_key","").trim();
+        URI parsed=new URI(base);
+        String host=parsed.getHost();
+        if(!"https".equalsIgnoreCase(parsed.getScheme())||host==null||
+          !host.toLowerCase(java.util.Locale.ROOT).endsWith(".trycloudflare.com")||
+          base.toLowerCase(java.util.Locale.ROOT).contains("undefined")||
+          base.toLowerCase(java.util.Locale.ROOT).contains("null")||key.isEmpty())
+          throw new Exception("runtime.json لینکی نادروستی تێدایە؛ تکایە بۆتەکە لە GitHub Actions دەستپێبکەرەوە.");
+        runtimeBase=base;runtimeKey=key;
+        relayUrl=runtimeBase+"/stream/"+currentChannelId+".ts?key="+runtimeKey;
+        sourceApiUrl=runtimeBase+"/source/"+currentChannelId+"?key="+runtimeKey;
+        runOnUiThread(()->{if(!isFinishing()&&onSuccess!=null)onSuccess.run();});
+      }catch(Exception e){
+        String message=e.getMessage()==null?"هەڵە لە نوێکردنەوەی لینکی ستریم":e.getMessage();
+        runOnUiThread(()->{
+          if(isFinishing())return;
+          loading.setVisibility(View.GONE);stateText.setVisibility(View.VISIBLE);
+          stateText.setText("نەتوانرا لینکی نوێ وەربگیرێت");
+          if(showError)new AlertDialog.Builder(this).setTitle("پەیوەندی بە ستریم").setMessage(message+"\\n\\nدڵنیابە Telegram TV Bot لە GitHub Actions چالاکە.").setPositiveButton("دووبارە هەوڵبدە", (d,w)->startStream()).setNegativeButton("داخستن",null).show();
+        });
+      }finally{if(conn!=null)conn.disconnect();}
+    }).start();
+  }
+  private boolean isNetworkFailure(Throwable error){
+    for(Throwable t=error;t!=null;t=t.getCause()){
+      if(t instanceof UnknownHostException||t instanceof IOException)return true;
+      String name=t.getClass().getSimpleName();
+      if(name.contains("UnknownHost")||name.contains("ConnectException"))return true;
+    }
+    return false;
   }
   private void playDirect(String url){
     if(isFinishing())return;
@@ -231,7 +275,12 @@ public class PlayerActivity extends Activity {
       }
       @Override public void onPlayerError(PlaybackException e){
         if(directAttempted&&!relayAttempted){playRelay("پەخشی ڕاستەوخۆ کار نەکرد؛ گۆڕین بۆ Relay");}
-        else{
+        else if(!runtimeRefreshAttempted&&isNetworkFailure(e)){
+          runtimeRefreshAttempted=true;relayAttempted=false;
+          loading.setVisibility(View.VISIBLE);stateText.setVisibility(View.VISIBLE);
+          stateText.setText("لینکی ستریم نوێ دەکرێتەوە...");
+          refreshRuntime(()->playRelay("لینکی نوێ وەرگیرا؛ دووبارە پەخش دەکرێت"),true);
+        }else{
           loading.setVisibility(View.GONE);stateText.setVisibility(View.VISIBLE);
           String detail=PlaybackException.getErrorCodeName(e.errorCode);
           Throwable cause=e.getCause();
