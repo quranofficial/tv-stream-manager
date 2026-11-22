@@ -73,8 +73,24 @@ public class MainActivity extends Activity {
     TextView footer=label("KURDISH TV+  •  PREMIUM LIVE EXPERIENCE",10,MUTED);footer.setGravity(Gravity.CENTER);footer.setPadding(0,dp(22),0,0);page.addView(footer);
     if(jumpToChannels){scroll.post(()->scroll.smoothScrollTo(0,list.getTop()));jumpToChannels=false;}
   }
-  void renderChannels(){if(list==null)return;list.removeAllViews();String q=search==null?"":search.getText().toString().toLowerCase(Locale.ROOT);int shown=0;
-    for(int i=0;i<channels.length();i++){JSONObject c=channels.optJSONObject(i);if(c==null)continue;String id=c.optString("id"),name=c.optString("name"),genre=c.optString("genre","");if(onlyFav&&!fav.contains(id))continue;if(!genreFilter.equals("هەمووی")&&!genre.equalsIgnoreCase(genreFilter))continue;if(!name.toLowerCase(Locale.ROOT).contains(q)&&!genre.toLowerCase(Locale.ROOT).contains(q))continue;shown++;
+  void renderChannels(){
+    if(list==null)return;
+    list.removeAllViews();
+    String q=search==null?"":search.getText().toString().toLowerCase(Locale.ROOT);
+    ArrayList<JSONObject> visible=new ArrayList<>();
+    for(int i=0;i<channels.length();i++){
+      JSONObject c=channels.optJSONObject(i);if(c==null)continue;
+      String id=c.optString("id"),name=c.optString("name"),genre=c.optString("genre","");
+      if(onlyFav&&!fav.contains(id))continue;
+      if(!genreFilter.equals("هەمووی")&&!genre.equalsIgnoreCase(genreFilter))continue;
+      if(!name.toLowerCase(Locale.ROOT).contains(q)&&!genre.toLowerCase(Locale.ROOT).contains(q))continue;
+      visible.add(c);
+    }
+    if(genreFilter.equalsIgnoreCase("Sports")){
+      Collections.sort(visible,(a,b)->Integer.compare(a.optInt("order",999999),b.optInt("order",999999)));
+    }
+    for(JSONObject c:visible){
+      String id=c.optString("id"),name=c.optString("name"),genre=c.optString("genre","");
       LinearLayout card=new LinearLayout(this);card.setGravity(Gravity.CENTER_VERTICAL);card.setPadding(dp(12),dp(10),dp(10),dp(10));card.setBackground(gradient(0xff1a2b43,0xff111d30,18));LinearLayout.LayoutParams cp=new LinearLayout.LayoutParams(-1,dp(88));cp.setMargins(0,0,0,dp(9));list.addView(card,cp);
       FrameLayout logoBox=new FrameLayout(this);logoBox.setBackground(shape(0xff29435e,16));TextView initials=label(name.isEmpty()?"TV":name.substring(0,Math.min(2,name.length())).toUpperCase(Locale.ROOT),18,ACCENT);initials.setGravity(Gravity.CENTER);logoBox.addView(initials,new FrameLayout.LayoutParams(-1,-1));card.addView(logoBox,new LinearLayout.LayoutParams(dp(58),dp(58)));
       String logo=c.optString("logo","");if(!logo.equals("null")&&!logo.isEmpty())loadLogo(logo,logoBox,initials);
@@ -83,7 +99,7 @@ public class MainActivity extends Activity {
       TextView play=label("▶",16,BG);play.setGravity(Gravity.CENTER);play.setBackground(shape(ACCENT,14));card.addView(play,new LinearLayout.LayoutParams(dp(42),dp(42)));play.setOnClickListener(v->playChannel(c));
       card.setOnClickListener(v->playChannel(c));
     }
-    if(shown==0){TextView empty=label("هیچ کەناڵێک نەدۆزرایەوە",14,MUTED);empty.setGravity(Gravity.CENTER);list.addView(empty);}
+    if(visible.isEmpty()){TextView empty=label("هیچ کەناڵێک نەدۆزرایەوە",14,MUTED);empty.setGravity(Gravity.CENTER);list.addView(empty);}
   }
   void loadLogo(String url,FrameLayout box,TextView fallback){new Thread(()->{try{HttpURLConnection c=(HttpURLConnection)new URL(url).openConnection();c.setConnectTimeout(6000);c.setReadTimeout(6000);android.graphics.Bitmap bm=android.graphics.BitmapFactory.decodeStream(c.getInputStream());c.disconnect();if(bm!=null)runOnUiThread(()->{ImageView iv=new ImageView(this);iv.setImageBitmap(bm);iv.setScaleType(ImageView.ScaleType.CENTER_CROP);box.removeAllViews();box.addView(iv,new FrameLayout.LayoutParams(-1,-1));});}catch(Exception ignored){}}).start();}
   void relaySettings(){
