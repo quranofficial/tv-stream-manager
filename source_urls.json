@@ -2,7 +2,11 @@
   "6": {
     "mode": "separate",
     "video": "http://edge01.cdn.omxx.net/live/ku/ku/unit/pesmerge_hd/tracks-v1/index.fmp4.m3u8",
-    "audio": "http://edge01.cdn.omxx.net/live/ku/ku/unit/pesmerge_hd/tracks-a1/index.fmp4.m3u8"
+    "audio": "http://edge01.cdn.omxx.net/live/ku/ku/unit/pesmerge_hd/tracks-a1/index.fmp4.m3u8",
+    "audio_options": [
+      "http://edge01.cdn.omxx.net/live/ku/ku/unit/pesmerge_hd/tracks-a1/index.fmp4.m3u8",
+      "http://edge01.cdn.omxx.net/live/ku/ku/unit/pesmerge_hd/tracks-a1/mono.ts.m3u8"
+    ]
   },
   "12": {
     "mode": "muxed",
@@ -11,17 +15,29 @@
   "14": {
     "mode": "separate",
     "video": "http://edge01.cdn.omxx.net/live/ku/ku/mtv/mtv_family/tracks-v1/index.fmp4.m3u8",
-    "audio": "http://edge01.cdn.omxx.net/live/ku/ku/mtv/mtv_family/tracks-a1/index.fmp4.m3u8"
+    "audio": "http://edge01.cdn.omxx.net/live/ku/ku/mtv/mtv_family/tracks-a1/index.fmp4.m3u8",
+    "audio_options": [
+      "http://edge01.cdn.omxx.net/live/ku/ku/mtv/mtv_family/tracks-a1/index.fmp4.m3u8",
+      "http://edge01.cdn.omxx.net/live/ku/ku/mtv/mtv_family/tracks-a1/mono.ts.m3u8"
+    ]
   },
   "27": {
     "mode": "separate",
     "video": "http://edge01.cdn.omxx.net/live/ku/ku/unit/kidco_hd/tracks-v1/index.fmp4.m3u8",
-    "audio": "http://edge01.cdn.omxx.net/live/ku/ku/unit/kidco_hd/tracks-a1/index.fmp4.m3u8"
+    "audio": "http://edge01.cdn.omxx.net/live/ku/ku/unit/kidco_hd/tracks-a1/index.fmp4.m3u8",
+    "audio_options": [
+      "http://edge01.cdn.omxx.net/live/ku/ku/unit/kidco_hd/tracks-a1/index.fmp4.m3u8",
+      "http://edge01.cdn.omxx.net/live/ku/ku/unit/kidco_hd/tracks-a1/mono.ts.m3u8"
+    ]
   },
   "37": {
     "mode": "separate",
     "video": "http://edge01.cdn.omxx.net/live/ku/ku/fox/fox_tv/tracks-v1/index.fmp4.m3u8",
-    "audio": "http://edge01.cdn.omxx.net/live/ku/ku/fox/fox_tv/tracks-a1/index.fmp4.m3u8"
+    "audio": "http://edge01.cdn.omxx.net/live/ku/ku/fox/fox_tv/tracks-a1/index.fmp4.m3u8",
+    "audio_options": [
+      "http://edge01.cdn.omxx.net/live/ku/ku/fox/fox_tv/tracks-a1/index.fmp4.m3u8",
+      "http://edge01.cdn.omxx.net/live/ku/ku/fox/fox_tv/tracks-a1/mono.ts.m3u8"
+    ]
   },
   "43": {
     "mode": "muxed",
@@ -38,7 +54,11 @@
   "67": {
     "mode": "separate",
     "video": "http://edge01.cdn.omxx.net/live/ku/ku/unit/shams_4k/tracks-v1/index.fmp4.m3u8",
-    "audio": "http://edge01.cdn.omxx.net/live/ku/ku/unit/shams_4k/tracks-a1/mono.ts.m3u8"
+    "audio": "http://edge01.cdn.omxx.net/live/ku/ku/unit/shams_4k/tracks-a1/mono.ts.m3u8",
+    "audio_options": [
+      "http://edge01.cdn.omxx.net/live/ku/ku/unit/shams_4k/tracks-a1/mono.ts.m3u8",
+      "http://edge01.cdn.omxx.net/live/ku/ku/unit/shams_4k/tracks-a1/index.fmp4.m3u8"
+    ]
   },
   "81": {
     "mode": "muxed",
@@ -91,7 +111,11 @@
   "174": {
     "mode": "separate",
     "video": "http://edge01.cdn.omxx.net/live/ku/ku/unit/amozhgary_tv_hd/tracks-v1/index.fmp4.m3u8",
-    "audio": "http://edge01.cdn.omxx.net/live/ku/ku/unit/amozhgary_tv_hd/tracks-a1/index.fmp4.m3u8"
+    "audio": "http://edge01.cdn.omxx.net/live/ku/ku/unit/amozhgary_tv_hd/tracks-a1/index.fmp4.m3u8",
+    "audio_options": [
+      "http://edge01.cdn.omxx.net/live/ku/ku/unit/amozhgary_tv_hd/tracks-a1/index.fmp4.m3u8",
+      "http://edge01.cdn.omxx.net/live/ku/ku/unit/amozhgary_tv_hd/tracks-a1/mono.ts.m3u8"
+    ]
   },
   "184": {
     "mode": "muxed",
@@ -104,6 +128,10 @@
   "5391": {
     "mode": "separate",
     "video": "http://edge01.cdn.omxx.net/live/ku/ku/unit/gk_plus/tracks-v1/index.fmp4.m3u8",
-    "audio": "http://edge01.cdn.omxx.net/live/ku/ku/unit/gk_plus/tracks-a1/index.fmp4.m3u8"
+    "audio": "http://edge01.cdn.omxx.net/live/ku/ku/unit/gk_plus/tracks-a1/index.fmp4.m3u8",
+    "audio_options": [
+      "http://edge01.cdn.omxx.net/live/ku/ku/unit/gk_plus/tracks-a1/index.fmp4.m3u8",
+      "http://edge01.cdn.omxx.net/live/ku/ku/unit/gk_plus/tracks-a1/mono.ts.m3u8"
+    ]
   }
 }
