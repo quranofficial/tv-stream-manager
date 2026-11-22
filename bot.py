@@ -31,10 +31,145 @@ STREAM_MODES = (
     if Path("stream_modes.json").exists() else {}
 )
 
-EXPLICIT_SOURCES = (
-    json.loads(Path("source_urls.json").read_text(encoding="utf-8"))
-    if Path("source_urls.json").exists() else {}
-)
+# Exact user-provided stream sources, kept in this existing bot module.
+# Separate video/audio tracks are muxed by FFmpeg for both Telegram bot and Android app.
+EXPLICIT_SOURCES = {
+    "6": {
+        "mode": "separate",
+        "video": "http://edge01.cdn.omxx.net/live/ku/ku/unit/pesmerge_hd/tracks-v1/index.fmp4.m3u8",
+        "audio": "http://edge01.cdn.omxx.net/live/ku/ku/unit/pesmerge_hd/tracks-a1/index.fmp4.m3u8",
+        "audio_options": [
+            "http://edge01.cdn.omxx.net/live/ku/ku/unit/pesmerge_hd/tracks-a1/index.fmp4.m3u8",
+            "http://edge01.cdn.omxx.net/live/ku/ku/unit/pesmerge_hd/tracks-a1/mono.ts.m3u8"
+        ]
+    },
+    "12": {
+        "mode": "muxed",
+        "url": "http://edge01.cdn.omxx.net/live/ku/ku/mtv/mtv_music/tracks-v1a1/mono.ts.m3u8"
+    },
+    "14": {
+        "mode": "separate",
+        "video": "http://edge01.cdn.omxx.net/live/ku/ku/mtv/mtv_family/tracks-v1/index.fmp4.m3u8",
+        "audio": "http://edge01.cdn.omxx.net/live/ku/ku/mtv/mtv_family/tracks-a1/index.fmp4.m3u8",
+        "audio_options": [
+            "http://edge01.cdn.omxx.net/live/ku/ku/mtv/mtv_family/tracks-a1/index.fmp4.m3u8",
+            "http://edge01.cdn.omxx.net/live/ku/ku/mtv/mtv_family/tracks-a1/mono.ts.m3u8"
+        ]
+    },
+    "27": {
+        "mode": "separate",
+        "video": "http://edge01.cdn.omxx.net/live/ku/ku/unit/kidco_hd/tracks-v1/index.fmp4.m3u8",
+        "audio": "http://edge01.cdn.omxx.net/live/ku/ku/unit/kidco_hd/tracks-a1/index.fmp4.m3u8",
+        "audio_options": [
+            "http://edge01.cdn.omxx.net/live/ku/ku/unit/kidco_hd/tracks-a1/index.fmp4.m3u8",
+            "http://edge01.cdn.omxx.net/live/ku/ku/unit/kidco_hd/tracks-a1/mono.ts.m3u8"
+        ]
+    },
+    "37": {
+        "mode": "separate",
+        "video": "http://edge01.cdn.omxx.net/live/ku/ku/fox/fox_tv/tracks-v1/index.fmp4.m3u8",
+        "audio": "http://edge01.cdn.omxx.net/live/ku/ku/fox/fox_tv/tracks-a1/index.fmp4.m3u8",
+        "audio_options": [
+            "http://edge01.cdn.omxx.net/live/ku/ku/fox/fox_tv/tracks-a1/index.fmp4.m3u8",
+            "http://edge01.cdn.omxx.net/live/ku/ku/fox/fox_tv/tracks-a1/mono.ts.m3u8"
+        ]
+    },
+    "43": {
+        "mode": "muxed",
+        "url": "http://edge01.cdn.omxx.net/live/ku/ku/unit/dunya_hd/tracks-v1a1/mono.ts.m3u8"
+    },
+    "49": {
+        "mode": "muxed",
+        "url": "http://edge01.cdn.omxx.net/live/ku/ku/unit/befrin_hd/tracks-v1a1/mono.ts.m3u8"
+    },
+    "66": {
+        "mode": "muxed",
+        "url": "http://edge01.cdn.omxx.net/live/ku/ku/unit/speda_sound2/tracks-v1a1/mono.ts.m3u8"
+    },
+    "67": {
+        "mode": "separate",
+        "video": "http://edge01.cdn.omxx.net/live/ku/ku/unit/shams_4k/tracks-v1/index.fmp4.m3u8",
+        "audio": "http://edge01.cdn.omxx.net/live/ku/ku/unit/shams_4k/tracks-a1/mono.ts.m3u8",
+        "audio_options": [
+            "http://edge01.cdn.omxx.net/live/ku/ku/unit/shams_4k/tracks-a1/mono.ts.m3u8",
+            "http://edge01.cdn.omxx.net/live/ku/ku/unit/shams_4k/tracks-a1/index.fmp4.m3u8"
+        ]
+    },
+    "81": {
+        "mode": "muxed",
+        "url": "http://edge01.cdn.omxx.net/live/ku/ku/mtv/mtv_sport/tracks-v1a1/mono.ts.m3u8"
+    },
+    "133": {
+        "mode": "muxed",
+        "url": "http://edge01.cdn.omxx.net/live/ku/ku/unit/bnar_action_hd/tracks-v1a1/mono.ts.m3u8"
+    },
+    "134": {
+        "mode": "muxed",
+        "url": "http://edge01.cdn.omxx.net/live/ku/ku/unit/bnar_movies_hd/tracks-v1a1/mono.ts.m3u8"
+    },
+    "135": {
+        "mode": "muxed",
+        "url": "http://edge01.cdn.omxx.net/live/ku/ku/unit/bnar_family_hd/tracks-v1a1/mono.ts.m3u8"
+    },
+    "160": {
+        "mode": "muxed",
+        "url": "http://edge01.cdn.omxx.net/live/ku/ku/unit/speda_4k/tracks-v1a1/mono.ts.m3u8"
+    },
+    "163": {
+        "mode": "muxed",
+        "url": "http://edge01.cdn.omxx.net/live/ku/ku/unit/sahar_4k/tracks-v1a1/mono.ts.m3u8"
+    },
+    "166": {
+        "mode": "muxed",
+        "url": "http://edge01.cdn.omxx.net/live/ku/ku/unit/rojava_hd/tracks-v1a1/mono.ts.m3u8"
+    },
+    "167": {
+        "mode": "muxed",
+        "url": "http://edge01.cdn.omxx.net/live/ku/ku/unit/payam_4k/tracks-v1a1/mono.ts.m3u8"
+    },
+    "169": {
+        "mode": "muxed",
+        "url": "http://edge01.cdn.omxx.net/live/ku/ku/unit/kirkuk/tracks-v1a1/mono.ts.m3u8"
+    },
+    "170": {
+        "mode": "muxed",
+        "url": "http://edge01.cdn.omxx.net/live/ku/ku/unit/jin_hd/tracks-v1a1/mono.ts.m3u8"
+    },
+    "171": {
+        "mode": "muxed",
+        "url": "http://edge01.cdn.omxx.net/live/ku/ku/unit/iraqia_kurdi/tracks-v1a1/mono.ts.m3u8"
+    },
+    "173": {
+        "mode": "muxed",
+        "url": "http://edge01.cdn.omxx.net/live/ku/ku/unit/bangawaz/tracks-v1a1/mono.ts.m3u8"
+    },
+    "174": {
+        "mode": "separate",
+        "video": "http://edge01.cdn.omxx.net/live/ku/ku/unit/amozhgary_tv_hd/tracks-v1/index.fmp4.m3u8",
+        "audio": "http://edge01.cdn.omxx.net/live/ku/ku/unit/amozhgary_tv_hd/tracks-a1/index.fmp4.m3u8",
+        "audio_options": [
+            "http://edge01.cdn.omxx.net/live/ku/ku/unit/amozhgary_tv_hd/tracks-a1/index.fmp4.m3u8",
+            "http://edge01.cdn.omxx.net/live/ku/ku/unit/amozhgary_tv_hd/tracks-a1/mono.ts.m3u8"
+        ]
+    },
+    "184": {
+        "mode": "muxed",
+        "url": "http://edge01.cdn.omxx.net/live/ku/ku/trt/trt_kurdi_4k/tracks-v1a1/mono.ts.m3u8"
+    },
+    "193": {
+        "mode": "muxed",
+        "url": "http://edge01.cdn.omxx.net/live/ku/ku/unit/kurdsat_news_4k/tracks-v1a1/mono.ts.m3u8"
+    },
+    "5391": {
+        "mode": "separate",
+        "video": "http://edge01.cdn.omxx.net/live/ku/ku/unit/gk_plus/tracks-v1/index.fmp4.m3u8",
+        "audio": "http://edge01.cdn.omxx.net/live/ku/ku/unit/gk_plus/tracks-a1/index.fmp4.m3u8",
+        "audio_options": [
+            "http://edge01.cdn.omxx.net/live/ku/ku/unit/gk_plus/tracks-a1/index.fmp4.m3u8",
+            "http://edge01.cdn.omxx.net/live/ku/ku/unit/gk_plus/tracks-a1/mono.ts.m3u8"
+        ]
+    }
+}
 
 
 def slug_for(channel):
