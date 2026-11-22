@@ -156,14 +156,15 @@ async def resolve_source(channel):
                     return result
             else:
                 video = explicit["video"]
-                audio = explicit["audio"]
+                audio_options = explicit.get("audio_options") or [explicit["audio"]]
                 vok, vs = await _manifest_ok(session, video)
-                aok, ast = await _manifest_ok(session, audio)
-                log.info("Explicit source probe channel=%s mode=separate video=%s audio=%s", cid, vs, ast)
-                if vok and aok and await _ffmpeg_smoke_test(video, audio, cid, channel["name"], "explicit"):
-                    result = {"mode": "separate", "video": video, "audio": audio, "slug": "explicit"}
-                    SLUG_CACHE[cid] = result
-                    return result
+                for audio in audio_options:
+                    aok, ast = await _manifest_ok(session, audio)
+                    log.info("Explicit source probe channel=%s mode=separate video=%s audio=%s", cid, vs, ast)
+                    if vok and aok and await _ffmpeg_smoke_test(video, audio, cid, channel["name"], "explicit"):
+                        result = {"mode": "separate", "video": video, "audio": audio, "slug": "explicit"}
+                        SLUG_CACHE[cid] = result
+                        return result
         log.error("Explicit source failed channel=%s; falling back to automatic source probing", cid)
 
     async with aiohttp.ClientSession(
