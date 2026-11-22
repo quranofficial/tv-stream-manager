@@ -1,4 +1,9 @@
 import asyncio
+import hashlib
+import datetime
+import secrets
+import urllib.parse
+import urllib.request
 import aiohttp
 import json
 import logging
@@ -19,6 +24,13 @@ DATA = json.loads(Path("channels.json").read_text(encoding="utf-8"))
 CHANNELS = DATA.get("data", [])
 CHANNEL_BY_ID = {str(c["id"]): c for c in CHANNELS}
 PAGE_SIZE = 10
+SUPABASE_URL = os.getenv("SUPABASE_URL", "").rstrip("/")
+SUPABASE_SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
+TV_ADMIN_IDS = {
+    item.strip() for item in os.getenv("TV_ADMIN_IDS", "").split(",")
+    if item.strip().isdigit()
+}
+
 BASE = os.getenv("STREAM_BASE", "http://edge01.cdn.omxx.net/live/ku/ku/unit")
 PUBLIC_BASE = os.getenv("STREAM_PUBLIC_BASE", "").rstrip("/")
 ACCESS_KEY = os.getenv("STREAM_ACCESS_KEY", "")
@@ -586,6 +598,112 @@ async def post_shutdown(application: Application):
         await runner.cleanup()
 
 
+
+def _tv_admin_allowed(update: Update) -> bool:
+    user = update.effective_user
+    return bool(user and str(user.id) in TV_ADMIN_IDS)
+
+
+def _tv_supabase_request(method: str, path: str, payload=None):
+    if not SUPABASE_URL or not SUPABASE_SERVICE_ROLE_KEY:
+        raise RuntimeError("TV login backend secrets are not configured in GitHub Actions.")
+    url = SUPABASE_URL + "/rest/v1/tv_login_codes" + path
+    data = json.dumps(payload).encode("utf-8") if payload is not None else None
+    request = urllib.request.Request(url, data=data, method=method, headers={
+        "apikey": SUPABASE_SERVICE_ROLE_KEY,
+        "Authorization": "Bearer " + SUPABASE_SERVICE_ROLE_KEY,
+        "Content-Type": "application/json",
+        "Prefer": "return=representation",
+    })
+    with urllib.request.urlopen(request, timeout=15) as response:
+        body = response.read().decode("utf-8")
+        return json.loads(body) if body else []
+
+
+async def tvadminid(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+    if user:
+        await update.effective_message.reply_text(
+            f"Telegram ID ـەکەت: {user.id}\\n"
+            "بۆ چالاککردنی فەرمانی کۆدی TV، ئەم ژمارەیە وەک GitHub Secret بە ناوی TV_ADMIN_IDS دابنێ."
+        )
+
+
+async def tvcode(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not _tv_admin_allowed(update):
+        await update.effective_message.reply_text("⛔ ئەم فەرمانە تەنها بۆ ئەدمینی TV ـە.")
+        return
+    days = 30
+    label = " ".join(context.args).strip()
+    if context.args and context.args[0].isdigit():
+        days = max(1, min(365, int(context.args[0])))
+        label = " ".join(context.args[1:]).strip()
+    code = "".join(secrets.choice("ABCDEFGHJKLMNPQRSTUVWXYZ23456789") for _ in range(12))
+    expires = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=days)
+    try:
+        await asyncio.to_thread(
+            _tv_supabase_request, "POST", "",
+            {"code_hash": hashlib.sha256(code.encode()).hexdigest(),
+             "label": label[:80] or None, "is_active": True,
+             "expires_at": expires.isoformat()}
+        )
+    except Exception as exc:
+        log.exception("Could not create TV login code")
+        await update.effective_message.reply_text(f"❌ نەیتوانی کۆد دروست بکات: {exc}")
+        return
+    await update.effective_message.reply_text(
+        "✅ کۆدی چوونەژوورەوە دروست کرا. تەنها یەکجار و لە یەک ئامێر کار دەکات.\\n\\n"
+        f"🔐 کۆد: <code>{code}</code>\\n"
+        f"📅 ماوە: {days} ڕۆژ\\n"
+        f"⏳ بەسەرچوون: {expires.strftime('%Y-%m-%d %H:%M UTC')}\\n"
+        "⚠️ ئەم کۆدە تەنها ئەمجارە پیشان دەدرێت؛ بە پارێزراوی بینێرە.",
+        parse_mode="HTML"
+    )
+
+
+async def tvcodes(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not _tv_admin_allowed(update):
+        await update.effective_message.reply_text("⛔ ئەم فەرمانە تەنها بۆ ئەدمینی TV ـە.")
+        return
+    query = urllib.parse.urlencode({
+        "select": "id,label,created_at,expires_at,redeemed_at,revoked_at,is_active",
+        "order": "created_at.desc", "limit": "30"
+    })
+    try:
+        rows = await asyncio.to_thread(_tv_supabase_request, "GET", "?" + query)
+    except Exception as exc:
+        await update.effective_message.reply_text(f"❌ هەڵە لە وەرگرتنی لیست: {exc}")
+        return
+    if not rows:
+        await update.effective_message.reply_text("هێشتا هیچ کۆدێک دروست نەکراوە.")
+        return
+    lines = ["📋 دوایین کۆدەکانی TV:"]
+    for row in rows:
+        status = "بەکارهاتوو" if row.get("redeemed_at") else ("ڕەتکراوە" if row.get("revoked_at") or not row.get("is_active") else "چاوەڕێی بەکارهێنان")
+        lines.append(f"• {row.get('label') or 'بێ ناونیشان'} — {status} — ID: {row['id']}")
+    await update.effective_message.reply_text("\\n".join(lines))
+
+
+async def tvrevoke(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not _tv_admin_allowed(update):
+        await update.effective_message.reply_text("⛔ ئەم فەرمانە تەنها بۆ ئەدمینی TV ـە.")
+        return
+    if not context.args or not re.fullmatch(r"[0-9a-fA-F-]{36}", context.args[0]):
+        await update.effective_message.reply_text("بەکارهێنان: /tvrevoke CODE_ID")
+        return
+    code_id = context.args[0]
+    try:
+        query = urllib.parse.urlencode({"id": "eq." + code_id})
+        await asyncio.to_thread(
+            _tv_supabase_request, "PATCH", "?" + query,
+            {"is_active": False, "revoked_at": datetime.datetime.now(datetime.timezone.utc).isoformat()}
+        )
+    except Exception as exc:
+        await update.effective_message.reply_text(f"❌ نەیتوانی کۆدەکە هەڵبوەشێنێتەوە: {exc}")
+        return
+    await update.effective_message.reply_text("✅ کۆدەکە هەڵوەشێندرایەوە.")
+
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data.clear()
     markup, total = channel_page()
@@ -694,6 +812,10 @@ def main():
     application.add_handler(CommandHandler("stop", stop))
     application.add_handler(CommandHandler("restart", restart))
     application.add_handler(CommandHandler("logs", logs))
+    application.add_handler(CommandHandler("tvadminid", tvadminid))
+    application.add_handler(CommandHandler("tvcode", tvcode))
+    application.add_handler(CommandHandler("tvcodes", tvcodes))
+    application.add_handler(CommandHandler("tvrevoke", tvrevoke))
     application.add_handler(CallbackQueryHandler(buttons))
     log.info("Loaded %d channels", len(CHANNELS))
     application.run_polling(drop_pending_updates=True)
