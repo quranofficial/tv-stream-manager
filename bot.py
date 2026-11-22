@@ -31,6 +31,11 @@ STREAM_MODES = (
     if Path("stream_modes.json").exists() else {}
 )
 
+EXPLICIT_SOURCES = (
+    json.loads(Path("source_urls.json").read_text(encoding="utf-8"))
+    if Path("source_urls.json").exists() else {}
+)
+
 
 def slug_for(channel):
     cid = str(channel["id"])
@@ -133,6 +138,34 @@ async def resolve_source(channel):
     cid = str(channel["id"])
     if cid in SLUG_CACHE:
         return SLUG_CACHE[cid]
+
+    # User-verified exact source URLs take priority over automatic slug probing.
+    explicit = EXPLICIT_SOURCES.get(cid)
+    if explicit:
+        async with aiohttp.ClientSession(
+            headers={"User-Agent": "Mozilla/5.0 TVStreamManager/2.0"}
+        ) as session:
+            mode = explicit.get("mode", "muxed")
+            if mode == "muxed":
+                url = explicit["url"]
+                ok, status = await _manifest_ok(session, url)
+                log.info("Explicit source probe channel=%s mode=muxed status=%s", cid, status)
+                if ok and await _ffmpeg_smoke_test(url, None, cid, channel["name"], "explicit", True):
+                    result = {"mode": "muxed", "url": url, "slug": "explicit"}
+                    SLUG_CACHE[cid] = result
+                    return result
+            else:
+                video = explicit["video"]
+                audio = explicit["audio"]
+                vok, vs = await _manifest_ok(session, video)
+                aok, ast = await _manifest_ok(session, audio)
+                log.info("Explicit source probe channel=%s mode=separate video=%s audio=%s", cid, vs, ast)
+                if vok and aok and await _ffmpeg_smoke_test(video, audio, cid, channel["name"], "explicit"):
+                    result = {"mode": "separate", "video": video, "audio": audio, "slug": "explicit"}
+                    SLUG_CACHE[cid] = result
+                    return result
+        log.error("Explicit source failed channel=%s; falling back to automatic source probing", cid)
+
     async with aiohttp.ClientSession(
         headers={"User-Agent": "Mozilla/5.0 TVStreamManager/2.0"}
     ) as session:
