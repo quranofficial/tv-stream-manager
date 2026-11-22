@@ -24,7 +24,7 @@ DATA = json.loads(Path("channels.json").read_text(encoding="utf-8"))
 CHANNELS = DATA.get("data", [])
 CHANNEL_BY_ID = {str(c["id"]): c for c in CHANNELS}
 PAGE_SIZE = 10
-SUPABASE_URL = os.getenv("SUPABASE_URL", "").rstrip("/")
+SUPABASE_URL = (os.getenv("SUPABASE_URL") or "https://herrkhvvfmbczbcebrci.supabase.co").rstrip("/")
 SUPABASE_SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
 TV_ADMIN_IDS = {
     item.strip() for item in os.getenv("TV_ADMIN_IDS", "").split(",")
