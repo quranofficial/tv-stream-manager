@@ -15,7 +15,7 @@ import java.net.*;
 import java.util.*;
 
 public class MainActivity extends Activity {
-  final int BG=0xff08111f, CARD=0xff121f32, MUTED=0xff91a4bd, ACCENT=0xff27d7c3, WHITE=0xfff4f7fb;
+  final int BG=0xff080713, CARD=0xff19142b, MUTED=0xffa99fbd, ACCENT=0xffb12cff, WHITE=0xfff7f3ff;
   JSONArray channels=new JSONArray();
   SharedPreferences prefs;
   LinearLayout root, list;
@@ -32,7 +32,7 @@ public class MainActivity extends Activity {
   GradientDrawable shape(int color,int radius){GradientDrawable d=new GradientDrawable();d.setColor(color);d.setCornerRadius(dp(radius));return d;}
   GradientDrawable gradient(int a,int b,int radius){GradientDrawable d=new GradientDrawable(GradientDrawable.Orientation.TL_BR,new int[]{a,b});d.setCornerRadius(dp(radius));return d;}
   TextView label(String s,int size,int color){TextView t=new TextView(this);t.setText(s);t.setTextSize(size);t.setTextColor(color);t.setGravity(Gravity.CENTER_VERTICAL);return t;}
-  TextView pill(String s){TextView t=label(s,12,ACCENT);t.setPadding(dp(10),dp(5),dp(10),dp(5));t.setBackground(shape(0xff123a42,30));return t;}
+  TextView pill(String s){TextView t=label(s,12,ACCENT);t.setPadding(dp(10),dp(5),dp(10),dp(5));t.setBackground(shape(0xff35104f,30));return t;}
   @Override public void onCreate(Bundle b){super.onCreate(b);getWindow().setStatusBarColor(BG);getWindow().setNavigationBarColor(BG);getWindow().getDecorView().setSystemUiVisibility(0);prefs=getSharedPreferences("kurdish_tv",0);fav.addAll(prefs.getStringSet("favorites",new HashSet<>()));deviceId=prefs.getString("tv_device_id","");if(deviceId.isEmpty()){deviceId=UUID.randomUUID().toString();prefs.edit().putString("tv_device_id",deviceId).apply();}try{InputStream in=getAssets().open("channels.json");ByteArrayOutputStream out=new ByteArrayOutputStream();byte[] buf=new byte[8192];int n;while((n=in.read(buf))>0)out.write(buf,0,n);channels=new JSONObject(out.toString("UTF-8")).getJSONArray("data");}catch(Exception e){}showLastCrash();checkAccess();}
   GradientDrawable strokeHome(int color,int line,int radius){GradientDrawable d=shape(color,radius);d.setStroke(dp(1),line);return d;}
   void showLastCrash(){String report=getSharedPreferences("crash_report",0).getString("last_crash",null);if(report==null||report.isEmpty())return;new AlertDialog.Builder(this).setTitle("Crash report").setMessage("ئەمە هۆکاری داخستنی جارەکەی پێشووترە. تکایە Copy بکە و بۆم بینێرە.\\n\\n"+report).setPositiveButton("Copy", (d,w)->{((android.content.ClipboardManager)getSystemService(CLIPBOARD_SERVICE)).setPrimaryClip(android.content.ClipData.newPlainText("Crash report",report));Toast.makeText(this,"Crash report کۆپی کرا",Toast.LENGTH_SHORT).show();}).setNegativeButton("داخستن",null).show();}
@@ -70,9 +70,9 @@ public class MainActivity extends Activity {
   }
   void showLogin(String message){
     LinearLayout page=new LinearLayout(this);page.setOrientation(1);page.setGravity(Gravity.CENTER);
-    page.setPadding(dp(28),dp(24),dp(28),dp(24));page.setBackground(gradient(0xff06101e,0xff12304a,0));
+    page.setPadding(dp(28),dp(24),dp(28),dp(24));page.setBackground(gradient(0xff080713,0xff24103e,0));
     LinearLayout card=new LinearLayout(this);card.setOrientation(1);card.setPadding(dp(24),dp(28),dp(24),dp(26));
-    card.setBackground(strokeHome(0xff13243a,0xff2b4c68,24));
+    card.setBackground(strokeHome(0xff1a1230,0xff7b2bc2,24));
     TextView logo=label("KURDISH TV+",25,ACCENT);logo.setTypeface(null,Typeface.BOLD);logo.setGravity(Gravity.CENTER);card.addView(logo);
     TextView heading=label("بەخێربێیت",22,WHITE);heading.setGravity(Gravity.CENTER);heading.setTypeface(null,Typeface.BOLD);
     LinearLayout.LayoutParams hp=new LinearLayout.LayoutParams(-1,-2);hp.topMargin=dp(18);card.addView(heading,hp);
@@ -80,7 +80,7 @@ public class MainActivity extends Activity {
     EditText code=new EditText(this);code.setSingleLine(true);code.setTextColor(WHITE);code.setHintTextColor(MUTED);
     code.setHint("XXXX-XXXX-XXXX");code.setTextSize(18);code.setLetterSpacing(.12f);code.setGravity(Gravity.CENTER);
     code.setInputType(android.text.InputType.TYPE_CLASS_TEXT|android.text.InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
-    code.setPadding(dp(12),dp(14),dp(12),dp(14));code.setBackground(strokeHome(0xff0b1829,0xff36516e,14));card.addView(code,new LinearLayout.LayoutParams(-1,dp(56)));
+    code.setPadding(dp(12),dp(14),dp(12),dp(14));code.setBackground(strokeHome(0xff100b20,0xff6930a0,14));card.addView(code,new LinearLayout.LayoutParams(-1,dp(56)));
     TextView error=label(message,12,0xffffa6a6);error.setGravity(Gravity.CENTER);error.setPadding(0,dp(10),0,dp(4));error.setVisibility(message.isEmpty()?View.GONE:View.VISIBLE);card.addView(error);
     TextView submit=label("چوونەژوورەوە  →",15,BG);submit.setTypeface(null,Typeface.BOLD);submit.setGravity(Gravity.CENTER);
     submit.setBackground(shape(ACCENT,14));LinearLayout.LayoutParams bp=new LinearLayout.LayoutParams(-1,dp(52));bp.topMargin=dp(12);card.addView(submit,bp);
@@ -107,21 +107,22 @@ public class MainActivity extends Activity {
     TextView settings=label("⚙",22,WHITE);settings.setGravity(Gravity.CENTER);settings.setBackground(shape(CARD,14));top.addView(settings,new LinearLayout.LayoutParams(dp(44),dp(44)));settings.setOnClickListener(v->relaySettings());
     root.addView(top);
     ScrollView scroll=new ScrollView(this);scroll.setFillViewport(true);scroll.setClipToPadding(false);LinearLayout page=new LinearLayout(this);page.setOrientation(1);page.setPadding(dp(16),dp(10),dp(16),dp(28));scroll.addView(page);root.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));
-    LinearLayout nav=new LinearLayout(this);nav.setGravity(Gravity.CENTER);nav.setPadding(dp(10),dp(8),dp(10),dp(8));nav.setBackgroundColor(0xff0a1524);
+    LinearLayout nav=new LinearLayout(this);nav.setGravity(Gravity.CENTER);nav.setPadding(dp(10),dp(8),dp(10),dp(8));nav.setBackgroundColor(0xff100b1d);
     TextView navHome=navItem("⌂","سەرەکی",true);TextView navChannels=navItem("▦","کەناڵەکان",false);TextView navFav=navItem("★","دڵخوازەکان",false);
     nav.addView(navHome,new LinearLayout.LayoutParams(0,dp(54),1));nav.addView(navChannels,new LinearLayout.LayoutParams(0,dp(54),1));nav.addView(navFav,new LinearLayout.LayoutParams(0,dp(54),1));root.addView(nav,new LinearLayout.LayoutParams(-1,-2));
     navHome.setOnClickListener(v->{onlyFav=false;genreFilter="هەمووی";showHome();});
     navChannels.setOnClickListener(v->{onlyFav=false;jumpToChannels=true;showHome();});
     navFav.setOnClickListener(v->{onlyFav=true;showHome();});
-    LinearLayout hero=new LinearLayout(this);hero.setOrientation(1);hero.setPadding(dp(20),dp(22),dp(20),dp(22));hero.setBackground(gradient(0xff087f79,0xff183451,24));
+    LinearLayout hero=new LinearLayout(this);hero.setOrientation(1);hero.setPadding(dp(20),dp(22),dp(20),dp(22));hero.setBackground(gradient(0xff7414c9,0xff21103d,24));
     hero.addView(pill("●  پەخشی ڕاستەوخۆ"));
     TextView welcome=label("هەموو جیهانی\nتەلەڤیزیۆن لە یەک شوێن",24,WHITE);welcome.setTypeface(null,Typeface.BOLD);welcome.setPadding(0,dp(12),0,dp(5));hero.addView(welcome);
-    hero.addView(label(channels.length()+" کەناڵی ڕاستەوخۆ • بێ چوونەژوورەوە",13,0xffc9e9e8));
+    hero.addView(label("کەناڵە دڵخوازەکانت بە کوالێتی بەرز ببینە",13,0xffe9d5ff));
+    TextView heroAction=label("▶  دەستپێکردنی بینین",13,WHITE);heroAction.setGravity(Gravity.CENTER);heroAction.setTypeface(null,Typeface.BOLD);heroAction.setPadding(dp(14),dp(10),dp(14),dp(10));heroAction.setBackground(gradient(0xffb12cff,0xff7414c9,22));LinearLayout.LayoutParams hap=new LinearLayout.LayoutParams(-2,dp(42));hap.topMargin=dp(14);hero.addView(heroAction,hap);heroAction.setOnClickListener(v->{jumpToChannels=true;scroll.post(()->scroll.smoothScrollTo(0,list.getTop()));});
     LinearLayout stats=new LinearLayout(this);stats.setPadding(0,dp(14),0,0);stats.setGravity(Gravity.CENTER_VERTICAL);
-    TextView stat1=label("◉  "+channels.length()+" کەناڵ",12,WHITE);stat1.setPadding(dp(12),dp(9),dp(12),dp(9));stat1.setBackground(shape(0x334fffff,22));stats.addView(stat1);
-    TextView stat2=label("  ★ دڵخوازەکانت",12,WHITE);stat2.setPadding(dp(12),dp(9),dp(12),dp(9));stat2.setBackground(shape(0x334fffff,22));LinearLayout.LayoutParams s2=new LinearLayout.LayoutParams(-2,-2);s2.leftMargin=dp(8);stats.addView(stat2,s2);hero.addView(stats);page.addView(hero);
+    TextView stat1=label("◉  "+channels.length()+" کەناڵ",12,WHITE);stat1.setPadding(dp(12),dp(9),dp(12),dp(9));stat1.setBackground(shape(0x44b12cff,22));stats.addView(stat1);
+    TextView stat2=label("  ★ دڵخوازەکانت",12,WHITE);stat2.setPadding(dp(12),dp(9),dp(12),dp(9));stat2.setBackground(shape(0x44b12cff,22));LinearLayout.LayoutParams s2=new LinearLayout.LayoutParams(-2,-2);s2.leftMargin=dp(8);stats.addView(stat2,s2);hero.addView(stats);page.addView(hero);
     LinearLayout searchRow=new LinearLayout(this);searchRow.setGravity(Gravity.CENTER_VERTICAL);searchRow.setPadding(0,dp(16),0,dp(12));
-    search=new EditText(this);search.setSingleLine(true);search.setTextColor(WHITE);search.setTextDirection(View.TEXT_DIRECTION_RTL);search.setHintTextColor(MUTED);search.setHint("گەڕان بە ناوی کەناڵ...");search.setTextSize(14);search.setPadding(dp(14),dp(10),dp(14),dp(10));search.setBackground(strokeHome(CARD,0xff263b55,15));searchRow.addView(search,new LinearLayout.LayoutParams(0,dp(48),1));
+    search=new EditText(this);search.setSingleLine(true);search.setTextColor(WHITE);search.setTextDirection(View.TEXT_DIRECTION_RTL);search.setHintTextColor(MUTED);search.setHint("گەڕان بە ناوی کەناڵ...");search.setTextSize(14);search.setPadding(dp(14),dp(10),dp(14),dp(10));search.setBackground(strokeHome(CARD,0xff49305f,15));searchRow.addView(search,new LinearLayout.LayoutParams(0,dp(48),1));
     TextView go=label("⌕",27,ACCENT);go.setGravity(Gravity.CENTER);searchRow.addView(go,new LinearLayout.LayoutParams(dp(48),dp(48)));page.addView(searchRow);
     LinearLayout filters=new LinearLayout(this);filters.setOrientation(0);filters.setPadding(0,0,0,dp(12));
     HorizontalScrollView hs=new HorizontalScrollView(this);hs.setHorizontalScrollBarEnabled(false);String[] genres={"هەمووی","News","Sports","Family","Islamic","Kids","Movies","Music","Documentary"};
@@ -152,8 +153,8 @@ public class MainActivity extends Activity {
     }
     for(JSONObject c:visible){
       String id=c.optString("id"),name=c.optString("name"),genre=c.optString("genre","");
-      LinearLayout card=new LinearLayout(this);card.setGravity(Gravity.CENTER_VERTICAL);card.setPadding(dp(12),dp(10),dp(10),dp(10));card.setBackground(gradient(0xff1a2b43,0xff111d30,18));addRipple(card,18);LinearLayout.LayoutParams cp=new LinearLayout.LayoutParams(-1,dp(88));cp.setMargins(0,0,0,dp(9));list.addView(card,cp);
-      FrameLayout logoBox=new FrameLayout(this);logoBox.setBackground(shape(0xff29435e,16));TextView initials=label(name.isEmpty()?"TV":name.substring(0,Math.min(2,name.length())).toUpperCase(Locale.ROOT),18,ACCENT);initials.setGravity(Gravity.CENTER);logoBox.addView(initials,new FrameLayout.LayoutParams(-1,-1));card.addView(logoBox,new LinearLayout.LayoutParams(dp(58),dp(58)));
+      LinearLayout card=new LinearLayout(this);card.setGravity(Gravity.CENTER_VERTICAL);card.setPadding(dp(12),dp(10),dp(10),dp(10));card.setBackground(gradient(0xff211735,0xff120d20,20));addRipple(card,18);LinearLayout.LayoutParams cp=new LinearLayout.LayoutParams(-1,dp(88));cp.setMargins(0,0,0,dp(9));list.addView(card,cp);
+      FrameLayout logoBox=new FrameLayout(this);logoBox.setBackground(shape(0xff34204f,16));TextView initials=label(name.isEmpty()?"TV":name.substring(0,Math.min(2,name.length())).toUpperCase(Locale.ROOT),18,ACCENT);initials.setGravity(Gravity.CENTER);logoBox.addView(initials,new FrameLayout.LayoutParams(-1,-1));card.addView(logoBox,new LinearLayout.LayoutParams(dp(58),dp(58)));
       String logo=c.optString("logo","");if(!logo.equals("null")&&!logo.isEmpty())loadLogo(logo,logoBox,initials);
       LinearLayout info=new LinearLayout(this);info.setOrientation(1);info.setPadding(dp(12),0,dp(5),0);TextView nm=label(name,15,WHITE);nm.setTypeface(null,Typeface.BOLD);info.addView(nm);info.addView(label(genre+"  •  HD",11,MUTED));card.addView(info,new LinearLayout.LayoutParams(0,-2,1));
       TextView star=label(fav.contains(id)?"★":"☆",23,fav.contains(id)?ACCENT:MUTED);star.setGravity(Gravity.CENTER);addRipple(star,12);card.addView(star,new LinearLayout.LayoutParams(dp(34),dp(48)));star.setOnClickListener(v->{if(!fav.add(id))fav.remove(id);prefs.edit().putStringSet("favorites",new HashSet<>(fav)).apply();renderChannels();});
