@@ -13,18 +13,6 @@
       ]
     },
     {
-      "id": 196,
-      "name": "Ava Sport",
-      "logo": "https://resources.vinex.tv/art/tvchannels/channels/a/ava-sport-196/square_any.png",
-      "genre": "Sports",
-      "order": 2,
-      "is_watchlist": false,
-      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/196/play-url",
-      "variants": [
-        "hd"
-      ]
-    },
-    {
       "id": 198,
       "name": "Rudaw",
       "logo": "https://resources.vinex.tv/art/tvchannels/channels/r/rudaw-198/square_any.png",
@@ -217,18 +205,6 @@
       ]
     },
     {
-      "id": 188,
-      "name": "NRT Sport",
-      "logo": "https://resources.vinex.tv/art/tvchannels/channels/n/nrt-sport-188/square_any.png",
-      "genre": "Sports",
-      "order": 19,
-      "is_watchlist": false,
-      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/188/play-url",
-      "variants": [
-        "hd"
-      ]
-    },
-    {
       "id": 182,
       "name": "Waar",
       "logo": "https://resources.vinex.tv/art/tvchannels/channels/w/waar-182/square_any.png",
@@ -272,18 +248,6 @@
       "order": 23,
       "is_watchlist": false,
       "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/186/play-url",
-      "variants": [
-        "hd"
-      ]
-    },
-    {
-      "id": 84,
-      "name": "Kurdistan Sport",
-      "logo": "https://resources.vinex.tv/art/tvchannels/channels/k/kurdistan-sport-84/square_any.png",
-      "genre": "Sports",
-      "order": 24,
-      "is_watchlist": false,
-      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/84/play-url",
       "variants": [
         "hd"
       ]
@@ -433,42 +397,6 @@
       ]
     },
     {
-      "id": 124,
-      "name": "MMN Sport",
-      "logo": "https://resources.vinex.tv/art/tvchannels/channels/m/mmn-sport-124/square_any.png",
-      "genre": "Sports",
-      "order": 37,
-      "is_watchlist": false,
-      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/124/play-url",
-      "variants": [
-        "hd"
-      ]
-    },
-    {
-      "id": 110,
-      "name": "Astera Sport",
-      "logo": "https://resources.vinex.tv/art/tvchannels/channels/a/astera-sport-110/square_any.png",
-      "genre": "Sports",
-      "order": 38,
-      "is_watchlist": false,
-      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/110/play-url",
-      "variants": [
-        "hd"
-      ]
-    },
-    {
-      "id": 5437,
-      "name": "Astera Sport 2",
-      "logo": null,
-      "genre": "Sports",
-      "order": 39,
-      "is_watchlist": false,
-      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5437/play-url",
-      "variants": [
-        "hd"
-      ]
-    },
-    {
       "id": 114,
       "name": "Astera Baby",
       "logo": "https://resources.vinex.tv/art/tvchannels/channels/a/astera-baby-114/square_any.png",
@@ -613,18 +541,6 @@
       ]
     },
     {
-      "id": 5438,
-      "name": "LD Sport",
-      "logo": null,
-      "genre": "Sports",
-      "order": 52,
-      "is_watchlist": false,
-      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5438/play-url",
-      "variants": [
-        "hd"
-      ]
-    },
-    {
       "id": 80,
       "name": "NewLine",
       "logo": "https://resources.vinex.tv/art/tvchannels/channels/n/newline-80/square_any.png",
@@ -685,18 +601,6 @@
       ]
     },
     {
-      "id": 74,
-      "name": "Newline Sport",
-      "logo": "https://resources.vinex.tv/art/tvchannels/channels/n/newline-sport-74/square_any.png",
-      "genre": "Sports",
-      "order": 58,
-      "is_watchlist": false,
-      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/74/play-url",
-      "variants": [
-        "hd"
-      ]
-    },
-    {
       "id": 55,
       "name": "Aro Drama",
       "logo": "https://resources.vinex.tv/art/tvchannels/channels/a/aro-drama-55/square_any.png",
@@ -728,18 +632,6 @@
       "order": 61,
       "is_watchlist": false,
       "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/54/play-url",
-      "variants": [
-        "hd"
-      ]
-    },
-    {
-      "id": 5432,
-      "name": "Aro Sport",
-      "logo": null,
-      "genre": "Sports",
-      "order": 62,
-      "is_watchlist": false,
-      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5432/play-url",
       "variants": [
         "hd"
       ]
@@ -829,18 +721,6 @@
       ]
     },
     {
-      "id": 5433,
-      "name": "Dasinya Sport",
-      "logo": null,
-      "genre": "Sports",
-      "order": 70,
-      "is_watchlist": false,
-      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5433/play-url",
-      "variants": [
-        "hd"
-      ]
-    },
-    {
       "id": 5414,
       "name": "Sima",
       "logo": null,
@@ -872,18 +752,6 @@
       "order": 73,
       "is_watchlist": false,
       "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5413/play-url",
-      "variants": [
-        "hd"
-      ]
-    },
-    {
-      "id": 5439,
-      "name": "Sima Sport",
-      "logo": null,
-      "genre": "Sports",
-      "order": 74,
-      "is_watchlist": false,
-      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5439/play-url",
       "variants": [
         "hd"
       ]
@@ -925,30 +793,6 @@
       ]
     },
     {
-      "id": 4862,
-      "name": "falcone 1",
-      "logo": null,
-      "genre": "Sports",
-      "order": 78,
-      "is_watchlist": false,
-      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/4862/play-url",
-      "variants": [
-        "hd"
-      ]
-    },
-    {
-      "id": 4863,
-      "name": "falcone 2",
-      "logo": null,
-      "genre": "Sports",
-      "order": 79,
-      "is_watchlist": false,
-      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/4863/play-url",
-      "variants": [
-        "hd"
-      ]
-    },
-    {
       "id": 4861,
       "name": "falcone family",
       "logo": null,
@@ -980,18 +824,6 @@
       "order": 82,
       "is_watchlist": false,
       "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/12/play-url",
-      "variants": [
-        "hd"
-      ]
-    },
-    {
-      "id": 81,
-      "name": "MTV Sport",
-      "logo": null,
-      "genre": "Sports",
-      "order": 83,
-      "is_watchlist": false,
-      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/81/play-url",
       "variants": [
         "hd"
       ]
@@ -1105,42 +937,6 @@
       ]
     },
     {
-      "id": 5434,
-      "name": "See Sport 1",
-      "logo": null,
-      "genre": "Sports",
-      "order": 93,
-      "is_watchlist": false,
-      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5434/play-url",
-      "variants": [
-        "hd"
-      ]
-    },
-    {
-      "id": 5435,
-      "name": "See Sport 2",
-      "logo": null,
-      "genre": "Sports",
-      "order": 94,
-      "is_watchlist": false,
-      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5435/play-url",
-      "variants": [
-        "hd"
-      ]
-    },
-    {
-      "id": 5436,
-      "name": "See Sport 3",
-      "logo": null,
-      "genre": "Sports",
-      "order": 95,
-      "is_watchlist": false,
-      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5436/play-url",
-      "variants": [
-        "hd"
-      ]
-    },
-    {
       "id": 160,
       "name": "Speda",
       "logo": "https://resources.vinex.tv/art/tvchannels/channels/s/speda-160/square_any.png",
@@ -1237,18 +1033,6 @@
       ]
     },
     {
-      "id": 102,
-      "name": "Delal Sport",
-      "logo": "https://resources.vinex.tv/art/tvchannels/channels/d/delal-sport-102/square_any.png",
-      "genre": "Sports",
-      "order": 104,
-      "is_watchlist": false,
-      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/102/play-url",
-      "variants": [
-        "hd"
-      ]
-    },
-    {
       "id": 101,
       "name": "Delal TV",
       "logo": "https://resources.vinex.tv/art/tvchannels/channels/d/delal-tv-101/square_any.png",
@@ -1256,18 +1040,6 @@
       "order": 105,
       "is_watchlist": false,
       "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/101/play-url",
-      "variants": [
-        "hd"
-      ]
-    },
-    {
-      "id": 98,
-      "name": "Duhok Sport",
-      "logo": "https://resources.vinex.tv/art/tvchannels/channels/d/duhok-sport-98/square_any.png",
-      "genre": "Sports",
-      "order": 106,
-      "is_watchlist": false,
-      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/98/play-url",
       "variants": [
         "hd"
       ]
@@ -1633,18 +1405,6 @@
       ]
     },
     {
-      "id": 5389,
-      "name": "ZAXO Sport",
-      "logo": null,
-      "genre": "Sports",
-      "order": 137,
-      "is_watchlist": false,
-      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5389/play-url",
-      "variants": [
-        "hd"
-      ]
-    },
-    {
       "id": 139,
       "name": "Zed",
       "logo": "https://resources.vinex.tv/art/tvchannels/channels/z/zed-139/square_any.png",
@@ -1796,18 +1556,6 @@
       "order": 150,
       "is_watchlist": false,
       "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/158/play-url",
-      "variants": [
-        "hd"
-      ]
-    },
-    {
-      "id": 157,
-      "name": "Aso Sport",
-      "logo": "https://resources.vinex.tv/art/tvchannels/channels/a/aso-sport-157/square_any.png",
-      "genre": "Sports",
-      "order": 151,
-      "is_watchlist": false,
-      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/157/play-url",
       "variants": [
         "hd"
       ]
@@ -2281,18 +2029,6 @@
       ]
     },
     {
-      "id": 91,
-      "name": "KRD WWE",
-      "logo": null,
-      "genre": "Sports",
-      "order": 191,
-      "is_watchlist": false,
-      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/91/play-url",
-      "variants": [
-        "hd"
-      ]
-    },
-    {
       "id": 25,
       "name": "KURD",
       "logo": null,
@@ -2699,6 +2435,678 @@
       "variants": [
         "hd"
       ]
+    },
+    {
+      "id": 188,
+      "name": "NRT Sport",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/n/nrt-sport-188/square_any.png",
+      "genre": "Sports",
+      "order": 1,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/188/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 196,
+      "name": "Ava Sport",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/a/ava-sport-196/square_any.png",
+      "genre": "Sports",
+      "order": 2,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/196/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 84,
+      "name": "Kurdistan Sport",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/k/kurdistan-sport-84/square_any.png",
+      "genre": "Sports",
+      "order": 3,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/84/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 157,
+      "name": "Aso Sport",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/a/aso-sport-157/square_any.png",
+      "genre": "Sports",
+      "order": 4,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/157/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5432,
+      "name": "Aro Sport",
+      "logo": null,
+      "genre": "Sports",
+      "order": 5,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5432/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 110,
+      "name": "Astera Sport",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/a/astera-sport-110/square_any.png",
+      "genre": "Sports",
+      "order": 6,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/110/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5437,
+      "name": "Astera Sport 2",
+      "logo": null,
+      "genre": "Sports",
+      "order": 7,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5437/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 74,
+      "name": "Newline Sport",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/n/newline-sport-74/square_any.png",
+      "genre": "Sports",
+      "order": 8,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/74/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 98,
+      "name": "Duhok Sport",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/d/duhok-sport-98/square_any.png",
+      "genre": "Sports",
+      "order": 9,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/98/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5389,
+      "name": "ZAXO Sport",
+      "logo": null,
+      "genre": "Sports",
+      "order": 10,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5389/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 124,
+      "name": "MMN Sport",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/m/mmn-sport-124/square_any.png",
+      "genre": "Sports",
+      "order": 11,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/124/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5438,
+      "name": "LD Sport",
+      "logo": null,
+      "genre": "Sports",
+      "order": 12,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5438/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5433,
+      "name": "Dasinya Sport",
+      "logo": null,
+      "genre": "Sports",
+      "order": 13,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5433/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5439,
+      "name": "Sima Sport",
+      "logo": null,
+      "genre": "Sports",
+      "order": 14,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5439/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 81,
+      "name": "MTV Sport",
+      "logo": null,
+      "genre": "Sports",
+      "order": 15,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/81/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5434,
+      "name": "See Sport 1",
+      "logo": null,
+      "genre": "Sports",
+      "order": 16,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5434/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5435,
+      "name": "See Sport 2",
+      "logo": null,
+      "genre": "Sports",
+      "order": 17,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5435/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 5436,
+      "name": "See Sport 3",
+      "logo": null,
+      "genre": "Sports",
+      "order": 18,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5436/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 102,
+      "name": "Delal Sport",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/d/delal-sport-102/square_any.png",
+      "genre": "Sports",
+      "order": 19,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/102/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 4862,
+      "name": "falcone 1",
+      "logo": null,
+      "genre": "Sports",
+      "order": 20,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/4862/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 4863,
+      "name": "falcone 2",
+      "logo": null,
+      "genre": "Sports",
+      "order": 21,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/4863/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 91,
+      "name": "KRD WWE",
+      "logo": null,
+      "genre": "Sports",
+      "order": 22,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/91/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 2634,
+      "name": "beIN SPORTS HD",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/b/bein-sports-hd-2634/square_any.png",
+      "genre": "Sports",
+      "order": 23,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/2634/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 2635,
+      "name": "beIN SPORTS 1 HD",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/b/bein-sports-1-hd-2635/square_any.png",
+      "genre": "Sports",
+      "order": 24,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/2635/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 2636,
+      "name": "beIN SPORTS 2 HD",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/b/bein-sports-2-hd-2636/square_any.png",
+      "genre": "Sports",
+      "order": 25,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/2636/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 2637,
+      "name": "beIN SPORTS 3 HD",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/b/bein-sports-3-hd-2637/square_any.png",
+      "genre": "Sports",
+      "order": 26,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/2637/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 2638,
+      "name": "beIN SPORTS 4 HD",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/b/bein-sports-4-hd-2638/square_any.png",
+      "genre": "Sports",
+      "order": 27,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/2638/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 2639,
+      "name": "beIN SPORTS 5 HD",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/b/bein-sports-5-hd-2639/square_any.png",
+      "genre": "Sports",
+      "order": 28,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/2639/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 2640,
+      "name": "beIN SPORTS 6 HD",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/b/bein-sports-6-hd-2640/square_any.png",
+      "genre": "Sports",
+      "order": 29,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/2640/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 2641,
+      "name": "beIN SPORTS 7 HD",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/b/bein-sports-7-hd-2641/square_any.png",
+      "genre": "Sports",
+      "order": 30,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/2641/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 2642,
+      "name": "beIN SPORTS 8 HD",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/b/bein-sports-8-hd-2642/square_any.png",
+      "genre": "Sports",
+      "order": 31,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/2642/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 2643,
+      "name": "beIN SPORTS 9 HD",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/b/bein-sports-9-hd-2643/square_any.png",
+      "genre": "Sports",
+      "order": 32,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/2643/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 2644,
+      "name": "beIN SPORTS XTRA 1 HD",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/b/bein-sports-xtra-1-hd-2644/square_any.png",
+      "genre": "Sports",
+      "order": 33,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/2644/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 2645,
+      "name": "beIN SPORTS XTRA 2 HD",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/b/bein-sports-xtra-2-hd-2645/square_any.png",
+      "genre": "Sports",
+      "order": 34,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/2645/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 2646,
+      "name": "beIN SPORTS XTRA 3 HD",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/b/bein-sports-xtra-3-hd-2646/square_any.png",
+      "genre": "Sports",
+      "order": 35,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/2646/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 2647,
+      "name": "beIN SPORTS XTRA 4 HD",
+      "logo": null,
+      "genre": "Sports",
+      "order": 36,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/2647/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 2648,
+      "name": "beIN SPORTS XTRA 5 HD",
+      "logo": null,
+      "genre": "Sports",
+      "order": 37,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/2648/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 2649,
+      "name": "beIN SPORTS XTRA 6 HD",
+      "logo": null,
+      "genre": "Sports",
+      "order": 38,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/2649/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 2650,
+      "name": "beIN SPORTS XTRA 7 HD",
+      "logo": null,
+      "genre": "Sports",
+      "order": 39,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/2650/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 2651,
+      "name": "beIN SPORTS XTRA 8 HD",
+      "logo": null,
+      "genre": "Sports",
+      "order": 40,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/2651/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 2652,
+      "name": "beIN SPORTS XTRA 9 HD",
+      "logo": null,
+      "genre": "Sports",
+      "order": 41,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/2652/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 2675,
+      "name": "beIN Sports 1",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/b/bein-sports-1-2675/square_any.png",
+      "genre": "Sports",
+      "order": 42,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/2675/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 2676,
+      "name": "beIN Sports 2",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/b/bein-sports-2-2676/square_any.png",
+      "genre": "Sports",
+      "order": 43,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/2676/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 2677,
+      "name": "beIN Sports 3",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/b/bein-sports-3-2677/square_any.png",
+      "genre": "Sports",
+      "order": 44,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/2677/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 2678,
+      "name": "beIN Sports 4",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/b/bein-sports-4-2678/square_any.png",
+      "genre": "Sports",
+      "order": 45,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/2678/play-url",
+      "variants": [
+        "hd"
+      ]
+    },
+    {
+      "id": 4352,
+      "name": "beIN SPORTS 4K",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/b/bein-sports-4352/square_any.png",
+      "genre": "Sports",
+      "order": 46,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/4352/play-url",
+      "variants": [
+        "4k"
+      ]
+    },
+    {
+      "id": 5481,
+      "name": "beIN SPORTS 1 4K",
+      "logo": null,
+      "genre": "Sports",
+      "order": 47,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5481/play-url",
+      "variants": [
+        "4k"
+      ]
+    },
+    {
+      "id": 5482,
+      "name": "beIN SPORTS 2 4K",
+      "logo": null,
+      "genre": "Sports",
+      "order": 48,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5482/play-url",
+      "variants": [
+        "4k"
+      ]
+    },
+    {
+      "id": 5483,
+      "name": "beIN SPORTS 3 4K",
+      "logo": null,
+      "genre": "Sports",
+      "order": 49,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5483/play-url",
+      "variants": [
+        "4k"
+      ]
+    },
+    {
+      "id": 5484,
+      "name": "beIN SPORTS 4 4K",
+      "logo": null,
+      "genre": "Sports",
+      "order": 50,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5484/play-url",
+      "variants": [
+        "4k"
+      ]
+    },
+    {
+      "id": 5485,
+      "name": "beIN SPORTS 5 4K",
+      "logo": null,
+      "genre": "Sports",
+      "order": 51,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5485/play-url",
+      "variants": [
+        "4k"
+      ]
+    },
+    {
+      "id": 5486,
+      "name": "beIN SPORTS 6 4K",
+      "logo": null,
+      "genre": "Sports",
+      "order": 52,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5486/play-url",
+      "variants": [
+        "4k"
+      ]
+    },
+    {
+      "id": 5487,
+      "name": "beIN SPORTS 7 4K",
+      "logo": null,
+      "genre": "Sports",
+      "order": 53,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5487/play-url",
+      "variants": [
+        "4k"
+      ]
+    },
+    {
+      "id": 5488,
+      "name": "beIN SPORTS 8 4K",
+      "logo": null,
+      "genre": "Sports",
+      "order": 54,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5488/play-url",
+      "variants": [
+        "4k"
+      ]
+    },
+    {
+      "id": 5489,
+      "name": "beIN SPORTS 9 4K",
+      "logo": null,
+      "genre": "Sports",
+      "order": 55,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5489/play-url",
+      "variants": [
+        "4k"
+      ]
+    },
+    {
+      "id": 4353,
+      "name": "BEIN SPORTS NEWS",
+      "logo": "https://resources.vinex.tv/art/tvchannels/channels/b/bein-sports-news-4353/square_any.png",
+      "genre": "Sports",
+      "order": 56,
+      "is_watchlist": false,
+      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/4353/play-url",
+      "variants": [
+        "hd"
+      ]
     }
   ],
   "meta": {
@@ -2707,7 +3115,7 @@
     "pagination": {
       "current_page": 1,
       "per_page": 5000,
-      "total": 225,
+      "total": 259,
       "last_page": 1
     },
     "default_format": null
