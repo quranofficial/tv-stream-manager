@@ -14,6 +14,7 @@ from telegram.ext import (
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger("SportVip")
+# SportVip runs from the current sports-only channel catalogue.
 
 DATA = json.loads(Path("channels.json").read_text(encoding="utf-8"))
 CHANNELS = DATA.get("data", [])
