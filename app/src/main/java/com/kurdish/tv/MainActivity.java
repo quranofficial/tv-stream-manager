@@ -107,9 +107,15 @@ public class MainActivity extends Activity {
         if(code!=200)throw new Exception("لینکی Live ئامادە نییە. سەرەتا Telegram TV Bot لە GitHub Actions Run بکە.");
         ByteArrayOutputStream out=new ByteArrayOutputStream();InputStream in=conn.getInputStream();byte[] buf=new byte[4096];int n;while((n=in.read(buf))>0)out.write(buf,0,n);
         JSONObject config=new JSONObject(out.toString("UTF-8"));
-        String base=config.optString("base_url","").replaceAll("/+$","");
-        String key=config.optString("access_key","");
-        if(base.isEmpty()||key.isEmpty())throw new Exception("زانیاریی ستریم تەواو نییە؛ Workflow دووبارە Run بکە.");
+        String base=config.optString("base_url","").trim().replaceAll("/+$","");
+        String key=config.optString("access_key","").trim();
+        URI parsed=new URI(base);
+        String host=parsed.getHost();
+        if(!"https".equalsIgnoreCase(parsed.getScheme())||host==null||
+          !host.toLowerCase(Locale.ROOT).endsWith(".trycloudflare.com")||
+          base.toLowerCase(Locale.ROOT).contains("undefined")||
+          base.toLowerCase(Locale.ROOT).contains("null")||key.isEmpty())
+          throw new Exception("runtime.json لینکی نادروستی تێدایە؛ Telegram TV Bot لە GitHub Actions دووبارە Run بکە.");
         String streamUrl=base+"/stream/"+id+".ts?key="+key;
         runOnUiThread(()->{
           Intent intent=new Intent(MainActivity.this,PlayerActivity.class);
