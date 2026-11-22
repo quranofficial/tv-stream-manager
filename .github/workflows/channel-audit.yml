@@ -2,12 +2,15 @@ name: 225 Channel Source Audit
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "17 3 * * *"
   push:
     paths:
       - ".github/workflows/channel-audit.yml"
       - "scripts/test_channels.py"
       - "channels.json"
       - "stream_keys.json"
+      - "bot.py"
 
 permissions:
   contents: read
@@ -39,11 +42,38 @@ jobs:
       - name: Test all 225 channel sources
         run: python -u scripts/test_channels.py
 
+      - name: Send only failed channel names to Telegram
+        if: always() && hashFiles('channel-test-report.json') != ''
+        env:
+          BOT_TOKEN: \${{ secrets.BOT_TOKEN }}
+          AUDIT_CHAT_ID: \${{ vars.AUDIT_CHAT_ID }}
+        run: |
+          python - <<'PY'
+          import json, os, urllib.request, urllib.parse
+          report = json.load(open("channel-test-report.json", encoding="utf-8"))
+          failed = [x for x in report if x.get("status") == "NOT_WORKING"]
+          if not failed:
+              print("No NOT_WORKING channels; Telegram message not sent.")
+              raise SystemExit(0)
+          token = os.environ.get("BOT_TOKEN", "")
+          chat_id = os.environ.get("AUDIT_CHAT_ID", "")
+          if not token or not chat_id:
+              print("Telegram notification skipped: configure BOT_TOKEN secret and AUDIT_CHAT_ID repository variable.")
+              raise SystemExit(0)
+          lines = ["⚠️ کەناڵە کارنەکەرەکان (" + str(len(failed)) + "):"]
+          lines += [f"• {x['name']} (ID: {x['id']})" for x in failed]
+          text = "\n".join(lines)
+          data = urllib.parse.urlencode({"chat_id": chat_id, "text": text}).encode()
+          req = urllib.request.Request(f"https://api.telegram.org/bot{token}/sendMessage", data=data)
+          with urllib.request.urlopen(req, timeout=20) as response:
+              print("Telegram notification sent:", response.status)
+          PY
+
       - name: Upload full channel report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: channel-source-audit-${{ github.run_id }}
+          name: channel-source-audit-\${{ github.run_id }}
           path: |
             channel-test-report.csv
             channel-test-report.json
