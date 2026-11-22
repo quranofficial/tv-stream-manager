@@ -11,6 +11,7 @@ on:
       - "channels.json"
       - "stream_keys.json"
       - "stream_modes.json"
+      - "source_urls.json"
   schedule:
     - cron: "*/15 * * * *"
   workflow_run:
@@ -42,7 +43,7 @@ jobs:
           python - <<'PY'
           import json
           from pathlib import Path
-          for name in ("channels.json", "stream_keys.json", "stream_modes.json"):
+          for name in ("channels.json", "stream_keys.json", "stream_modes.json", "source_urls.json"):
               path = Path(name)
               if path.exists():
                   json.loads(path.read_text(encoding="utf-8"))
