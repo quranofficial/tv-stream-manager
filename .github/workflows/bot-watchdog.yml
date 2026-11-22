@@ -14,7 +14,7 @@ on:
   schedule:
     - cron: "*/15 * * * *"
   workflow_run:
-    workflows: ["SportVip"]
+    workflows: ["Telegram TV Bot", "SportVip"]
     types: [completed]
   workflow_dispatch:
 
@@ -101,14 +101,33 @@ jobs:
           except Exception as exc:
               print("Public relay health check unavailable:", type(exc).__name__)
 
-          # A queued or running bot job is already the single active instance.
+          # Cancel an old bot revision so the updated SportVip build can take over.
+          _, ref = request(api_root + "/git/ref/heads/main")
+          latest_sha = ref["object"]["sha"]
           _, data = request(api_root + "/actions/workflows/bot.yml/runs?per_page=20")
           runs = data.get("workflow_runs", [])
           active = [r for r in runs if r.get("status") in ("queued", "in_progress")]
+          stale = [r for r in active if r.get("head_sha") != latest_sha]
+          if stale:
+              for run in stale:
+                  request(
+                      api_root + f"/actions/runs/{run['id']}/cancel",
+                      method="POST",
+                  )
+                  print(
+                      "Cancelled outdated bot run so SportVip can start:",
+                      "run_id=", run.get("id"),
+                      "old_sha=", run.get("head_sha"),
+                      "new_sha=", latest_sha,
+                  )
+              print("Waiting for GitHub to finish cancelling the outdated run.")
+              raise SystemExit(0)
+
           if active:
               run = active[0]
               print(
-                  "Bot is already active; no second run will be started.",
+                  "SportVip is already active on the latest revision; "
+                  "no second run will be started.",
                   "run_id=", run.get("id"),
                   "status=", run.get("status"),
               )
