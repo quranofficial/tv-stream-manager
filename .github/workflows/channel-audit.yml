@@ -1,0 +1,51 @@
+name: 225 Channel Source Audit
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/channel-audit.yml"
+      - "scripts/test_channels.py"
+      - "channels.json"
+      - "stream_keys.json"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: channel-source-audit
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install FFmpeg and dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          python -m pip install --upgrade pip
+          pip install aiohttp==3.11.11
+
+      - name: Test all 225 channel sources
+        run: python -u scripts/test_channels.py
+
+      - name: Upload full channel report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: channel-source-audit-${{ github.run_id }}
+          path: |
+            channel-test-report.csv
+            channel-test-report.json
+          if-no-files-found: warn
+          retention-days: 30
