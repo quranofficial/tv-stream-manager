@@ -25,3 +25,5 @@ If a channel key is wrong or either source track is unavailable, VLC will not re
 
 ## SportVip branding
 The Telegram bot replies use the SportVip name. To change the actual Telegram display name shown in the chat header, use BotFather `/setname`; the bot username is changed separately with `/setusername`.
+
+The BEIN SPORTS NEWS (ID 4353) HLS source is smoke-tested automatically by `.github/workflows/sportvip-source-test.yml`.
