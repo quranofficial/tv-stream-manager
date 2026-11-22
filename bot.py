@@ -13,8 +13,7 @@ from telegram.ext import (
 )
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
-log = logging.getLogger("SportVip")
-# SportVip runs from the current sports-only channel catalogue.
+log = logging.getLogger("tv-stream-manager")
 
 DATA = json.loads(Path("channels.json").read_text(encoding="utf-8"))
 CHANNELS = DATA.get("data", [])
@@ -135,20 +134,8 @@ async def resolve_source(channel):
     if cid in SLUG_CACHE:
         return SLUG_CACHE[cid]
     async with aiohttp.ClientSession(
-        headers={"User-Agent": "Mozilla/5.0 SportVip/1.0"}
+        headers={"User-Agent": "Mozilla/5.0 TVStreamManager/2.0"}
     ) as session:
-        # Prefer an exact per-channel HLS URL supplied for this channel.
-        explicit_url = channel.get("source_url")
-        if explicit_url:
-            ok, status = await _manifest_ok(session, explicit_url)
-            log.info("Explicit source probe channel=%s status=%s", cid, status)
-            if ok and await _ffmpeg_smoke_test(
-                explicit_url, None, cid, channel["name"], "explicit", True
-            ):
-                result = {"mode": "muxed", "url": explicit_url, "slug": "explicit"}
-                SLUG_CACHE[cid] = result
-                return result
-            log.warning("Explicit source failed validation for channel %s; trying generated candidates", cid)
         for slug, mode in source_candidates(channel):
             if mode == "muxed":
                 url = f"{BASE.rstrip('/')}/{slug}/tracks-v1a1/mono.ts.m3u8"
@@ -380,7 +367,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data.clear()
     markup, total = channel_page()
     await update.message.reply_text(
-        f"🏆 بەخێربێیت بۆ SportVip! {total} کەناڵی وەرزشی بەردەستن. کەناڵێک هەڵبژێرە یان /search بنووسە.",
+        f"📺 بەخێربێیت! {total} کەناڵ بەردەستن. کەناڵێک هەڵبژێرە یان /search بنووسە.",
         reply_markup=markup,
     )
 
@@ -441,7 +428,7 @@ async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def status(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
-        f"🟢 SportVip چالاکە. ژمارەی کەناڵەکان: {len(CHANNELS)}"
+        f"🟢 بۆت چالاکە. ژمارەی کەناڵەکان: {len(CHANNELS)}"
     )
 
 
@@ -460,7 +447,7 @@ async def restart(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def logs(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
-        "بۆ بینینی log ـەکان: GitHub → Actions → SportVip → workflow run → Logs"
+        "بۆ بینینی log ـەکان: GitHub → Actions → Telegram TV Bot → workflow run → Logs"
     )
 
 
