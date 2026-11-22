@@ -51,7 +51,7 @@ public class PlayerActivity extends Activity {
   GradientDrawable gradient(int top,int bottom,int radius){GradientDrawable d=new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,new int[]{top,bottom});d.setCornerRadius(dp(radius));return d;}
   GradientDrawable stroke(int color,int line,int radius){GradientDrawable d=bg(color,radius);d.setStroke(dp(1),line);return d;}
   TextView txt(String value,int size,int color){TextView t=new TextView(this);t.setText(value);t.setTextSize(size);t.setTextColor(color);t.setGravity(Gravity.CENTER);return t;}
-  TextView control(String value){TextView t=txt(value,19,WHITE);t.setBackground(stroke(0xdd172438,0x665b718d,16));return t;}
+  TextView control(String value){TextView t=txt(value,19,WHITE);t.setBackground(stroke(0xdd172438,0x665b718d,16));t.setClickable(true);t.setFocusable(true);t.setForeground(new android.graphics.drawable.RippleDrawable(android.content.res.ColorStateList.valueOf(0x66ffffff),null,bg(0xffffffff,16)));return t;}
   LinearLayout.LayoutParams lp(int w,int h){return new LinearLayout.LayoutParams(w<0?w:dp(w),h<0?h:dp(h));}
   @Override public void onCreate(Bundle b){
     super.onCreate(b);
@@ -100,6 +100,8 @@ public class PlayerActivity extends Activity {
     bottomPanel=new LinearLayout(this);bottomPanel.setGravity(Gravity.CENTER_VERTICAL);bottomPanel.setPadding(dp(18),dp(10),dp(18),dp(14));bottomPanel.setBackground(gradient(0xee091321,0xff07111f,0));
     playButton=control("Ⅱ");bottomPanel.addView(playButton,lp(50,46));playButton.setOnClickListener(v->{if(player==null)return;if(player.isPlaying())player.pause();else player.play();});
     TextView label=txt("KURDISH TV+  •  LIVE",11,0xffc0cbd9);label.setGravity(Gravity.CENTER_VERTICAL);label.setPadding(dp(13),0,0,0);bottomPanel.addView(label,new LinearLayout.LayoutParams(0,-2,1));
+    TextView previousChannel=control("▲");bottomPanel.addView(previousChannel,lp(42,46));previousChannel.setOnClickListener(v->tuneRelative(-1));
+    TextView nextChannel=control("▼");LinearLayout.LayoutParams ncp=lp(42,46);ncp.leftMargin=dp(6);bottomPanel.addView(nextChannel,ncp);nextChannel.setOnClickListener(v->tuneRelative(1));
     muteButton=control("🔊");bottomPanel.addView(muteButton,lp(48,46));muteButton.setOnClickListener(v->{muted=!muted;if(player!=null)player.setVolume(muted?0f:(volumeSeek.getProgress()/100f));muteButton.setText(muted?"×":"🔊");});
     fitButton=control("▣");LinearLayout.LayoutParams fp=lp(48,46);fp.leftMargin=dp(8);bottomPanel.addView(fitButton,fp);fitButton.setOnClickListener(v->{fitMode=fitMode==AspectRatioFrameLayout.RESIZE_MODE_FIT?AspectRatioFrameLayout.RESIZE_MODE_ZOOM:fitMode==AspectRatioFrameLayout.RESIZE_MODE_ZOOM?AspectRatioFrameLayout.RESIZE_MODE_FILL:AspectRatioFrameLayout.RESIZE_MODE_FIT;playerView.setResizeMode(fitMode);fitButton.setText(fitMode==AspectRatioFrameLayout.RESIZE_MODE_FIT?"FIT":fitMode==AspectRatioFrameLayout.RESIZE_MODE_ZOOM?"ZOOM":"FILL");showControls();});
     TextView retry=control("↻");LinearLayout.LayoutParams rp=lp(48,46);rp.leftMargin=dp(8);bottomPanel.addView(retry,rp);retry.setOnClickListener(v->startStream());
@@ -174,6 +176,34 @@ public class PlayerActivity extends Activity {
     stateText.setText("وەرگرتنی لینکی نوێ بۆ "+name+"...");
     refreshRuntime(()->playRelay("گۆڕینی کەناڵ بۆ "+name),true);showControls();
   }
+
+  private void tuneRelative(int direction){
+    if(channelItems==null||channelItems.length()==0)return;
+    int current=-1;
+    for(int i=0;i<channelItems.length();i++){
+      JSONObject item=channelItems.optJSONObject(i);
+      if(item!=null&&item.optString("id").equals(currentChannelId)){current=i;break;}
+    }
+    if(current<0)current=0;
+    int next=(current+direction+channelItems.length())%channelItems.length();
+    JSONObject item=channelItems.optJSONObject(next);
+    if(item!=null)selectChannel(item.optString("id"),item.optString("name","Live TV"));
+  }
+  @Override public boolean onKeyDown(int keyCode,KeyEvent event){
+    if(!drawerVisible){
+      if(keyCode==KeyEvent.KEYCODE_CHANNEL_UP||keyCode==KeyEvent.KEYCODE_DPAD_UP||keyCode==KeyEvent.KEYCODE_MEDIA_PREVIOUS){
+        tuneRelative(-1);showControls();return true;
+      }
+      if(keyCode==KeyEvent.KEYCODE_CHANNEL_DOWN||keyCode==KeyEvent.KEYCODE_DPAD_DOWN||keyCode==KeyEvent.KEYCODE_MEDIA_NEXT){
+        tuneRelative(1);showControls();return true;
+      }
+      if(keyCode==KeyEvent.KEYCODE_DPAD_CENTER||keyCode==KeyEvent.KEYCODE_ENTER||keyCode==KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE){
+        if(player!=null){if(player.isPlaying())player.pause();else player.play();showControls();}return true;
+      }
+    }
+    return super.onKeyDown(keyCode,event);
+  }
+
   private void hideSystemBars(){getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN|View.SYSTEM_UI_FLAG_HIDE_NAVIGATION|View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY|View.SYSTEM_UI_FLAG_LAYOUT_STABLE|View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN|View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);}
   private void toggleControls(){if(controlsVisible){topBar.setVisibility(View.GONE);bottomPanel.setVisibility(View.GONE);extraPanel.setVisibility(View.GONE);controlsVisible=false;handler.removeCallbacks(hideRunnable);}else showControls();}
   private void showControls(){if(controlsLocked)return;topBar.setVisibility(View.VISIBLE);bottomPanel.setVisibility(View.VISIBLE);extraPanel.setVisibility(View.VISIBLE);controlsVisible=true;handler.removeCallbacks(hideRunnable);hideRunnable=()->{if(!controlsLocked&&!drawerVisible){topBar.setVisibility(View.GONE);bottomPanel.setVisibility(View.GONE);extraPanel.setVisibility(View.GONE);controlsVisible=false;}};handler.postDelayed(hideRunnable,6500);}
