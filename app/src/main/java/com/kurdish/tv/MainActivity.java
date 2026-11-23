@@ -214,17 +214,25 @@ public class MainActivity extends Activity {
   void playChannel(JSONObject channel){
     String id=channel.optString("id");
     String title=channel.optString("name");
+    // Start immediately with the last known relay; refresh the tunnel only when needed.
+    String cachedBase=prefs.getString("tv_runtime_base","");
+    String cachedKey=prefs.getString("tv_runtime_key","");
+    if(!cachedBase.isEmpty()&&!cachedKey.isEmpty()){
+      launchPlayer(id,title,cachedBase,cachedKey);
+      return;
+    }
     Toast.makeText(this,"وەرگرتنی لینکی Live بۆ "+title+"...",Toast.LENGTH_SHORT).show();
     new Thread(()->{
       HttpURLConnection conn=null;
       try{
         URL configUrl=new URL("https://raw.githubusercontent.com/quranofficial/tv-stream-manager/main/runtime.json?nocache="+System.currentTimeMillis());
         conn=(HttpURLConnection)configUrl.openConnection();
-        conn.setConnectTimeout(12000);conn.setReadTimeout(12000);
+        conn.setConnectTimeout(8000);conn.setReadTimeout(8000);
         conn.setRequestProperty("Cache-Control","no-cache");
         int code=conn.getResponseCode();
         if(code!=200)throw new Exception("لینکی Live ئامادە نییە. سەرەتا Telegram TV Bot لە GitHub Actions Run بکە.");
-        ByteArrayOutputStream out=new ByteArrayOutputStream();InputStream in=conn.getInputStream();byte[] buf=new byte[4096];int n;while((n=in.read(buf))>0)out.write(buf,0,n);
+        ByteArrayOutputStream out=new ByteArrayOutputStream();
+        try(InputStream in=conn.getInputStream()){byte[] buf=new byte[4096];int n;while((n=in.read(buf))>0)out.write(buf,0,n);}
         JSONObject config=new JSONObject(out.toString("UTF-8"));
         String base=config.optString("base_url","").trim().replaceAll("/+$","");
         String key=config.optString("access_key","").trim();
@@ -235,21 +243,24 @@ public class MainActivity extends Activity {
           base.toLowerCase(Locale.ROOT).contains("undefined")||
           base.toLowerCase(Locale.ROOT).contains("null")||key.isEmpty())
           throw new Exception("runtime.json لینکی نادروستی تێدایە؛ Telegram TV Bot لە GitHub Actions دووبارە Run بکە.");
-        String streamUrl=base+"/stream/"+id+".ts?key="+key;
-        runOnUiThread(()->{
-          Intent intent=new Intent(MainActivity.this,PlayerActivity.class);
-          intent.putExtra("title",title);
-          intent.putExtra("url",streamUrl);
-          intent.putExtra("source_api_url",base+"/source/"+id+"?key="+key);
-          intent.putExtra("relay_url",streamUrl);
-          intent.putExtra("runtime_base",base);
-          intent.putExtra("runtime_key",key);
-          intent.putExtra("channel_id",id);
-          intent.putExtra("channels_json",channels.toString());
-          startActivity(intent);
-        });
-      }catch(Exception e){String message=e.getMessage()==null?"هەڵە لە پەیوەندی بە ستریم":e.getMessage();runOnUiThread(()->new AlertDialog.Builder(MainActivity.this).setTitle("پەخش ئامادە نییە").setMessage(message+"\n\nGitHub → Actions → Telegram TV Bot → Run workflow").setPositiveButton("باشە",null).show());}
-      finally{if(conn!=null)conn.disconnect();}
+        prefs.edit().putString("tv_runtime_base",base).putString("tv_runtime_key",key).apply();
+        runOnUiThread(()->{if(!isFinishing())launchPlayer(id,title,base,key);});
+      }catch(Exception e){
+        String message=e.getMessage()==null?"هەڵە لە پەیوەندی بە ستریم":e.getMessage();
+        runOnUiThread(()->{if(!isFinishing())new AlertDialog.Builder(MainActivity.this).setTitle("پەخش ئامادە نییە").setMessage(message+"\\n\\nGitHub → Actions → Telegram TV Bot → Run workflow").setPositiveButton("باشە",null).show();});
+      }finally{if(conn!=null)conn.disconnect();}
     }).start();
   }
-}
+  void launchPlayer(String id,String title,String base,String key){
+    String streamUrl=base+"/stream/"+id+".ts?key="+key;
+    Intent intent=new Intent(MainActivity.this,PlayerActivity.class);
+    intent.putExtra("title",title);
+    intent.putExtra("url",streamUrl);
+    intent.putExtra("source_api_url",base+"/source/"+id+"?key="+key);
+    intent.putExtra("relay_url",streamUrl);
+    intent.putExtra("runtime_base",base);
+    intent.putExtra("runtime_key",key);
+    intent.putExtra("channel_id",id);
+    intent.putExtra("channels_json",channels.toString());
+    startActivity(intent);
+  }}
