@@ -18,6 +18,8 @@ import androidx.media3.exoplayer.hls.HlsMediaSource;
 import androidx.media3.common.PlaybackException;
 import androidx.media3.common.Player;
 import androidx.media3.exoplayer.ExoPlayer;
+import androidx.media3.exoplayer.LoadControl;
+import androidx.media3.exoplayer.DefaultLoadControl;
 import androidx.media3.datasource.DefaultHttpDataSource;
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory;
 import androidx.media3.ui.AspectRatioFrameLayout;
@@ -41,6 +43,9 @@ public class PlayerActivity extends Activity {
   private Runnable hideRunnable;
   private String streamUrl, channelTitle, sourceApiUrl, relayUrl;
   private boolean directAttempted=false, relayAttempted=false, runtimeRefreshAttempted=false;
+  private String activePlaybackUrl="";
+  private int networkRetryCount=0;
+  private Runnable networkRetryRunnable;
   private boolean muted=false, controlsLocked=false, controlsVisible=true;
   private int fitMode=AspectRatioFrameLayout.RESIZE_MODE_FIT;
   private float oldBrightness=-1f;
@@ -100,8 +105,8 @@ public class PlayerActivity extends Activity {
     bottomPanel=new LinearLayout(this);bottomPanel.setGravity(Gravity.CENTER_VERTICAL);bottomPanel.setPadding(dp(18),dp(10),dp(18),dp(14));bottomPanel.setBackground(gradient(0xee10091d,0xff080713,0));
     playButton=control("Ⅱ");bottomPanel.addView(playButton,lp(50,46));playButton.setOnClickListener(v->{if(player==null)return;if(player.isPlaying())player.pause();else player.play();});
     TextView label=txt("KURDISH TV+  •  LIVE",11,0xffc0cbd9);label.setGravity(Gravity.CENTER_VERTICAL);label.setPadding(dp(13),0,0,0);bottomPanel.addView(label,new LinearLayout.LayoutParams(0,-2,1));
-    TextView previousChannel=control("▲");bottomPanel.addView(previousChannel,lp(42,46));previousChannel.setOnClickListener(v->tuneRelative(-1));
-    TextView nextChannel=control("▼");LinearLayout.LayoutParams ncp=lp(42,46);ncp.leftMargin=dp(6);bottomPanel.addView(nextChannel,ncp);nextChannel.setOnClickListener(v->tuneRelative(1));
+    TextView previousChannel=control("▲");bottomPanel.addView(previousChannel,lp(42,46));previousChannel.setOnClickListener(v->tuneRelative(1));
+    TextView nextChannel=control("▼");LinearLayout.LayoutParams ncp=lp(42,46);ncp.leftMargin=dp(6);bottomPanel.addView(nextChannel,ncp);nextChannel.setOnClickListener(v->tuneRelative(-1));
     muteButton=control("🔊");bottomPanel.addView(muteButton,lp(48,46));muteButton.setOnClickListener(v->{muted=!muted;if(player!=null)player.setVolume(muted?0f:(volumeSeek.getProgress()/100f));muteButton.setText(muted?"×":"🔊");});
     fitButton=control("▣");LinearLayout.LayoutParams fp=lp(48,46);fp.leftMargin=dp(8);bottomPanel.addView(fitButton,fp);fitButton.setOnClickListener(v->{fitMode=fitMode==AspectRatioFrameLayout.RESIZE_MODE_FIT?AspectRatioFrameLayout.RESIZE_MODE_ZOOM:fitMode==AspectRatioFrameLayout.RESIZE_MODE_ZOOM?AspectRatioFrameLayout.RESIZE_MODE_FILL:AspectRatioFrameLayout.RESIZE_MODE_FIT;playerView.setResizeMode(fitMode);fitButton.setText(fitMode==AspectRatioFrameLayout.RESIZE_MODE_FIT?"FIT":fitMode==AspectRatioFrameLayout.RESIZE_MODE_ZOOM?"ZOOM":"FILL");showControls();});
     TextView retry=control("↻");LinearLayout.LayoutParams rp=lp(48,46);rp.leftMargin=dp(8);bottomPanel.addView(retry,rp);retry.setOnClickListener(v->startStream());
@@ -193,11 +198,11 @@ public class PlayerActivity extends Activity {
     if(!drawerVisible){
       if(keyCode==KeyEvent.KEYCODE_CHANNEL_UP||keyCode==KeyEvent.KEYCODE_MEDIA_PREVIOUS||
          (keyCode==KeyEvent.KEYCODE_DPAD_UP&&!controlsVisible)){
-        tuneRelative(-1);showControls();return true;
+        tuneRelative(1);showControls();return true;
       }
       if(keyCode==KeyEvent.KEYCODE_CHANNEL_DOWN||keyCode==KeyEvent.KEYCODE_MEDIA_NEXT||
          (keyCode==KeyEvent.KEYCODE_DPAD_DOWN&&!controlsVisible)){
-        tuneRelative(1);showControls();return true;
+        tuneRelative(-1);showControls();return true;
       }
       if(keyCode==KeyEvent.KEYCODE_DPAD_CENTER||keyCode==KeyEvent.KEYCODE_ENTER||keyCode==KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE){
         if(player!=null){if(player.isPlaying())player.pause();else player.play();showControls();}return true;
@@ -278,6 +283,8 @@ public class PlayerActivity extends Activity {
     playUrl(relayUrl);
   }
   private void playUrl(String url){
+    activePlaybackUrl=url;
+    if(networkRetryRunnable!=null){handler.removeCallbacks(networkRetryRunnable);networkRetryRunnable=null;}
     if(player!=null){player.release();player=null;}
     loading.setVisibility(View.VISIBLE);stateText.setVisibility(View.VISIBLE);playButton.setText("Ⅱ");
     DefaultHttpDataSource.Factory httpFactory=new DefaultHttpDataSource.Factory()
@@ -285,7 +292,12 @@ public class PlayerActivity extends Activity {
       .setConnectTimeoutMs(20000)
       .setReadTimeoutMs(30000)
       .setAllowCrossProtocolRedirects(true);
+    LoadControl loadControl=new DefaultLoadControl.Builder()
+      .setBufferDurationsMs(12000,45000,1500,5000)
+      .setPrioritizeTimeOverSizeThresholds(true)
+      .build();
     player=new ExoPlayer.Builder(this)
+      .setLoadControl(loadControl)
       .setMediaSourceFactory(new DefaultMediaSourceFactory(this).setDataSourceFactory(httpFactory))
       .build();
     playerView.setPlayer(player);
@@ -302,13 +314,21 @@ public class PlayerActivity extends Activity {
     player.addListener(new Player.Listener(){
       @Override public void onPlaybackStateChanged(int s){
         if(s==Player.STATE_BUFFERING){loading.setVisibility(View.VISIBLE);stateText.setVisibility(View.VISIBLE);stateText.setText("بارکردنی پەخش...");}
-        else if(s==Player.STATE_READY){loading.setVisibility(View.GONE);stateText.setVisibility(View.GONE);}
+        else if(s==Player.STATE_READY){networkRetryCount=0;runtimeRefreshAttempted=false;loading.setVisibility(View.GONE);stateText.setVisibility(View.GONE);}
         else if(s==Player.STATE_ENDED){loading.setVisibility(View.GONE);stateText.setVisibility(View.GONE);}
       }
       @Override public void onPlayerError(PlaybackException e){
         if(directAttempted&&!relayAttempted){playRelay("پەخشی ڕاستەوخۆ کار نەکرد؛ گۆڕین بۆ Relay");}
-        else if(!runtimeRefreshAttempted&&isNetworkFailure(e)){
-          runtimeRefreshAttempted=true;relayAttempted=false;
+        else if(isNetworkFailure(e)&&networkRetryCount<5){
+          final String retryUrl=activePlaybackUrl;
+          final int attempt=++networkRetryCount;
+          long delay=Math.min(15000L,2000L*(1L<<(attempt-1)));
+          loading.setVisibility(View.VISIBLE);stateText.setVisibility(View.VISIBLE);
+          stateText.setText("ئینتەرنێت لاوازە؛ پەخش بەردەوام دەبێت... هەوڵی "+attempt+"/5");
+          networkRetryRunnable=()->{if(!isFinishing()&&retryUrl.equals(activePlaybackUrl))playUrl(retryUrl);};
+          handler.postDelayed(networkRetryRunnable,delay);
+        }else if(!runtimeRefreshAttempted&&isNetworkFailure(e)){
+          runtimeRefreshAttempted=true;relayAttempted=false;networkRetryCount=0;
           loading.setVisibility(View.VISIBLE);stateText.setVisibility(View.VISIBLE);
           stateText.setText("لینکی ستریم نوێ دەکرێتەوە...");
           refreshRuntime(()->playRelay("لینکی نوێ وەرگیرا؛ دووبارە پەخش دەکرێت"),true);
@@ -325,7 +345,7 @@ public class PlayerActivity extends Activity {
     });
     player.prepare();player.play();
   }
-  @Override protected void onStop(){super.onStop();handler.removeCallbacksAndMessages(null);if(player!=null){player.release();player=null;}}
+  @Override protected void onStop(){super.onStop();handler.removeCallbacksAndMessages(null);networkRetryRunnable=null;if(player!=null){player.release();player=null;}}
   @Override public void onWindowFocusChanged(boolean hasFocus){super.onWindowFocusChanged(hasFocus);if(hasFocus)hideSystemBars();}
   @Override public void onBackPressed(){finish();}
 }
