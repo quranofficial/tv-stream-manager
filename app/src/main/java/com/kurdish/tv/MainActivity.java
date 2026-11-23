@@ -33,7 +33,54 @@ public class MainActivity extends Activity {
   GradientDrawable gradient(int a,int b,int radius){GradientDrawable d=new GradientDrawable(GradientDrawable.Orientation.TL_BR,new int[]{a,b});d.setCornerRadius(dp(radius));return d;}
   TextView label(String s,int size,int color){TextView t=new TextView(this);t.setText(s);t.setTextSize(size);t.setTextColor(color);t.setGravity(Gravity.CENTER_VERTICAL);return t;}
   TextView pill(String s){TextView t=label(s,12,ACCENT);t.setPadding(dp(10),dp(5),dp(10),dp(5));t.setBackground(shape(0xff35104f,30));return t;}
-  @Override public void onCreate(Bundle b){super.onCreate(b);getWindow().setStatusBarColor(BG);getWindow().setNavigationBarColor(BG);getWindow().getDecorView().setSystemUiVisibility(0);prefs=getSharedPreferences("kurdish_tv",0);fav.addAll(prefs.getStringSet("favorites",new HashSet<>()));deviceId=prefs.getString("tv_device_id","");if(deviceId.isEmpty()){deviceId=UUID.randomUUID().toString();prefs.edit().putString("tv_device_id",deviceId).apply();}try{InputStream in=getAssets().open("channels.json");ByteArrayOutputStream out=new ByteArrayOutputStream();byte[] buf=new byte[8192];int n;while((n=in.read(buf))>0)out.write(buf,0,n);channels=new JSONObject(out.toString("UTF-8")).getJSONArray("data");}catch(Exception e){}showLastCrash();checkAccess();}
+  @Override public void onCreate(Bundle b){
+    super.onCreate(b);
+    getWindow().setStatusBarColor(BG);getWindow().setNavigationBarColor(BG);getWindow().getDecorView().setSystemUiVisibility(0);
+    prefs=getSharedPreferences("kurdish_tv",0);fav.addAll(prefs.getStringSet("favorites",new HashSet<>()));
+    deviceId=prefs.getString("tv_device_id","");
+    if(deviceId.isEmpty()){deviceId=UUID.randomUUID().toString();prefs.edit().putString("tv_device_id",deviceId).apply();}
+    showLastCrash();
+    loadInitialState();
+  }
+  void showSplash(){
+    LinearLayout page=new LinearLayout(this);page.setOrientation(1);page.setGravity(Gravity.CENTER);
+    page.setPadding(dp(28),dp(24),dp(28),dp(24));page.setBackground(gradient(0xff080713,0xff211039,0));
+    FrameLayout mark=new FrameLayout(this);mark.setBackground(gradient(0xff40136c,0xff160d2b,30));
+    ImageView logo=new ImageView(this);logo.setImageResource(com.kurdish.tv.R.drawable.ic_kurdish_tv_logo);logo.setScaleType(ImageView.ScaleType.FIT_CENTER);
+    FrameLayout.LayoutParams logoP=new FrameLayout.LayoutParams(dp(92),dp(92),Gravity.CENTER);mark.addView(logo,logoP);
+    LinearLayout.LayoutParams markP=new LinearLayout.LayoutParams(dp(132),dp(132));markP.bottomMargin=dp(22);page.addView(mark,markP);
+    TextView brand=label("KURDISH TV+",27,WHITE);brand.setTypeface(null,Typeface.BOLD);brand.setGravity(Gravity.CENTER);page.addView(brand);
+    TextView sub=label("PREMIUM LIVE TELEVISION",10,0xffc7a1ef);sub.setGravity(Gravity.CENTER);sub.setLetterSpacing(.18f);
+    LinearLayout.LayoutParams subP=new LinearLayout.LayoutParams(-1,-2);subP.topMargin=dp(7);page.addView(sub,subP);
+    ProgressBar progress=new ProgressBar(this);progress.setIndeterminateTintList(android.content.res.ColorStateList.valueOf(ACCENT));
+    LinearLayout.LayoutParams progressP=new LinearLayout.LayoutParams(dp(42),dp(42));progressP.topMargin=dp(30);page.addView(progress,progressP);
+    TextView status=label("ئامادەکردنی کەناڵەکان و پەیوەندی...",12,MUTED);status.setGravity(Gravity.CENTER);
+    LinearLayout.LayoutParams statusP=new LinearLayout.LayoutParams(-1,-2);statusP.topMargin=dp(12);page.addView(status,statusP);
+    setContentView(page);
+  }
+  void loadInitialState(){
+    showSplash();
+    String saved=prefs.getString("tv_session_token","");
+    new Thread(()->{
+      boolean channelsOk=false,authorized=saved.isEmpty(),networkError=false;
+      try(InputStream in=getAssets().open("channels.json");ByteArrayOutputStream out=new ByteArrayOutputStream()){
+        byte[] buf=new byte[8192];int n;while((n=in.read(buf))>0)out.write(buf,0,n);
+        channels=new JSONObject(out.toString("UTF-8")).getJSONArray("data");channelsOk=true;
+      }catch(Exception ignored){}
+      if(!saved.isEmpty()){
+        try{accessRequest("validate",null,saved);authorized=true;}
+        catch(Exception e){networkError=true;}
+      }
+      final boolean ready=channelsOk,allowed=authorized,offline=networkError;
+      runOnUiThread(()->{
+        if(isFinishing())return;
+        if(!ready){showLogin("نەتوانرا زانیاریی کەناڵەکان باربکرێت. تکایە دووبارە هەوڵبدە.");return;}
+        if(allowed){accessToken=saved;showHome();}
+        else if(offline){accessToken=saved;showLogin("پەیوەندی بە سێرڤەر نەکرا. ئینتەرنێت بپشکنە و دووبارە هەوڵبدە.");}
+        else{prefs.edit().remove("tv_session_token").apply();accessToken="";showLogin("کۆدی پێشووت بەسەرچووە یان ناچالاک کراوە. تکایە کۆدی نوێ بنووسە.");}
+      });
+    }).start();
+  }
   GradientDrawable strokeHome(int color,int line,int radius){GradientDrawable d=shape(color,radius);d.setStroke(dp(1),line);return d;}
   void showLastCrash(){String report=getSharedPreferences("crash_report",0).getString("last_crash",null);if(report==null||report.isEmpty())return;new AlertDialog.Builder(this).setTitle("Crash report").setMessage("ئەمە هۆکاری داخستنی جارەکەی پێشووترە. تکایە Copy بکە و بۆم بینێرە.\\n\\n"+report).setPositiveButton("Copy", (d,w)->{((android.content.ClipboardManager)getSystemService(CLIPBOARD_SERVICE)).setPrimaryClip(android.content.ClipData.newPlainText("Crash report",report));Toast.makeText(this,"Crash report کۆپی کرا",Toast.LENGTH_SHORT).show();}).setNegativeButton("داخستن",null).show();}
   void addRipple(View v,int radius){
@@ -61,13 +108,7 @@ public class MainActivity extends Activity {
     if(status<200||status>=300)throw new Exception(result.optString("error","هەڵە لە چوونەژوورەوە"));
     return result;
   }
-  void checkAccess(){
-    accessToken=prefs.getString("tv_session_token","");
-    if(accessToken.isEmpty()){showLogin("");return;}
-    new Thread(()->{try{accessRequest("validate",null,accessToken);runOnUiThread(()->{if(!isFinishing())showHome();});}
-      catch(Exception e){prefs.edit().remove("tv_session_token").apply();accessToken="";runOnUiThread(()->{if(!isFinishing())showLogin("کۆدی پێشوو بەسەرچووە یان ناچالاک کراوە. تکایە کۆدی نوێ بنووسە.");});}
-    }).start();
-  }
+
   void showLogin(String message){
     LinearLayout page=new LinearLayout(this);page.setOrientation(1);page.setGravity(Gravity.CENTER);
     page.setPadding(dp(28),dp(24),dp(28),dp(24));page.setBackground(gradient(0xff080713,0xff24103e,0));
