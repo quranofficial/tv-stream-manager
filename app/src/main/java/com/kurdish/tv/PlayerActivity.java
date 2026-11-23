@@ -345,7 +345,23 @@ public class PlayerActivity extends Activity {
     });
     player.prepare();player.play();
   }
-  @Override protected void onStop(){super.onStop();handler.removeCallbacksAndMessages(null);networkRetryRunnable=null;if(player!=null){player.release();player=null;}}
+  private void stopPlaybackCompletely(){
+    handler.removeCallbacksAndMessages(null);
+    networkRetryRunnable=null;
+    activePlaybackUrl="";
+    if(playerView!=null)playerView.setPlayer(null);
+    if(player!=null){
+      try{player.stop();player.clearMediaItems();}catch(Exception ignored){}
+      player.release();player=null;
+    }
+  }
+  @Override protected void onPause(){
+    super.onPause();
+    // Live audio must never continue after the user leaves the player/app.
+    stopPlaybackCompletely();
+  }
+  @Override protected void onStop(){super.onStop();stopPlaybackCompletely();}
+  @Override protected void onDestroy(){stopPlaybackCompletely();super.onDestroy();}
   @Override public void onWindowFocusChanged(boolean hasFocus){super.onWindowFocusChanged(hasFocus);if(hasFocus)hideSystemBars();}
   @Override public void onBackPressed(){finish();}
 }
