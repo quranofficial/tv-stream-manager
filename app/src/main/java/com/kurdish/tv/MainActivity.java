@@ -9,6 +9,8 @@ import android.graphics.drawable.GradientDrawable;
 import android.view.*;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.*;
+import android.util.LruCache;
+import java.util.concurrent.*;
 import org.json.*;
 import java.io.*;
 import java.net.*;
@@ -16,6 +18,11 @@ import java.util.*;
 
 public class MainActivity extends Activity {
   final int BG=0xff080713, CARD=0xff19142b, MUTED=0xffa99fbd, ACCENT=0xffb12cff, WHITE=0xfff7f3ff;
+  private static final ExecutorService logoExecutor=Executors.newFixedThreadPool(3);
+  private static final Set<String> logoLoads=java.util.Collections.newSetFromMap(new ConcurrentHashMap<String,Boolean>());
+  private static final LruCache<String,android.graphics.Bitmap> logoCache=new LruCache<String,android.graphics.Bitmap>(6*1024*1024){
+    @Override protected int sizeOf(String key,android.graphics.Bitmap value){return value.getByteCount();}
+  };
   JSONArray channels=new JSONArray();
   SharedPreferences prefs;
   LinearLayout root, list;
@@ -205,7 +212,28 @@ public class MainActivity extends Activity {
     }
     if(visible.isEmpty()){TextView empty=label("هیچ کەناڵێک نەدۆزرایەوە",14,MUTED);empty.setGravity(Gravity.CENTER);list.addView(empty);}
   }
-  void loadLogo(String url,FrameLayout box,TextView fallback){new Thread(()->{try{HttpURLConnection c=(HttpURLConnection)new URL(url).openConnection();c.setConnectTimeout(6000);c.setReadTimeout(6000);android.graphics.Bitmap bm=android.graphics.BitmapFactory.decodeStream(c.getInputStream());c.disconnect();if(bm!=null)runOnUiThread(()->{ImageView iv=new ImageView(this);iv.setImageBitmap(bm);iv.setScaleType(ImageView.ScaleType.CENTER_CROP);box.removeAllViews();box.addView(iv,new FrameLayout.LayoutParams(-1,-1));});}catch(Exception ignored){}}).start();}
+  void loadLogo(String url,FrameLayout box,TextView fallback){
+    android.graphics.Bitmap cached=logoCache.get(url);
+    if(cached!=null){showLogoBitmap(box,cached);return;}
+    if(!logoLoads.add(url))return;
+    logoExecutor.execute(()->{
+      HttpURLConnection conn=null;android.graphics.Bitmap bitmap=null;
+      try{
+        conn=(HttpURLConnection)new URL(url).openConnection();
+        conn.setConnectTimeout(4000);conn.setReadTimeout(5000);
+        conn.setUseCaches(true);
+        try(InputStream in=conn.getInputStream()){bitmap=android.graphics.BitmapFactory.decodeStream(in);}
+        if(bitmap!=null)logoCache.put(url,bitmap);
+      }catch(Exception ignored){}finally{if(conn!=null)conn.disconnect();logoLoads.remove(url);}
+      final android.graphics.Bitmap result=bitmap;
+      if(result!=null)runOnUiThread(()->{if(!isFinishing()&&box.getParent()!=null)showLogoBitmap(box,result);});
+    });
+  }
+  void showLogoBitmap(FrameLayout box,android.graphics.Bitmap bitmap){
+    ImageView image=new ImageView(this);image.setImageBitmap(bitmap);
+    image.setScaleType(ImageView.ScaleType.CENTER_CROP);
+    box.removeAllViews();box.addView(image,new FrameLayout.LayoutParams(-1,-1));
+  }
   void relaySettings(){
     new AlertDialog.Builder(this)
       .setTitle("پەیوەندی بە ستریم")
