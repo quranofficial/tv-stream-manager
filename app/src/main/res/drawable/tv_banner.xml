@@ -1,0 +1,8 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <gradient android:angle="0" android:startColor="#080713" android:centerColor="#24103D" android:endColor="#57128A"/>
+        </shape>
+    </item>
+    <item android:drawable="@drawable/ic_kurdish_tv_logo" android:gravity="center" android:width="88dp" android:height="88dp"/>
+</layer-list>
