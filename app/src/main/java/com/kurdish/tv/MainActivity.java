@@ -41,6 +41,7 @@ public class MainActivity extends Activity {
     if(deviceId.isEmpty()){deviceId=UUID.randomUUID().toString();prefs.edit().putString("tv_device_id",deviceId).apply();}
     showLastCrash();
     loadInitialState();
+    prefetchRuntime();
   }
   void showSplash(){
     LinearLayout page=new LinearLayout(this);page.setOrientation(1);page.setGravity(Gravity.CENTER);
@@ -210,6 +211,28 @@ public class MainActivity extends Activity {
       .setTitle("پەیوەندی بە ستریم")
       .setMessage("ئەپەکە بە شێوەی ئۆتۆماتیکی نوێترین لینکی Live لە GitHub Actions وەردەگرێت. پێویست ناکات هیچ لینکێک بە دەستی دابنێیت.\n\nتکایە دڵنیابە Telegram Bot workflow چالاکە.")
       .setPositiveButton("باشە",null).show();
+  }
+  void prefetchRuntime(){
+    new Thread(()->{
+      HttpURLConnection conn=null;
+      try{
+        URL url=new URL("https://raw.githubusercontent.com/quranofficial/tv-stream-manager/main/runtime.json?prefetch="+System.currentTimeMillis());
+        conn=(HttpURLConnection)url.openConnection();
+        conn.setConnectTimeout(5000);conn.setReadTimeout(5000);
+        conn.setRequestProperty("Cache-Control","no-cache");
+        if(conn.getResponseCode()!=200)return;
+        ByteArrayOutputStream out=new ByteArrayOutputStream();
+        try(InputStream in=conn.getInputStream()){byte[] buf=new byte[2048];int n;while((n=in.read(buf))>0)out.write(buf,0,n);}
+        JSONObject config=new JSONObject(out.toString("UTF-8"));
+        String base=config.optString("base_url","").trim().replaceAll("/+$","");
+        String key=config.optString("access_key","").trim();
+        URI parsed=new URI(base);
+        String host=parsed.getHost();
+        if("https".equalsIgnoreCase(parsed.getScheme())&&host!=null&&host.toLowerCase(Locale.ROOT).endsWith(".trycloudflare.com")&&!key.isEmpty()){
+          prefs.edit().putString("tv_runtime_base",base).putString("tv_runtime_key",key).apply();
+        }
+      }catch(Exception ignored){}finally{if(conn!=null)conn.disconnect();}
+    }).start();
   }
   void playChannel(JSONObject channel){
     String id=channel.optString("id");
