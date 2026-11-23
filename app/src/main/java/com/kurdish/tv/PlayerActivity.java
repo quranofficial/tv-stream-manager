@@ -191,10 +191,12 @@ public class PlayerActivity extends Activity {
   }
   @Override public boolean onKeyDown(int keyCode,KeyEvent event){
     if(!drawerVisible){
-      if(keyCode==KeyEvent.KEYCODE_CHANNEL_UP||keyCode==KeyEvent.KEYCODE_DPAD_UP||keyCode==KeyEvent.KEYCODE_MEDIA_PREVIOUS){
+      if(keyCode==KeyEvent.KEYCODE_CHANNEL_UP||keyCode==KeyEvent.KEYCODE_MEDIA_PREVIOUS||
+         (keyCode==KeyEvent.KEYCODE_DPAD_UP&&!controlsVisible)){
         tuneRelative(-1);showControls();return true;
       }
-      if(keyCode==KeyEvent.KEYCODE_CHANNEL_DOWN||keyCode==KeyEvent.KEYCODE_DPAD_DOWN||keyCode==KeyEvent.KEYCODE_MEDIA_NEXT){
+      if(keyCode==KeyEvent.KEYCODE_CHANNEL_DOWN||keyCode==KeyEvent.KEYCODE_MEDIA_NEXT||
+         (keyCode==KeyEvent.KEYCODE_DPAD_DOWN&&!controlsVisible)){
         tuneRelative(1);showControls();return true;
       }
       if(keyCode==KeyEvent.KEYCODE_DPAD_CENTER||keyCode==KeyEvent.KEYCODE_ENTER||keyCode==KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE){
