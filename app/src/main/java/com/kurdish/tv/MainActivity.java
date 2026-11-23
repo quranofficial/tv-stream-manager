@@ -247,7 +247,7 @@ public class MainActivity extends Activity {
         runOnUiThread(()->{if(!isFinishing())launchPlayer(id,title,base,key);});
       }catch(Exception e){
         String message=e.getMessage()==null?"هەڵە لە پەیوەندی بە ستریم":e.getMessage();
-        runOnUiThread(()->{if(!isFinishing())new AlertDialog.Builder(MainActivity.this).setTitle("پەخش ئامادە نییە").setMessage(message+"\\n\\nGitHub → Actions → Telegram TV Bot → Run workflow").setPositiveButton("باشە",null).show();});
+        runOnUiThread(()->{if(!isFinishing())new AlertDialog.Builder(MainActivity.this).setTitle("پەخش ئامادە نییە").setMessage(message+"\n\nGitHub → Actions → Telegram TV Bot → Run workflow").setPositiveButton("باشە",null).show();});
       }finally{if(conn!=null)conn.disconnect();}
     }).start();
   }
@@ -263,4 +263,5 @@ public class MainActivity extends Activity {
     intent.putExtra("channel_id",id);
     intent.putExtra("channels_json",channels.toString());
     startActivity(intent);
-  }}
+  }
+}
