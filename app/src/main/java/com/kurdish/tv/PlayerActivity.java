@@ -293,65 +293,71 @@ public class PlayerActivity extends Activity {
   private void playUrl(String url){
     activePlaybackUrl=url;
     if(networkRetryRunnable!=null){handler.removeCallbacks(networkRetryRunnable);networkRetryRunnable=null;}
-    if(player!=null){player.release();player=null;}
+    if(player==null){
+      DefaultHttpDataSource.Factory httpFactory=new DefaultHttpDataSource.Factory()
+        .setUserAgent("Mozilla/5.0 TVStreamManager/2.0")
+        .setConnectTimeoutMs(8000)
+        .setReadTimeoutMs(15000)
+        .setAllowCrossProtocolRedirects(true);
+      LoadControl loadControl=new DefaultLoadControl.Builder()
+        .setBufferDurationsMs(1500,12000,500,1000)
+        .setPrioritizeTimeOverSizeThresholds(true)
+        .build();
+      player=new ExoPlayer.Builder(this)
+        .setLoadControl(loadControl)
+        .setMediaSourceFactory(new DefaultMediaSourceFactory(this).setDataSourceFactory(httpFactory))
+        .build();
+      playerView.setPlayer(player);
+      player.addListener(new Player.Listener(){
+        @Override public void onPlaybackStateChanged(int s){
+          if(s==Player.STATE_BUFFERING){loading.setVisibility(View.VISIBLE);stateText.setVisibility(View.VISIBLE);stateText.setText("بارکردنی پەخش...");}
+          else if(s==Player.STATE_READY){networkRetryCount=0;runtimeRefreshAttempted=false;loading.setVisibility(View.GONE);stateText.setVisibility(View.GONE);}
+          else if(s==Player.STATE_ENDED){loading.setVisibility(View.GONE);stateText.setVisibility(View.GONE);}
+        }
+        @Override public void onPlayerError(PlaybackException e){
+          if(directAttempted&&!relayAttempted){playRelay("پەخشی ڕاستەوخۆ کار نەکرد؛ گۆڕین بۆ Relay");}
+          else if(isNetworkFailure(e)&&networkRetryCount<2){
+            final String retryUrl=activePlaybackUrl;
+            final int attempt=++networkRetryCount;
+            long delay=1000L*(1L<<(attempt-1));
+            loading.setVisibility(View.VISIBLE);stateText.setVisibility(View.VISIBLE);
+            stateText.setText("ئینتەرنێت لاوازە؛ پەخش بەردەوام دەبێت... هەوڵی "+attempt+"/2");
+            networkRetryRunnable=()->{if(!isFinishing()&&retryUrl.equals(activePlaybackUrl))playUrl(retryUrl);};
+            handler.postDelayed(networkRetryRunnable,delay);
+          }else if(!runtimeRefreshAttempted&&isNetworkFailure(e)){
+            runtimeRefreshAttempted=true;relayAttempted=false;networkRetryCount=0;
+            loading.setVisibility(View.VISIBLE);stateText.setVisibility(View.VISIBLE);
+            stateText.setText("لینکی ستریم نوێ دەکرێتەوە...");
+            refreshRuntime(()->playRelay("لینکی نوێ وەرگیرا؛ دووبارە پەخش دەکرێت"),true);
+          }else{
+            loading.setVisibility(View.GONE);stateText.setVisibility(View.VISIBLE);
+            String detail=PlaybackException.getErrorCodeName(e.errorCode);
+            Throwable cause=e.getCause();
+            if(cause!=null&&cause.getMessage()!=null)detail+=": "+cause.getMessage();
+            stateText.setText("پلەیەری ئەپ نەتوانی پەخش بکات. هەڵە: "+detail);
+            showControls();
+          }
+        }
+        @Override public void onIsPlayingChanged(boolean playing){playButton.setText(playing?"Ⅱ":"▶");}
+      });
+    }
     loading.setVisibility(View.VISIBLE);stateText.setVisibility(View.VISIBLE);playButton.setText("Ⅱ");
-    DefaultHttpDataSource.Factory httpFactory=new DefaultHttpDataSource.Factory()
-      .setUserAgent("Mozilla/5.0 TVStreamManager/2.0")
-      .setConnectTimeoutMs(20000)
-      .setReadTimeoutMs(30000)
-      .setAllowCrossProtocolRedirects(true);
-    LoadControl loadControl=new DefaultLoadControl.Builder()
-      .setBufferDurationsMs(12000,45000,1500,5000)
-      .setPrioritizeTimeOverSizeThresholds(true)
-      .build();
-    player=new ExoPlayer.Builder(this)
-      .setLoadControl(loadControl)
-      .setMediaSourceFactory(new DefaultMediaSourceFactory(this).setDataSourceFactory(httpFactory))
-      .build();
-    playerView.setPlayer(player);
     MediaItem item=new MediaItem.Builder().setUri(url)
       .setMimeType(url.toLowerCase(java.util.Locale.ROOT).contains(".m3u8")
         ? MimeTypes.APPLICATION_M3U8 : MimeTypes.VIDEO_MP2T)
       .build();
     if(url.toLowerCase(java.util.Locale.ROOT).contains(".m3u8")){
+      DefaultHttpDataSource.Factory httpFactory=new DefaultHttpDataSource.Factory()
+        .setUserAgent("Mozilla/5.0 TVStreamManager/2.0")
+        .setConnectTimeoutMs(8000).setReadTimeoutMs(15000)
+        .setAllowCrossProtocolRedirects(true);
       player.setMediaSource(new HlsMediaSource.Factory(httpFactory)
         .setAllowChunklessPreparation(false).createMediaSource(item));
     }else{
       player.setMediaItem(item);
     }
-    player.addListener(new Player.Listener(){
-      @Override public void onPlaybackStateChanged(int s){
-        if(s==Player.STATE_BUFFERING){loading.setVisibility(View.VISIBLE);stateText.setVisibility(View.VISIBLE);stateText.setText("بارکردنی پەخش...");}
-        else if(s==Player.STATE_READY){networkRetryCount=0;runtimeRefreshAttempted=false;loading.setVisibility(View.GONE);stateText.setVisibility(View.GONE);}
-        else if(s==Player.STATE_ENDED){loading.setVisibility(View.GONE);stateText.setVisibility(View.GONE);}
-      }
-      @Override public void onPlayerError(PlaybackException e){
-        if(directAttempted&&!relayAttempted){playRelay("پەخشی ڕاستەوخۆ کار نەکرد؛ گۆڕین بۆ Relay");}
-        else if(isNetworkFailure(e)&&networkRetryCount<2){
-          final String retryUrl=activePlaybackUrl;
-          final int attempt=++networkRetryCount;
-          long delay=1000L*(1L<<(attempt-1));
-          loading.setVisibility(View.VISIBLE);stateText.setVisibility(View.VISIBLE);
-          stateText.setText("ئینتەرنێت لاوازە؛ پەخش بەردەوام دەبێت... هەوڵی "+attempt+"/2");
-          networkRetryRunnable=()->{if(!isFinishing()&&retryUrl.equals(activePlaybackUrl))playUrl(retryUrl);};
-          handler.postDelayed(networkRetryRunnable,delay);
-        }else if(!runtimeRefreshAttempted&&isNetworkFailure(e)){
-          runtimeRefreshAttempted=true;relayAttempted=false;networkRetryCount=0;
-          loading.setVisibility(View.VISIBLE);stateText.setVisibility(View.VISIBLE);
-          stateText.setText("لینکی ستریم نوێ دەکرێتەوە...");
-          refreshRuntime(()->playRelay("لینکی نوێ وەرگیرا؛ دووبارە پەخش دەکرێت"),true);
-        }else{
-          loading.setVisibility(View.GONE);stateText.setVisibility(View.VISIBLE);
-          String detail=PlaybackException.getErrorCodeName(e.errorCode);
-          Throwable cause=e.getCause();
-          if(cause!=null&&cause.getMessage()!=null)detail+=": "+cause.getMessage();
-          stateText.setText("پلەیەری ئەپ نەتوانی پەخش بکات. هەڵە: "+detail);
-          showControls();
-        }
-      }
-      @Override public void onIsPlayingChanged(boolean playing){playButton.setText(playing?"Ⅱ":"▶");}
-    });
-    player.prepare();player.play();
+    player.prepare();
+    player.play();
   }
   private void stopPlaybackCompletely(){
     handler.removeCallbacksAndMessages(null);
