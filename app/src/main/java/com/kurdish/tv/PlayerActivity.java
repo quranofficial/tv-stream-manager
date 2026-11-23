@@ -113,7 +113,7 @@ public class PlayerActivity extends Activity {
     lockButton=control("🔓");LinearLayout.LayoutParams lk=lp(48,46);lk.leftMargin=dp(8);bottomPanel.addView(lockButton,lk);lockButton.setOnClickListener(v->{controlsLocked=!controlsLocked;lockButton.setText(controlsLocked?"🔒":"🔓");if(controlsLocked){extraPanel.setVisibility(View.GONE);topBar.setVisibility(View.GONE);bottomPanel.setVisibility(View.GONE);controlsVisible=false;}else showControls();});
     overlay.addView(bottomPanel,lp(-1,68));
     playerView.setOnClickListener(v->{if(controlsLocked){controlsLocked=false;lockButton.setText("🔓");showControls();}else toggleControls();});
-    setContentView(root);buildChannelDrawer(root);refreshRuntime(()->startStream(),true);showControls();
+    setContentView(root);buildChannelDrawer(root);if(!relayUrl.isEmpty())playUrl(relayUrl);else refreshRuntime(()->playRelay("پەخش ئامادەیە"),true);showControls();
   }
   private void buildChannelDrawer(FrameLayout root){
     drawerLayer=new FrameLayout(this);drawerLayer.setVisibility(View.GONE);
@@ -176,10 +176,17 @@ public class PlayerActivity extends Activity {
       LinearLayout titleBox=(LinearLayout)topBar.getChildAt(1);
       if(titleBox.getChildCount()>0&&titleBox.getChildAt(0) instanceof TextView)((TextView)titleBox.getChildAt(0)).setText(name);
     }
-    runtimeRefreshAttempted=false;relayAttempted=false;directAttempted=false;
+    runtimeRefreshAttempted=false;relayAttempted=false;directAttempted=false;networkRetryCount=0;
     loading.setVisibility(View.VISIBLE);stateText.setVisibility(View.VISIBLE);
-    stateText.setText("وەرگرتنی لینکی نوێ بۆ "+name+"...");
-    refreshRuntime(()->playRelay("گۆڕینی کەناڵ بۆ "+name),true);showControls();
+    if(!runtimeBase.isEmpty()&&!runtimeKey.isEmpty()){
+      relayUrl=runtimeBase+"/stream/"+id+".ts?key="+runtimeKey;
+      sourceApiUrl=runtimeBase+"/source/"+id+"?key="+runtimeKey;
+      playRelay("گۆڕینی کەناڵ بۆ "+name);
+    }else{
+      stateText.setText("وەرگرتنی لینکی کەناڵ...");
+      refreshRuntime(()->playRelay("گۆڕینی کەناڵ بۆ "+name),true);
+    }
+    showControls();
   }
 
   private void tuneRelative(int direction){
@@ -215,10 +222,10 @@ public class PlayerActivity extends Activity {
   private void toggleControls(){if(controlsVisible){topBar.setVisibility(View.GONE);bottomPanel.setVisibility(View.GONE);extraPanel.setVisibility(View.GONE);controlsVisible=false;handler.removeCallbacks(hideRunnable);}else showControls();}
   private void showControls(){if(controlsLocked)return;topBar.setVisibility(View.VISIBLE);bottomPanel.setVisibility(View.VISIBLE);extraPanel.setVisibility(View.VISIBLE);controlsVisible=true;handler.removeCallbacks(hideRunnable);hideRunnable=()->{if(!controlsLocked&&!drawerVisible){topBar.setVisibility(View.GONE);bottomPanel.setVisibility(View.GONE);extraPanel.setVisibility(View.GONE);controlsVisible=false;}};handler.postDelayed(hideRunnable,6500);}
   private void startStream(){
-    directAttempted=false;relayAttempted=false;runtimeRefreshAttempted=false;
+    directAttempted=false;relayAttempted=false;runtimeRefreshAttempted=false;networkRetryCount=0;
     loading.setVisibility(View.VISIBLE);stateText.setVisibility(View.VISIBLE);
-    stateText.setText("نوێکردنەوەی لینکی ستریم...");
-    refreshRuntime(()->playRelay("پەخش بە لینکی یەکگرتووی VLC"),true);
+    if(relayUrl!=null&&!relayUrl.isEmpty())playRelay("دووبارە دەستپێکردنی پەخش");
+    else refreshRuntime(()->playRelay("پەخش بە لینکی یەکگرتووی VLC"),true);
   }
   private void refreshRuntime(Runnable onSuccess,boolean showError){
     new Thread(()->{
