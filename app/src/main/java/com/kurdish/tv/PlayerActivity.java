@@ -252,6 +252,7 @@ public class PlayerActivity extends Activity {
           base.toLowerCase(java.util.Locale.ROOT).contains("null")||key.isEmpty())
           throw new Exception("runtime.json لینکی نادروستی تێدایە؛ تکایە بۆتەکە لە GitHub Actions دەستپێبکەرەوە.");
         runtimeBase=base;runtimeKey=key;
+        getSharedPreferences("kurdish_tv",0).edit().putString("tv_runtime_base",base).putString("tv_runtime_key",key).apply();
         relayUrl=runtimeBase+"/stream/"+currentChannelId+".ts?key="+runtimeKey;
         sourceApiUrl=runtimeBase+"/source/"+currentChannelId+"?key="+runtimeKey;
         runOnUiThread(()->{if(!isFinishing()&&onSuccess!=null)onSuccess.run();});
@@ -326,12 +327,12 @@ public class PlayerActivity extends Activity {
       }
       @Override public void onPlayerError(PlaybackException e){
         if(directAttempted&&!relayAttempted){playRelay("پەخشی ڕاستەوخۆ کار نەکرد؛ گۆڕین بۆ Relay");}
-        else if(isNetworkFailure(e)&&networkRetryCount<5){
+        else if(isNetworkFailure(e)&&networkRetryCount<2){
           final String retryUrl=activePlaybackUrl;
           final int attempt=++networkRetryCount;
-          long delay=Math.min(15000L,2000L*(1L<<(attempt-1)));
+          long delay=1000L*(1L<<(attempt-1));
           loading.setVisibility(View.VISIBLE);stateText.setVisibility(View.VISIBLE);
-          stateText.setText("ئینتەرنێت لاوازە؛ پەخش بەردەوام دەبێت... هەوڵی "+attempt+"/5");
+          stateText.setText("ئینتەرنێت لاوازە؛ پەخش بەردەوام دەبێت... هەوڵی "+attempt+"/2");
           networkRetryRunnable=()->{if(!isFinishing()&&retryUrl.equals(activePlaybackUrl))playUrl(retryUrl);};
           handler.postDelayed(networkRetryRunnable,delay);
         }else if(!runtimeRefreshAttempted&&isNetworkFailure(e)){
