@@ -305,41 +305,50 @@ public class MainActivity extends Activity {
   void playChannel(JSONObject channel){
     String id=channel.optString("id");
     String title=channel.optString("name");
-    // Start immediately with the last known relay; refresh the tunnel only when needed.
-    String cachedBase=prefs.getString("tv_runtime_base","");
-    String cachedKey=prefs.getString("tv_runtime_key","");
-    if(!cachedBase.isEmpty()&&!cachedKey.isEmpty()){
-      launchPlayer(id,title,cachedBase,cachedKey);
-      return;
-    }
-    Toast.makeText(this,"وەرگرتنی لینکی Live بۆ "+title+"...",Toast.LENGTH_SHORT).show();
+    Toast.makeText(this,"وەرگرتنی لینکی نوێی Live بۆ "+title+"...",Toast.LENGTH_SHORT).show();
     new Thread(()->{
       HttpURLConnection conn=null;
-      try{
-        URL configUrl=new URL("https://raw.githubusercontent.com/quranofficial/tv-stream-manager/main/runtime.json?nocache="+System.currentTimeMillis());
-        conn=(HttpURLConnection)configUrl.openConnection();
-        conn.setConnectTimeout(8000);conn.setReadTimeout(8000);
-        conn.setRequestProperty("Cache-Control","no-cache");
-        int code=conn.getResponseCode();
-        if(code!=200)throw new Exception("لینکی Live ئامادە نییە. سەرەتا Telegram TV Bot لە GitHub Actions Run بکە.");
-        ByteArrayOutputStream out=new ByteArrayOutputStream();
-        try(InputStream in=conn.getInputStream()){byte[] buf=new byte[4096];int n;while((n=in.read(buf))>0)out.write(buf,0,n);}
-        JSONObject config=new JSONObject(out.toString("UTF-8"));
-        String base=config.optString("base_url","").trim().replaceAll("/+$","");
-        String key=config.optString("access_key","").trim();
-        URI parsed=new URI(base);
-        String host=parsed.getHost();
-        if(!"https".equalsIgnoreCase(parsed.getScheme())||host==null||
-          !host.toLowerCase(Locale.ROOT).endsWith(".trycloudflare.com")||
-          base.toLowerCase(Locale.ROOT).contains("undefined")||
-          base.toLowerCase(Locale.ROOT).contains("null")||key.isEmpty())
-          throw new Exception("runtime.json لینکی نادروستی تێدایە؛ Telegram TV Bot لە GitHub Actions دووبارە Run بکە.");
-        prefs.edit().putString("tv_runtime_base",base).putString("tv_runtime_key",key).apply();
-        runOnUiThread(()->{if(!isFinishing())launchPlayer(id,title,base,key);});
-      }catch(Exception e){
-        String message=e.getMessage()==null?"هەڵە لە پەیوەندی بە ستریم":e.getMessage();
-        runOnUiThread(()->{if(!isFinishing())new AlertDialog.Builder(MainActivity.this).setTitle("پەخش ئامادە نییە").setMessage(message+"\n\nGitHub → Actions → Telegram TV Bot → Run workflow").setPositiveButton("باشە",null).show();});
-      }finally{if(conn!=null)conn.disconnect();}
+      Exception lastError=null;
+      for(int attempt=1;attempt<=3;attempt++){
+        try{
+          URL configUrl=new URL("https://raw.githubusercontent.com/quranofficial/tv-stream-manager/main/runtime.json?fresh="+System.currentTimeMillis()+"_"+attempt);
+          conn=(HttpURLConnection)configUrl.openConnection();
+          conn.setConnectTimeout(9000);conn.setReadTimeout(9000);conn.setUseCaches(false);
+          conn.setRequestProperty("Cache-Control","no-cache, no-store, max-age=0");
+          conn.setRequestProperty("Pragma","no-cache");
+          int code=conn.getResponseCode();
+          if(code!=200)throw new Exception("HTTP "+code+" لە runtime.json");
+          ByteArrayOutputStream out=new ByteArrayOutputStream();
+          try(InputStream in=conn.getInputStream()){byte[] buf=new byte[4096];int n;while((n=in.read(buf))>0)out.write(buf,0,n);}
+          JSONObject config=new JSONObject(out.toString("UTF-8"));
+          String base=config.optString("base_url","").trim().replaceAll("/+$","");
+          String key=config.optString("access_key","").trim();
+          URI parsed=new URI(base);
+          String host=parsed.getHost();
+          if(!"https".equalsIgnoreCase(parsed.getScheme())||host==null||
+            !host.toLowerCase(Locale.ROOT).endsWith(".trycloudflare.com")||key.isEmpty())
+            throw new Exception("لینکی Live لە سێرڤەر نادروستە.");
+          InetAddress.getAllByName(host);
+          HttpURLConnection health=(HttpURLConnection)new URL(base+"/health").openConnection();
+          health.setConnectTimeout(5000);health.setReadTimeout(5000);
+          int healthCode=health.getResponseCode();health.disconnect();
+          if(healthCode!=200)throw new Exception("سێرڤەری ستریم هێشتا ئامادە نییە (HTTP "+healthCode+")");
+          prefs.edit().putString("tv_runtime_base",base).putString("tv_runtime_key",key).apply();
+          String finalBase=base,finalKey=key;
+          runOnUiThread(()->{if(!isFinishing())launchPlayer(id,title,finalBase,finalKey);});
+          return;
+        }catch(Exception e){
+          lastError=e;
+          if(conn!=null){conn.disconnect();conn=null;}
+          if(attempt<3){try{Thread.sleep(1200L*attempt);}catch(InterruptedException interrupted){Thread.currentThread().interrupt();break;}}
+        }finally{if(conn!=null){conn.disconnect();conn=null;}}
+      }
+      String detail=lastError==null?"پەیوەندی بە سێرڤەر نەکرا":(lastError.getMessage()==null?lastError.getClass().getSimpleName():lastError.getMessage());
+      runOnUiThread(()->{if(!isFinishing())new AlertDialog.Builder(MainActivity.this)
+        .setTitle("پەخش ئامادە نییە")
+        .setMessage("نەتوانرا لینکی نوێ و سێرڤەری ستریم پشتڕاست بکرێتەوە.\\n"+detail+"\\n\\nئەپەکە خۆکارانە ٣ جار هەوڵی داوە.")
+        .setPositiveButton("دووبارە هەوڵبدە",(d,w)->playChannel(channel))
+        .setNegativeButton("داخستن",null).show();});
     }).start();
   }
   void launchPlayer(String id,String title,String base,String key){
