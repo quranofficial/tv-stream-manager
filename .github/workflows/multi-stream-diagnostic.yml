@@ -41,22 +41,25 @@ jobs:
               with urllib.request.urlopen(req, timeout=30) as response:
                   return json.loads(response.read().decode("utf-8"))
 
+          def input_options(url):
+              opts = ["-rw_timeout", "20000000", "-user_agent", "VLC/3.0.21"]
+              if ".m3u8" in url.lower():
+                  opts += ["-allowed_extensions", "ALL", "-extension_picky", "0"]
+              return opts + ["-i", url]
+
           def measure(label, url, mode="muxed", audio_url=None):
-              cmd = ["ffmpeg", "-hide_banner", "-loglevel", "error",
-                     "-rw_timeout", "20000000", "-user_agent", "VLC/3.0.21",
-                     "-allowed_extensions", "ALL", "-extension_picky", "0",
-                     "-i", url]
+              cmd = ["ffmpeg", "-hide_banner", "-loglevel", "error", "-nostdin"]
+              cmd += input_options(url)
               if mode == "separate" and audio_url:
-                  cmd += ["-rw_timeout", "20000000", "-allowed_extensions", "ALL",
-                          "-extension_picky", "0", "-i", audio_url,
-                          "-map", "0:v:0", "-map", "1:a:0"]
+                  cmd += input_options(audio_url)
+                  cmd += ["-map", "0:v:0", "-map", "1:a:0"]
               else:
                   cmd += ["-map", "0:v:0", "-map", "0:a:0"]
-              cmd += ["-t", "60", "-c", "copy", "-mpegts_flags", "+resend_headers",
+              cmd += ["-c", "copy", "-mpegts_flags", "+resend_headers",
                       "-f", "mpegts", "pipe:1"]
 
               result = {
-                  "path": label, "http_status": None, "first_byte_seconds": None,
+                  "path": label, "target_seconds": 60, "first_byte_seconds": None,
                   "measured_seconds": 0, "bytes_received": 0, "chunks": 0,
                   "average_mbps": 0, "max_inter_chunk_gap_seconds": None,
                   "gaps_over_2s": 0, "error": None
@@ -71,8 +74,10 @@ jobs:
                       sel = selectors.DefaultSelector()
                       sel.register(fd, selectors.EVENT_READ)
                       first_at = last_at = None
-                      deadline = started + 65
-                      while time.monotonic() < deadline:
+                      hard_deadline = started + 65
+                      while time.monotonic() < hard_deadline:
+                          if first_at is not None and time.monotonic() - first_at >= 60:
+                              break
                           events = sel.select(timeout=1)
                           if not events:
                               if proc.poll() is not None:
@@ -101,14 +106,14 @@ jobs:
                               proc.kill()
                               proc.wait()
                       sel.close()
-                      result["http_status"] = "ffmpeg_output"
                       if first_at is not None and last_at is not None:
                           result["measured_seconds"] = round(last_at - first_at, 3)
                       if result["bytes_received"] == 0:
                           result["error"] = "no_output"
                       if proc.returncode not in (0, -15, -9) and result["bytes_received"] == 0:
                           errfile.seek(0)
-                          result["error"] = errfile.read().decode("utf-8", "replace")[-500:]
+                          detail = errfile.read().decode("utf-8", "replace")[-500:]
+                          result["error"] = detail.replace(key, "[REDACTED]").replace(base, "[RELAY]")
                   except Exception as exc:
                       result["error"] = type(exc).__name__ + ": " + str(exc)[:180]
               elapsed = max(result["measured_seconds"], 0.001)
