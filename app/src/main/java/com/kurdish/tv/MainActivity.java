@@ -83,10 +83,50 @@ public class MainActivity extends Activity {
       runOnUiThread(()->{
         if(isFinishing())return;
         if(!ready){showLogin("نەتوانرا زانیاریی کەناڵەکان باربکرێت. تکایە دووبارە هەوڵبدە.");return;}
-        if(allowed){accessToken=saved;showHome();}
+        if(allowed){accessToken=saved;showHome();syncChannelCatalog();}
         else if(offline){accessToken=saved;showLogin("پەیوەندی بە سێرڤەر نەکرا. ئینتەرنێت بپشکنە و دووبارە هەوڵبدە.");}
         else{prefs.edit().remove("tv_session_token").apply();accessToken="";showLogin("کۆدی پێشووت بەسەرچووە یان ناچالاک کراوە. تکایە کۆدی نوێ بنووسە.");}
       });
+    }).start();
+  }
+  void syncChannelCatalog(){
+    new Thread(()->{
+      HttpURLConnection conn=null;
+      try{
+        URL url=new URL("https://raw.githubusercontent.com/quranofficial/tv-stream-manager/main/channels.json?sync="+System.currentTimeMillis());
+        conn=(HttpURLConnection)url.openConnection();
+        conn.setConnectTimeout(5000);conn.setReadTimeout(7000);
+        conn.setRequestProperty("Cache-Control","no-cache");
+        conn.setRequestProperty("User-Agent","KurdishTVPlus/2.0");
+        try(InputStream in=conn.getInputStream();ByteArrayOutputStream out=new ByteArrayOutputStream()){
+          byte[] buf=new byte[8192];int n;while((n=in.read(buf))>0)out.write(buf,0,n);
+          String json=out.toString("UTF-8");
+          JSONArray latest=new JSONObject(json).getJSONArray("data");
+          if(latest.length()==0)return;
+          HashSet<String> ids=new HashSet<>();
+          for(int i=0;i<latest.length();i++){
+            JSONObject item=latest.optJSONObject(i);
+            if(item==null||item.optString("id").isEmpty()||item.optString("name").isEmpty())return;
+            if(!ids.add(item.optString("id")))return;
+          }
+          String previous=channels.toString();
+          if(!previous.equals(latest.toString())){
+            runOnUiThread(()->{
+              if(isFinishing())return;
+              String oldQuery=search==null?"":search.getText().toString();
+              channels=latest;
+              prefs.edit().putString("tv_channels_cache",json).apply();
+              showHome();
+              if(search!=null&&!oldQuery.isEmpty())search.setText(oldQuery);
+              Toast.makeText(this,"لیستی کەناڵەکان نوێ کرایەوە: "+channels.length(),Toast.LENGTH_SHORT).show();
+            });
+          }else{
+            prefs.edit().putString("tv_channels_cache",json).apply();
+          }
+        }
+      }catch(Exception e){
+        android.util.Log.w("KurdishTV","Online channel sync failed; keeping cached catalog",e);
+      }finally{if(conn!=null)conn.disconnect();}
     }).start();
   }
   GradientDrawable strokeHome(int color,int line,int radius){GradientDrawable d=shape(color,radius);d.setStroke(dp(1),line);return d;}
