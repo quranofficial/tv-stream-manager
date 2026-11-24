@@ -1,0 +1,84 @@
+name: Temporary Relay 60s Diagnostic
+
+on:
+  push:
+    paths:
+      - ".github/workflows/relay-diagnostic.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  relay-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Measure 60-second VLC-style relay stream
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, time, urllib.request, urllib.error, statistics
+          from pathlib import Path
+
+          cfg = json.loads(Path("runtime.json").read_text())
+          url = cfg["base_url"].rstrip("/") + "/stream/43.ts?key=" + cfg["access_key"]
+          req = urllib.request.Request(url, headers={"User-Agent": "VLC/3.0.21"})
+          result = {
+              "channel_id": "43",
+              "client": "VLC-style (stream-copy path)",
+              "target_seconds": 60,
+              "http_status": None,
+              "bytes_received": 0,
+              "chunks": 0,
+              "first_byte_seconds": None,
+              "measured_seconds": 0,
+              "average_mbps": 0,
+              "max_inter_chunk_gap_seconds": None,
+              "gaps_over_2s": 0,
+              "error": None,
+          }
+          gaps = []
+          try:
+              started = time.monotonic()
+              with urllib.request.urlopen(req, timeout=20) as response:
+                  result["http_status"] = response.status
+                  first = True
+                  last = None
+                  deadline = time.monotonic() + 60
+                  while time.monotonic() < deadline:
+                      chunk = response.read(65536)
+                      now = time.monotonic()
+                      if not chunk:
+                          result["error"] = "early_end_of_stream"
+                          break
+                      if first:
+                          result["first_byte_seconds"] = round(now - started, 3)
+                          first = False
+                      if last is not None:
+                          gaps.append(now - last)
+                      last = now
+                      result["bytes_received"] += len(chunk)
+                      result["chunks"] += 1
+                  result["measured_seconds"] = round(time.monotonic() - (started + (result["first_byte_seconds"] or 0)), 3)
+          except Exception as e:
+              result["error"] = type(e).__name__ + ": " + str(e)[:180]
+          elapsed = max(result["measured_seconds"], 0.001)
+          result["average_mbps"] = round(result["bytes_received"] * 8 / elapsed / 1_000_000, 3)
+          if gaps:
+              result["max_inter_chunk_gap_seconds"] = round(max(gaps), 3)
+              result["gaps_over_2s"] = sum(g > 2 for g in gaps)
+          Path("relay-diagnostic.json").write_text(json.dumps(result, indent=2))
+          print(json.dumps(result, indent=2))
+          PY
+
+      - name: Upload diagnostic result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: relay-60s-diagnostic
+          path: relay-diagnostic.json
+          if-no-files-found: warn
+          retention-days: 3
