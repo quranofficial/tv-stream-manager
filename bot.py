@@ -304,9 +304,8 @@ async def _ffmpeg_smoke_test(video_url, audio_url, cid, name, slug, muxed=False)
 
 
 def source_candidates(channel):
+    """Yield channel-specific slugs; every track URL is derived from the same slug."""
     cid = str(channel["id"])
-    # Default for EVERY channel: test muxed v1a1 only.
-    # Move a channel to separate v1+a1 only after the user confirms v1a1 fails.
     known = {
         "197": ["ava_4k"], "198": ["rudaw_4k"],
         "195": ["k24_4k"], "194": ["kurdsat_4k"],
@@ -330,9 +329,39 @@ def source_candidates(channel):
     slugs = list(dict.fromkeys(
         slug for slug in ([override] if override else []) + known.get(cid, []) + generated if slug
     ))
-    mode = "separate" if STREAM_MODES.get(cid) == "separate" else "muxed"
-    for slug in slugs:
-        yield slug, mode
+    yield from slugs
+
+
+def _split_track_urls(muxed_url):
+    """Derive v1 and a1 only by changing the track path of this exact source URL."""
+    parts = urllib.parse.urlsplit(muxed_url)
+    marker = "/tracks-v1a1/"
+    if marker not in parts.path:
+        return None
+    base_path = parts.path.replace(marker, "/", 1)
+    video_path = base_path.rstrip("/") + "/tracks-v1/index.fmp4.m3u8"
+    audio_paths = [
+        base_path.rstrip("/") + "/tracks-a1/index.fmp4.m3u8",
+        base_path.rstrip("/") + "/tracks-a1/mono.ts.m3u8",
+    ]
+    video_url = urllib.parse.urlunsplit(parts._replace(path=video_path))
+    audio_urls = [urllib.parse.urlunsplit(parts._replace(path=p)) for p in audio_paths]
+    return video_url, audio_urls
+
+
+async def _test_separate_source(session, video_url, audio_urls, cid, name, slug):
+    vok, vs = await _manifest_ok(session, video_url)
+    if not vok:
+        log.info("Separate source has no video: channel=%s slug=%s status=%s", cid, slug, vs)
+        return None
+    for audio_url in audio_urls:
+        aok, ast = await _manifest_ok(session, audio_url)
+        log.info("Separate track probe channel=%s slug=%s video=%s audio=%s",
+                 cid, slug, vs, ast)
+        if aok and await _ffmpeg_smoke_test(video_url, audio_url, cid, name, slug):
+            return {"mode": "separate", "video": video_url,
+                    "audio": audio_url, "slug": slug}
+    return None
 
 
 async def resolve_source(channel):
@@ -340,63 +369,68 @@ async def resolve_source(channel):
     if cid in SLUG_CACHE:
         return SLUG_CACHE[cid]
 
-    # User-verified exact source URLs take priority over automatic slug probing.
-    explicit = EXPLICIT_SOURCES.get(cid)
-    if explicit:
-        async with aiohttp.ClientSession(
-            headers={"User-Agent": "Mozilla/5.0 TVStreamManager/2.0"}
-        ) as session:
+    headers = {"User-Agent": "Mozilla/5.0 TVStreamManager/2.0"}
+    async with aiohttp.ClientSession(headers=headers) as session:
+        # User-verified exact sources always take priority.
+        explicit = EXPLICIT_SOURCES.get(cid)
+        if explicit:
             mode = explicit.get("mode", "muxed")
-            if mode == "muxed":
+            if mode == "separate":
+                exact = await _test_separate_source(
+                    session, explicit["video"],
+                    explicit.get("audio_options") or [explicit["audio"]],
+                    cid, channel["name"], "explicit",
+                )
+                if exact:
+                    SLUG_CACHE[cid] = exact
+                    return exact
+            else:
                 url = explicit["url"]
                 ok, status = await _manifest_ok(session, url)
-                log.info("Explicit source probe channel=%s mode=muxed status=%s", cid, status)
-                if ok and await _ffmpeg_smoke_test(url, None, cid, channel["name"], "explicit", True):
+                log.info("Explicit v1a1 probe channel=%s status=%s", cid, status)
+                # Keep a complete v1a1 stream untouched; never add another audio track.
+                if ok and await _ffmpeg_smoke_test(
+                    url, None, cid, channel["name"], "explicit", True
+                ):
                     result = {"mode": "muxed", "url": url, "slug": "explicit"}
                     SLUG_CACHE[cid] = result
                     return result
-            else:
-                video = explicit["video"]
-                audio_options = explicit.get("audio_options") or [explicit["audio"]]
-                vok, vs = await _manifest_ok(session, video)
-                for audio in audio_options:
-                    aok, ast = await _manifest_ok(session, audio)
-                    log.info("Explicit source probe channel=%s mode=separate video=%s audio=%s", cid, vs, ast)
-                    if vok and aok and await _ffmpeg_smoke_test(video, audio, cid, channel["name"], "explicit"):
-                        result = {"mode": "separate", "video": video, "audio": audio, "slug": "explicit"}
-                        SLUG_CACHE[cid] = result
-                        return result
-        log.error("Explicit source failed channel=%s; falling back to automatic source probing", cid)
+                # Only if the combined source fails, inspect tracks from this same URL.
+                split = _split_track_urls(url)
+                if split:
+                    separate = await _test_separate_source(
+                        session, split[0], split[1], cid, channel["name"], "explicit"
+                    )
+                    if separate:
+                        SLUG_CACHE[cid] = separate
+                        return separate
+            log.warning("Explicit source failed channel=%s; trying same-channel candidates", cid)
 
-    async with aiohttp.ClientSession(
-        headers={"User-Agent": "Mozilla/5.0 TVStreamManager/2.0"}
-    ) as session:
-        for slug, mode in source_candidates(channel):
-            if mode == "muxed":
-                url = f"{BASE.rstrip('/')}/{slug}/tracks-v1a1/mono.ts.m3u8"
-                ok, status = await _manifest_ok(session, url)
-                log.info("Source probe channel=%s slug=%s muxed=%s", cid, slug, status)
-                if ok and await _ffmpeg_smoke_test(url, None, cid, channel["name"], slug, True):
-                    result = {"mode": "muxed", "url": url, "slug": slug}
-                    SLUG_CACHE[cid] = result
-                    return result
-            else:
-                video = f"{BASE.rstrip('/')}/{slug}/tracks-v1/index.fmp4.m3u8"
-                audio_options = [
-                    f"{BASE.rstrip('/')}/{slug}/tracks-a1/index.fmp4.m3u8",
-                ]
-                vok, vs = await _manifest_ok(session, video)
-                for audio in audio_options:
-                    aok, ast = await _manifest_ok(session, audio)
-                    log.info("Source probe channel=%s slug=%s video=%s audio=%s",
-                             cid, slug, vs, ast)
-                    if vok and aok and await _ffmpeg_smoke_test(video, audio, cid, channel["name"], slug):
-                        result = {"mode": "separate", "video": video, "audio": audio, "slug": slug}
-                        SLUG_CACHE[cid] = result
-                        return result
-    log.error("No working source found for channel %s (%s)", cid, channel["name"])
+        for slug in source_candidates(channel):
+            muxed_url = f"{BASE.rstrip('/')}/{slug}/tracks-v1a1/mono.ts.m3u8"
+            ok, status = await _manifest_ok(session, muxed_url)
+            log.info("Source probe channel=%s slug=%s v1a1=%s", cid, slug, status)
+            # v1a1 is preferred and returned as-is when FFmpeg confirms both streams.
+            if ok and await _ffmpeg_smoke_test(
+                muxed_url, None, cid, channel["name"], slug, True
+            ):
+                result = {"mode": "muxed", "url": muxed_url, "slug": slug}
+                SLUG_CACHE[cid] = result
+                return result
+
+            # No complete muxed stream: test v1 and a1 derived from this same slug.
+            split = _split_track_urls(muxed_url)
+            if split:
+                separate = await _test_separate_source(
+                    session, split[0], split[1], cid, channel["name"], slug
+                )
+                if separate:
+                    SLUG_CACHE[cid] = separate
+                    return separate
+
+    log.error("No working v1a1 or same-channel v1+a1 source found for channel %s (%s)",
+              cid, channel["name"])
     return None
-
 
 async def resolve_slug(channel):
     source = await resolve_source(channel)
