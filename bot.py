@@ -14,7 +14,7 @@ from pathlib import Path
 from aiohttp import web
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import (
-    Application, CallbackQueryHandler, CommandHandler, ContextTypes,
+    Application, CallbackQueryHandler, CommandHandler, ContextTypes, MessageHandler, filters,
 )
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
@@ -420,8 +420,14 @@ def channel_page(page=0, query=""):
     part = items[start:start + PAGE_SIZE]
     rows = [
         [InlineKeyboardButton("▶️ Start", callback_data="menu:start"),
-         InlineKeyboardButton("🔐 TV Code", callback_data="menu:tvcode")],
-        [InlineKeyboardButton("📊 کەناڵە ناکاراکان", callback_data="menu:broken")],
+         InlineKeyboardButton("🔎 Search", callback_data="menu:search")],
+        [InlineKeyboardButton("🔐 TV Code", callback_data="menu:tvcode"),
+         InlineKeyboardButton("📋 TV Codes", callback_data="menu:tvcodes")],
+        [InlineKeyboardButton("📊 Status", callback_data="menu:status"),
+         InlineKeyboardButton("🧪 کەناڵە ناکاراکان", callback_data="menu:broken")],
+        [InlineKeyboardButton("⏹ Stop", callback_data="menu:stop"),
+         InlineKeyboardButton("🔄 Restart", callback_data="menu:restart")],
+        [InlineKeyboardButton("📜 Logs", callback_data="menu:logs")],
     ]
     rows += [[InlineKeyboardButton(c["name"], callback_data=f"ch:{c['id']}")] for c in part]
     nav = []
@@ -756,17 +762,33 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
-async def search(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = " ".join(context.args).strip()
+async def _send_search_results(message, context, query):
+    query = query.strip()
     if not query:
-        await update.message.reply_text("بەکارهێنان: /search ناوی کەناڵ")
+        await message.reply_text("تکایە ناوی کەناڵ بنووسە یان /search ناوی کەناڵ بەکاربهێنە.")
         return
     markup, total = channel_page(0, query)
     if not total:
-        await update.message.reply_text("هیچ کەناڵێک نەدۆزرایەوە.")
+        await message.reply_text("هیچ کەناڵێک بەو ناوە نەدۆزرایەوە.")
     else:
         context.user_data["query"] = query
-        await update.message.reply_text(f"ئەنجامەکان: {total}", reply_markup=markup)
+        await message.reply_text(f"🔎 ئەنجامەکانی گەڕان: {total}", reply_markup=markup)
+
+
+async def search(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = " ".join(context.args).strip()
+    if not query:
+        context.user_data["await_search"] = True
+        await update.effective_message.reply_text("🔎 تکایە ناوی کەناڵ بنووسە:")
+        return
+    await _send_search_results(update.effective_message, context, query)
+
+
+async def text_search(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not context.user_data.get("await_search"):
+        return
+    context.user_data["await_search"] = False
+    await _send_search_results(update.effective_message, context, update.effective_message.text or "")
 
 
 async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -781,8 +803,39 @@ async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
+    if query.data == "menu:search":
+        context.user_data["await_search"] = True
+        await query.message.reply_text("🔎 تکایە ناوی کەناڵ بنووسە:")
+        return
+
     if query.data == "menu:tvcode":
         await _issue_tv_code(query.message, query.from_user, [])
+        return
+
+    if query.data == "menu:tvcodes":
+        if not _tv_admin_allowed(update):
+            await query.message.reply_text("⛔ ئەم فەرمانە تەنها بۆ ئەدمینی TV ـە.")
+        else:
+            await tvcodes(update, context)
+        return
+
+    if query.data == "menu:status":
+        await query.message.reply_text(f"🟢 بۆت چالاکە. ژمارەی کەناڵەکان: {len(CHANNELS)}")
+        return
+
+    if query.data == "menu:stop":
+        context.user_data.clear()
+        await query.message.reply_text("⏹ گفتوگۆکە پاککرایەوە. بۆ دەستپێکردن Start یان /start هەڵبژێرە.")
+        return
+
+    if query.data == "menu:restart":
+        context.user_data.clear()
+        markup, total = channel_page()
+        await query.message.reply_text(f"🔄 بۆت نوێ کرایەوە. {total} کەناڵ بەردەستن.", reply_markup=markup)
+        return
+
+    if query.data == "menu:logs":
+        await query.message.reply_text("📜 بۆ بینینی Log ـەکان: GitHub → Actions → Telegram TV Bot → Workflow run → Logs")
         return
 
     if query.data == "menu:broken":
@@ -876,6 +929,7 @@ def main():
     application.add_handler(CommandHandler("tvcode", tvcode))
     application.add_handler(CommandHandler("tvcodes", tvcodes))
     application.add_handler(CommandHandler("tvrevoke", tvrevoke))
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, text_search))
     application.add_handler(CallbackQueryHandler(buttons))
     log.info("Loaded %d channels", len(CHANNELS))
     application.run_polling(drop_pending_updates=True)
