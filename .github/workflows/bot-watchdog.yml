@@ -87,20 +87,22 @@ jobs:
                   body = response.read()
                   return response.status, json.loads(body) if body else None
 
-          # Observe the public health endpoint when a current tunnel URL is available.
+          # Validate both DNS and the live relay before treating a bot run as healthy.
+          health_ok = False
           try:
-              runtime_url = f"https://raw.githubusercontent.com/{repo}/main/runtime.json"
+              runtime_url = f"https://raw.githubusercontent.com/{repo}/main/runtime.json?health={datetime.datetime.now(datetime.timezone.utc).timestamp()}"
               with urllib.request.urlopen(runtime_url, timeout=10) as response:
                   runtime = json.load(response)
               base = runtime.get("base_url", "").rstrip("/")
               if base:
                   with urllib.request.urlopen(base + "/health", timeout=10) as response:
                       health = json.load(response)
+                  health_ok = response.status == 200 and health.get("status") == "ok"
                   print("Public relay health:", health.get("status", "unknown"))
               else:
-                  print("Health check skipped: runtime URL is empty.")
+                  print("Relay health failed: runtime URL is empty.")
           except Exception as exc:
-              print("Public relay health check unavailable:", type(exc).__name__)
+              print("Public relay health failed:", type(exc).__name__, str(exc)[:300])
 
           # Keep exactly one bot instance. If code was updated while an older
           # workflow is still running, cancel that stale instance and launch
@@ -111,23 +113,40 @@ jobs:
           current_sha = os.getenv("GITHUB_SHA", "")
           if active:
               run = active[0]
-              if run.get("head_sha") != current_sha:
+              stale_code = run.get("head_sha") != current_sha
+              created = run.get("created_at")
+              age_minutes = 0
+              if created:
+                  try:
+                      started = datetime.datetime.fromisoformat(created.replace("Z", "+00:00"))
+                      age_minutes = (datetime.datetime.now(datetime.timezone.utc) - started).total_seconds() / 60
+                  except Exception:
+                      pass
+              if stale_code or (not health_ok and age_minutes >= 5):
                   print(
-                      "Stopping stale bot instance before deploying current commit.",
+                      "Stopping stale/unhealthy bot before redeploy.",
                       "run_id=", run.get("id"),
+                      "age_minutes=", round(age_minutes, 1),
                       "old_sha=", run.get("head_sha"),
                       "new_sha=", current_sha,
                   )
                   request(api_root + f"/actions/runs/{run['id']}/cancel", method="POST")
-                  for _ in range(15):
+                  for _ in range(20):
                       import time
                       time.sleep(2)
                       _, latest = request(api_root + f"/actions/runs/{run['id']}")
                       if latest.get("status") == "completed":
                           break
+              elif not health_ok:
+                  print(
+                      "Relay health is not ready yet; keeping the fresh bot run during startup grace.",
+                      "run_id=", run.get("id"),
+                      "age_minutes=", round(age_minutes, 1),
+                  )
+                  raise SystemExit(0)
               else:
                   print(
-                      "Bot is already active on the current commit; no second run will be started.",
+                      "Bot and public relay are healthy; no restart is needed.",
                       "run_id=", run.get("id"),
                       "status=", run.get("status"),
                   )
