@@ -685,42 +685,6 @@
       ]
     },
     {
-      "id": 48,
-      "name": "Dasinya",
-      "logo": "https://resources.vinex.tv/art/tvchannels/channels/d/dasinya-48/square_any.png",
-      "genre": "News",
-      "order": 67,
-      "is_watchlist": false,
-      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/48/play-url",
-      "variants": [
-        "hd"
-      ]
-    },
-    {
-      "id": 47,
-      "name": "Dasinya kids",
-      "logo": "https://resources.vinex.tv/art/tvchannels/channels/d/dasinya-kids-47/square_any.png",
-      "genre": "Kids",
-      "order": 68,
-      "is_watchlist": false,
-      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/47/play-url",
-      "variants": [
-        "hd"
-      ]
-    },
-    {
-      "id": 46,
-      "name": "Dasinya Music",
-      "logo": "https://resources.vinex.tv/art/tvchannels/channels/d/dasinya-music-46/square_any.png",
-      "genre": "Music",
-      "order": 69,
-      "is_watchlist": false,
-      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/46/play-url",
-      "variants": [
-        "hd"
-      ]
-    },
-    {
       "id": 5414,
       "name": "Sima",
       "logo": null,
@@ -2581,18 +2545,6 @@
       ]
     },
     {
-      "id": 5433,
-      "name": "Dasinya Sport",
-      "logo": null,
-      "genre": "Sports",
-      "order": 13,
-      "is_watchlist": false,
-      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5433/play-url",
-      "variants": [
-        "hd"
-      ]
-    },
-    {
       "id": 5439,
       "name": "Sima Sport",
       "logo": null,
@@ -2612,42 +2564,6 @@
       "order": 15,
       "is_watchlist": false,
       "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/81/play-url",
-      "variants": [
-        "hd"
-      ]
-    },
-    {
-      "id": 5434,
-      "name": "See Sport 1",
-      "logo": null,
-      "genre": "Sports",
-      "order": 16,
-      "is_watchlist": false,
-      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5434/play-url",
-      "variants": [
-        "hd"
-      ]
-    },
-    {
-      "id": 5435,
-      "name": "See Sport 2",
-      "logo": null,
-      "genre": "Sports",
-      "order": 17,
-      "is_watchlist": false,
-      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5435/play-url",
-      "variants": [
-        "hd"
-      ]
-    },
-    {
-      "id": 5436,
-      "name": "See Sport 3",
-      "logo": null,
-      "genre": "Sports",
-      "order": 18,
-      "is_watchlist": false,
-      "play_url": "https://auth.stackgrid.cloud/api/live/v2/catalog/channels/5436/play-url",
       "variants": [
         "hd"
       ]
@@ -3115,7 +3031,7 @@
     "pagination": {
       "current_page": 1,
       "per_page": 5000,
-      "total": 259,
+      "total": 252,
       "last_page": 1
     },
     "default_format": null
