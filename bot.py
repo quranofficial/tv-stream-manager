@@ -12,9 +12,10 @@ import re
 from pathlib import Path
 
 from aiohttp import web
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, Update
 from telegram.ext import (
     Application, CallbackQueryHandler, CommandHandler, ContextTypes,
+    MessageHandler, filters,
 )
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
@@ -257,6 +258,8 @@ def slug_for(channel):
 
 
 SLUG_CACHE = {}
+CHANNEL_STATS_CACHE = None
+CHANNEL_STATS_CACHE_AT = 0.0
 
 
 async def _manifest_ok(session, url):
@@ -738,26 +741,175 @@ async def tvrevoke(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.effective_message.reply_text("✅ کۆدەکە هەڵوەشێندرایەوە.")
 
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    context.user_data.clear()
+def main_menu_keyboard(update: Update):
+    rows = [
+        ["📺 لیستی کەناڵەکان", "🔎 گەڕانی کەناڵ"],
+        ["📊 ئاماری کەناڵەکان", "ℹ️ دۆخی بۆت"],
+        ["🔄 نوێکردنەوە", "🧹 پاککردنەوە"],
+        ["📜 ڕێنمایی و لاگ"],
+    ]
+    if _tv_admin_allowed(update):
+        rows.extend([
+            ["🆔 ناسنامەی ئەدمین", "🔐 دروستکردنی کۆدی TV"],
+            ["📋 کۆدەکانی TV", "⛔ هەڵوەشاندنەوەی کۆدی TV"],
+        ])
+    return ReplyKeyboardMarkup(rows, resize_keyboard=True, is_persistent=True)
+
+
+async def show_channel_list(message, context):
     markup, total = channel_page()
-    await update.message.reply_text(
-        f"📺 بەخێربێیت! {total} کەناڵ بەردەستن. کەناڵێک هەڵبژێرە یان /search بنووسە.",
+    await message.reply_text(
+        f"📺 {total} کەناڵ بەردەستن. کەناڵێک هەڵبژێرە:",
         reply_markup=markup,
     )
+
+
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    context.user_data.clear()
+    await update.effective_message.reply_text(
+        "📺 بەخێربێیت بۆ بۆتی KURDISH TV+\n"
+        "هەموو تایبەتمەندییەکانت لە دوگمەکانی خوارەوە دەست دەکەون.",
+        reply_markup=main_menu_keyboard(update),
+    )
+    await show_channel_list(update.effective_message, context)
+
+
+async def _show_search(update: Update, context: ContextTypes.DEFAULT_TYPE, query: str):
+    query = query.strip()
+    if not query:
+        await update.effective_message.reply_text("ناوی کەناڵ یان جۆری کەناڵ بنووسە.")
+        return
+    markup, total = channel_page(0, query)
+    if not total:
+        await update.effective_message.reply_text("هیچ کەناڵێک نەدۆزرایەوە.")
+    else:
+        context.user_data["query"] = query
+        await update.effective_message.reply_text(f"🔎 ئەنجامەکان: {total}", reply_markup=markup)
 
 
 async def search(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = " ".join(context.args).strip()
     if not query:
-        await update.message.reply_text("بەکارهێنان: /search ناوی کەناڵ")
+        context.user_data["awaiting_search"] = True
+        await update.effective_message.reply_text("🔎 تکایە ناوی کەناڵ یان جۆری کەناڵ بنووسە.")
         return
-    markup, total = channel_page(0, query)
-    if not total:
-        await update.message.reply_text("هیچ کەناڵێک نەدۆزرایەوە.")
-    else:
-        context.user_data["query"] = query
-        await update.message.reply_text(f"ئەنجامەکان: {total}", reply_markup=markup)
+    await _show_search(update, context, query)
+
+
+async def channel_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    global CHANNEL_STATS_CACHE, CHANNEL_STATS_CACHE_AT
+    now = asyncio.get_running_loop().time()
+    if CHANNEL_STATS_CACHE is not None and now - CHANNEL_STATS_CACHE_AT < 180:
+        working, failed, unknown = CHANNEL_STATS_CACHE
+        await update.effective_message.reply_text(
+            "📊 ئاماری کەناڵەکان (پشکنینی نوێی کەمتر لە ٣ خولەک):\n\n"
+            f"🟢 کارا: {working}\n🔴 کار ناکەن: {failed}\n🟡 نەتوانرا پشتڕاست بکرێنەوە: {unknown}\n"
+            f"📺 کۆی گشتی: {len(CHANNELS)}"
+        )
+        return
+
+    progress = await update.effective_message.reply_text(
+        f"⏳ پشکنینی {len(CHANNELS)} کەناڵ دەستپێکرد... تکایە چاوەڕێ بکە."
+    )
+    semaphore = asyncio.Semaphore(12)
+
+    async def check_one(channel):
+        async with semaphore:
+            try:
+                source = await asyncio.wait_for(resolve_source(channel), timeout=50)
+                return "working" if source else "failed"
+            except asyncio.TimeoutError:
+                return "unknown"
+            except Exception:
+                log.exception("Channel status check failed: %s", channel.get("id"))
+                return "unknown"
+
+    tasks = [asyncio.create_task(check_one(channel)) for channel in CHANNELS]
+    working = failed = unknown = completed = 0
+    for task in asyncio.as_completed(tasks):
+        result = await task
+        if result == "working":
+            working += 1
+        elif result == "failed":
+            failed += 1
+        else:
+            unknown += 1
+        completed += 1
+        if completed % 30 == 0 and completed < len(CHANNELS):
+            try:
+                await progress.edit_text(
+                    f"⏳ پشکنین بەردەوامە: {completed}/{len(CHANNELS)}\n"
+                    f"🟢 کارا: {working} | 🔴 ناکارا: {failed} | 🟡 نادیار: {unknown}"
+                )
+            except Exception:
+                pass
+
+    CHANNEL_STATS_CACHE = (working, failed, unknown)
+    CHANNEL_STATS_CACHE_AT = asyncio.get_running_loop().time()
+    await progress.edit_text(
+        "📊 ئەنجامی پشکنینی کەناڵەکان:\n\n"
+        f"🟢 **کارا:** {working}\n"
+        f"🔴 **کار ناکەن:** {failed}\n"
+        f"🟡 **نەتوانرا پشتڕاست بکرێنەوە (timeout):** {unknown}\n"
+        f"📺 **کۆی گشتی:** {len(CHANNELS)}",
+        parse_mode="Markdown",
+    )
+
+
+async def menu_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    message = update.effective_message
+    choice = (message.text or "").strip()
+
+    if context.user_data.pop("awaiting_search", False):
+        await _show_search(update, context, choice)
+        return
+    if context.user_data.pop("awaiting_revoke", False):
+        if not _tv_admin_allowed(update):
+            await message.reply_text("⛔ تەنها ئەدمین دەتوانێت ئەم کارە بکات.")
+            return
+        if not re.fullmatch(r"[0-9a-fA-F-]{36}", choice):
+            await message.reply_text("ID ـی کۆد دروست نییە؛ دووبارە هەوڵ بدە.")
+            context.user_data["awaiting_revoke"] = True
+            return
+        try:
+            query = urllib.parse.urlencode({"id": "eq." + choice})
+            await asyncio.to_thread(
+                _tv_supabase_request, "PATCH", "?" + query,
+                {"is_active": False, "revoked_at": datetime.datetime.now(datetime.timezone.utc).isoformat()}
+            )
+            await message.reply_text("✅ کۆدەکە هەڵوەشێندرایەوە.")
+        except Exception as exc:
+            await message.reply_text(f"❌ هەڵە لە هەڵوەشاندنەوەی کۆد: {exc}")
+        return
+
+    if choice == "📺 لیستی کەناڵەکان":
+        await show_channel_list(message, context)
+    elif choice == "🔎 گەڕانی کەناڵ":
+        context.user_data["awaiting_search"] = True
+        await message.reply_text("🔎 ناوی کەناڵ یان جۆری کەناڵ بنووسە.")
+    elif choice == "📊 ئاماری کەناڵەکان":
+        await channel_stats(update, context)
+    elif choice == "ℹ️ دۆخی بۆت":
+        await status(update, context)
+    elif choice == "🔄 نوێکردنەوە":
+        context.user_data.clear()
+        await start(update, context)
+    elif choice == "🧹 پاککردنەوە":
+        await stop(update, context)
+    elif choice == "📜 ڕێنمایی و لاگ":
+        await logs(update, context)
+    elif choice == "🆔 ناسنامەی ئەدمین":
+        await tvadminid(update, context)
+    elif choice == "🔐 دروستکردنی کۆدی TV":
+        await tvcode(update, context)
+    elif choice == "📋 کۆدەکانی TV":
+        await tvcodes(update, context)
+    elif choice == "⛔ هەڵوەشاندنەوەی کۆدی TV":
+        if not _tv_admin_allowed(update):
+            await message.reply_text("⛔ تەنها ئەدمین دەتوانێت ئەم کارە بکات.")
+            return
+        context.user_data["awaiting_revoke"] = True
+        await message.reply_text("ID ـی کۆدی TV بنێرە بۆ هەڵوەشاندنەوەی.")
 
 
 async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -851,6 +1003,7 @@ def main():
     application.add_handler(CommandHandler("tvcodes", tvcodes))
     application.add_handler(CommandHandler("tvrevoke", tvrevoke))
     application.add_handler(CallbackQueryHandler(buttons))
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, menu_buttons))
     log.info("Loaded %d channels", len(CHANNELS))
     application.run_polling(drop_pending_updates=True)
 
