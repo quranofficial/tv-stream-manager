@@ -11,7 +11,11 @@ on:
       - '.github/workflows/android-apk.yml'
 
 permissions:
-  contents: read
+  contents: write
+
+concurrency:
+  group: android-apk-build
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -37,3 +41,19 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 14
+      - name: Publish APK to GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION=$(sed -n "s/.*versionName '\\([^']*\\)'.*/\\1/p" app/build.gradle)
+          TAG="v${VERSION}"
+          APK="app/build/outputs/apk/debug/app-debug.apk"
+          RELEASE_APK="Kurdish-TV-Plus-${TAG}.apk"
+          cp "${APK}" "${RELEASE_APK}"
+          if gh release view "${TAG}" >/dev/null 2>&1; then
+            gh release upload "${TAG}" "${RELEASE_APK}" --clobber
+          else
+            gh release create "${TAG}" "${RELEASE_APK}" \
+              --title "Kurdish TV+ ${TAG}" \
+              --notes "Kurdish TV+ Android APK. Includes the LibVLC playback engine, fresh relay validation, and automatic playback recovery."
+          fi
