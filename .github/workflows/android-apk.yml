@@ -32,28 +32,37 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
-      - name: Build debug APK
+      - name: Build ABI-specific APKs
         run: gradle --no-daemon assembleDebug
-      - name: Upload APK
+      - name: Upload ABI-specific APKs
         uses: actions/upload-artifact@v4
         with:
-          name: Kurdish-TV-debug-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
+          name: Kurdish-TV-Plus-${{ github.sha }}
+          path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
           retention-days: 14
-      - name: Publish APK to GitHub Release
+      - name: Publish APKs to GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           VERSION=$(grep -o "versionName '[^']*'" app/build.gradle | cut -d"'" -f2)
           TAG="v${VERSION}"
-          APK="app/build/outputs/apk/debug/app-debug.apk"
-          RELEASE_APK="Kurdish-TV-Plus-${TAG}.apk"
-          cp "${APK}" "${RELEASE_APK}"
+          mkdir -p release-apks
+          shopt -s nullglob
+          APKS=(app/build/outputs/apk/debug/*.apk)
+          if [ ${#APKS[@]} -eq 0 ]; then
+            echo "No ABI APKs were produced"
+            exit 1
+          fi
+          RELEASE_FILES=()
+          for APK in "${APKS[@]}"; do
+            ABI_APK=$(basename "${APK}")
+            RELEASE_APK="Kurdish-TV-Plus-${TAG}-${ABI_APK}"
+            cp "${APK}" "release-apks/${RELEASE_APK}"
+            RELEASE_FILES+=("release-apks/${RELEASE_APK}")
+          done
           if gh release view "${TAG}" >/dev/null 2>&1; then
-            gh release upload "${TAG}" "${RELEASE_APK}" --clobber
+            gh release upload "${TAG}" "${RELEASE_FILES[@]}" --clobber
           else
-            gh release create "${TAG}" "${RELEASE_APK}" \
-              --title "Kurdish TV+ ${TAG}" \
-              --notes "Kurdish TV+ Android APK. Includes the LibVLC playback engine, fresh relay validation, and automatic playback recovery."
+            gh release create "${TAG}" "${RELEASE_FILES[@]}" --title "Kurdish TV+ ${TAG}" --notes "Kurdish TV+ Android APKs split by CPU architecture. Choose arm64-v8a for most modern Android phones, or armeabi-v7a for 32-bit ARM devices."
           fi
