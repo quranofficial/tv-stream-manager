@@ -41,7 +41,7 @@ public class PlayerActivity extends Activity {
   private String activePlaybackUrl="";
   private int networkRetryCount=0;
   private Runnable networkRetryRunnable;
-  private boolean muted=false, controlsLocked=false, controlsVisible=true;
+  private boolean muted=false, controlsLocked=false, controlsVisible=true, streamStarted=false;
   private MediaPlayer.ScaleType fitMode=MediaPlayer.ScaleType.SURFACE_BEST_FIT;
   private float oldBrightness=-1f;
   private final int WHITE=0xfff7f3ff, MUTED=0xffb0a5c2, ACCENT=0xffb12cff;
@@ -171,7 +171,7 @@ public class PlayerActivity extends Activity {
       LinearLayout titleBox=(LinearLayout)topBar.getChildAt(1);
       if(titleBox.getChildCount()>0&&titleBox.getChildAt(0) instanceof TextView)((TextView)titleBox.getChildAt(0)).setText(name);
     }
-    runtimeRefreshAttempted=false;relayAttempted=false;directAttempted=false;networkRetryCount=0;
+    runtimeRefreshAttempted=false;relayAttempted=false;directAttempted=false;networkRetryCount=0;streamStarted=false;
     loading.setVisibility(View.VISIBLE);stateText.setVisibility(View.VISIBLE);
     if(!runtimeBase.isEmpty()&&!runtimeKey.isEmpty()){
       relayUrl=runtimeBase+"/stream/"+id+".ts?key="+runtimeKey;
@@ -217,7 +217,7 @@ public class PlayerActivity extends Activity {
   private void toggleControls(){if(controlsVisible){topBar.setVisibility(View.GONE);bottomPanel.setVisibility(View.GONE);extraPanel.setVisibility(View.GONE);controlsVisible=false;handler.removeCallbacks(hideRunnable);}else showControls();}
   private void showControls(){if(controlsLocked)return;topBar.setVisibility(View.VISIBLE);bottomPanel.setVisibility(View.VISIBLE);extraPanel.setVisibility(View.VISIBLE);controlsVisible=true;handler.removeCallbacks(hideRunnable);hideRunnable=()->{if(!controlsLocked&&!drawerVisible){topBar.setVisibility(View.GONE);bottomPanel.setVisibility(View.GONE);extraPanel.setVisibility(View.GONE);controlsVisible=false;}};handler.postDelayed(hideRunnable,6500);}
   private void startStream(){
-    directAttempted=false;relayAttempted=false;runtimeRefreshAttempted=false;networkRetryCount=0;
+    directAttempted=false;relayAttempted=false;runtimeRefreshAttempted=false;networkRetryCount=0;streamStarted=false;
     loading.setVisibility(View.VISIBLE);stateText.setVisibility(View.VISIBLE);
     stateText.setText("لینکی نوێی سێرڤەر و پەیوەندی دەپشکنرێت...");
     refreshRuntime(()->playRelay("سێرڤەر پشتڕاست کرایەوە؛ پەخش دەستپێدەکات"),true);
@@ -291,14 +291,18 @@ public class PlayerActivity extends Activity {
     playUrl(relayUrl);
   }
   private void playUrl(String url){
+    if(!url.equals(activePlaybackUrl))streamStarted=false;
     activePlaybackUrl=url;
     if(networkRetryRunnable!=null){handler.removeCallbacks(networkRetryRunnable);networkRetryRunnable=null;}
     if(player==null){
       ArrayList<String> options=new ArrayList<>();
       options.add("--no-video-title-show");
-      options.add("--network-caching=1800");
-      options.add("--live-caching=1800");
-      options.add("--file-caching=1200");
+      options.add("--network-caching=1200");
+      options.add("--live-caching=1200");
+      options.add("--file-caching=1000");
+      options.add("--avcodec-hw=any");
+      options.add("--drop-late-frames");
+      options.add("--skip-frames");
       options.add("--http-reconnect");
       options.add("--clock-jitter=0");
       options.add("--clock-synchro=0");
@@ -308,10 +312,10 @@ public class PlayerActivity extends Activity {
       player.setVideoScale(fitMode);
       player.setEventListener(event->{
         if(isFinishing())return;
-        if(event.type==MediaPlayer.Event.Opening||event.type==MediaPlayer.Event.Buffering){
-          runOnUiThread(()->{loading.setVisibility(View.VISIBLE);stateText.setVisibility(View.VISIBLE);stateText.setText("بارکردنی پەخش بە VLC...");});
+        if((event.type==MediaPlayer.Event.Opening||event.type==MediaPlayer.Event.Buffering)&&!streamStarted){
+          runOnUiThread(()->{if(!streamStarted){loading.setVisibility(View.VISIBLE);stateText.setVisibility(View.VISIBLE);stateText.setText("بارکردنی پەخش بە VLC...");}});
         }else if(event.type==MediaPlayer.Event.Playing){
-          runOnUiThread(()->{networkRetryCount=0;runtimeRefreshAttempted=false;loading.setVisibility(View.GONE);stateText.setVisibility(View.GONE);playButton.setText("Ⅱ");});
+          runOnUiThread(()->{streamStarted=true;networkRetryCount=0;runtimeRefreshAttempted=false;loading.setVisibility(View.GONE);stateText.setVisibility(View.GONE);playButton.setText("Ⅱ");});
         }else if(event.type==MediaPlayer.Event.Paused){
           runOnUiThread(()->playButton.setText("▶"));
         }else if(event.type==MediaPlayer.Event.EndReached){
