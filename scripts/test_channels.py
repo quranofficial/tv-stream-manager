@@ -5,6 +5,7 @@ import json
 import re
 from pathlib import Path
 import aiohttp
+import urllib.parse
 
 CHANNELS = json.loads(Path("channels.json").read_text(encoding="utf-8"))["data"]
 TREE = ast.parse(Path("bot.py").read_text(encoding="utf-8"))
@@ -56,38 +57,82 @@ async def ffmpeg(urls):
     except Exception as e:
         return None,type(e).__name__
 
+def split_track_urls(muxed_url):
+    """Derive v1/a1 from the exact same channel path and host."""
+    parts=urllib.parse.urlsplit(muxed_url)
+    marker="/tracks-v1a1/"
+    if marker not in parts.path: return None
+    base=parts.path.split(marker,1)[0].rstrip("/")
+    video=urllib.parse.urlunsplit(parts._replace(path=base+"/tracks-v1/index.fmp4.m3u8"))
+    audio=[
+        urllib.parse.urlunsplit(parts._replace(path=base+"/tracks-a1/index.fmp4.m3u8")),
+        urllib.parse.urlunsplit(parts._replace(path=base+"/tracks-a1/mono.ts.m3u8")),
+    ]
+    return video,audio
+
+async def test_separate_urls(ch,video,audios):
+    async with aiohttp.ClientSession(headers={"User-Agent":"Mozilla/5.0 TVStreamManager-Audit/2.0"}) as session:
+        vok,vd=await manifest(session,video)
+        if not vok: return False,"v1 unavailable: "+str(vd)
+        for audio in audios:
+            aok,ad=await manifest(session,audio)
+            if not aok: continue
+            passed,why=await ffmpeg([video,audio])
+            if passed: return True,"same-channel v1+a1 FFmpeg passed"
+            if passed is None: return None,why
+        return False,"v1 exists but no matching a1 passed FFmpeg"
+
 async def test_exact(ch,src):
     mode=src.get("mode","muxed")
-    urls=[src["url"]] if mode=="muxed" else [src["video"]]+src.get("audio_options",[src["audio"]])
+    if mode=="separate":
+        return await test_separate_urls(
+            ch,src["video"],src.get("audio_options",[src["audio"]])
+        )
+    url=src["url"]
     async with aiohttp.ClientSession(headers={"User-Agent":"Mozilla/5.0 TVStreamManager-Audit/2.0"}) as session:
-        valid=[]
-        for url in urls:
-            ok,detail=await manifest(session,url)
-            if ok: valid.append(url)
-            elif url==urls[0]: return False,"manifest "+detail
-        if mode=="separate" and len(valid)<2: return False,"no valid separate audio track"
-        return await ffmpeg(valid[:1] if mode=="muxed" else valid[:2])
+        ok,detail=await manifest(session,url)
+    if ok:
+        passed,why=await ffmpeg([url])
+        if passed: return True,"complete v1a1 FFmpeg passed"
+        if passed is None: return None,why
+    split=split_track_urls(url)
+    if split:
+        passed,why=await test_separate_urls(ch,*split)
+        if passed: return True,why
+        if passed is None: return None,why
+    return False,"v1a1 failed ("+str(detail)+"); same-source v1+a1 failed"
 
 async def test_one(ch):
     cid=str(ch["id"]); name=ch["name"]
     async with SEM:
         if cid in EXPLICIT:
             ok,detail=await test_exact(ch,EXPLICIT[cid])
-            if ok: return {"id":cid,"name":name,"status":"WORKING","url":EXPLICIT[cid].get("url",EXPLICIT[cid].get("video","")),"details":"Exact bot.py source passed"}
-            return {"id":cid,"name":name,"status":"NOT_WORKING" if ok is False else "UNKNOWN","url":"","details":"Exact bot.py source: "+detail}
+            if ok: return {"id":cid,"name":name,"status":"WORKING","url":EXPLICIT[cid].get("url",EXPLICIT[cid].get("video","")),"details":detail}
+            return {"id":cid,"name":name,"status":"UNKNOWN" if ok is None else "NOT_WORKING",
+                    "url":"","details":"Exact bot.py source: "+detail}
         notes=[]; unknown=False
         for slug in candidate_slugs(ch):
-            url=f"{BASE}/{slug}/tracks-v1a1/mono.ts.m3u8"
+            muxed=f"{BASE}/{slug}/tracks-v1a1/mono.ts.m3u8"
             async with aiohttp.ClientSession(headers={"User-Agent":"Mozilla/5.0 TVStreamManager-Audit/2.0"}) as session:
-                ok,detail=await manifest(session,url)
-            if ok is None: unknown=True; notes.append(detail); continue
-            if not ok: notes.append(detail); continue
-            passed,why=await ffmpeg([url])
-            if passed: return {"id":cid,"name":name,"status":"WORKING","url":url,"details":"v1a1 FFmpeg passed"}
-            if passed is None: unknown=True
-            notes.append(why)
+                ok,detail=await manifest(session,muxed)
+            if ok:
+                passed,why=await ffmpeg([muxed])
+                if passed:
+                    return {"id":cid,"name":name,"status":"WORKING","url":muxed,"details":"complete v1a1 FFmpeg passed"}
+                if passed is None: unknown=True
+                notes.append("v1a1: "+why)
+            elif ok is None:
+                unknown=True; notes.append("v1a1: "+str(detail))
+            split=split_track_urls(muxed)
+            if split:
+                passed,why=await test_separate_urls(ch,*split)
+                if passed:
+                    return {"id":cid,"name":name,"status":"WORKING","url":split[0]+" + "+next((a for a in split[1] if a in str(why)),split[1][0]),
+                            "details":"same-slug v1+a1 FFmpeg passed"}
+                if passed is None: unknown=True
+                notes.append("v1+a1: "+str(why))
         return {"id":cid,"name":name,"status":"UNKNOWN" if unknown else "NOT_WORKING",
-                "url":"","details":"; ".join(notes[-4:]) or "No valid candidate"}
+                "url":"","details":"; ".join(notes[-6:]) or "No valid same-channel source"}
 
 async def main():
     results=await asyncio.gather(*(test_one(ch) for ch in CHANNELS))
