@@ -418,7 +418,12 @@ def channel_page(page=0, query=""):
         ]
     start = page * PAGE_SIZE
     part = items[start:start + PAGE_SIZE]
-    rows = [[InlineKeyboardButton(c["name"], callback_data=f"ch:{c['id']}")] for c in part]
+    rows = [
+        [InlineKeyboardButton("▶️ Start", callback_data="menu:start"),
+         InlineKeyboardButton("🔐 TV Code", callback_data="menu:tvcode")],
+        [InlineKeyboardButton("📊 کەناڵە ناکاراکان", callback_data="menu:broken")],
+    ]
+    rows += [[InlineKeyboardButton(c["name"], callback_data=f"ch:{c['id']}")] for c in part]
     nav = []
     if page > 0:
         nav.append(InlineKeyboardButton("⬅️ پێشوو", callback_data=f"page:{page-1}"))
@@ -633,15 +638,15 @@ async def tvadminid(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
 
-async def tvcode(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if not _tv_admin_allowed(update):
-        await update.effective_message.reply_text("⛔ ئەم فەرمانە تەنها بۆ ئەدمینی TV ـە.")
+async def _issue_tv_code(message, user, args):
+    if not user or str(user.id) not in TV_ADMIN_IDS:
+        await message.reply_text("⛔ ئەم فەرمانە تەنها بۆ ئەدمینی TV ـە.")
         return
     days = 30
-    label = " ".join(context.args).strip()
-    if context.args and context.args[0].isdigit():
-        days = max(1, min(365, int(context.args[0])))
-        label = " ".join(context.args[1:]).strip()
+    label = " ".join(args).strip()
+    if args and args[0].isdigit():
+        days = max(1, min(365, int(args[0])))
+        label = " ".join(args[1:]).strip()
     code = "".join(secrets.choice("ABCDEFGHJKLMNPQRSTUVWXYZ23456789") for _ in range(12))
     expires = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=days)
     try:
@@ -653,9 +658,9 @@ async def tvcode(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
     except Exception as exc:
         log.exception("Could not create TV login code")
-        await update.effective_message.reply_text(f"❌ نەیتوانی کۆد دروست بکات: {exc}")
+        await message.reply_text(f"❌ نەیتوانی کۆد دروست بکات: {exc}")
         return
-    await update.effective_message.reply_text(
+    await message.reply_text(
         "✅ کۆدی چوونەژوورەوە دروست کرا. تەنها یەکجار و لە یەک ئامێر کار دەکات.\\n\\n"
         f"🔐 کۆد: <code>{code}</code>\\n"
         f"📅 ماوە: {days} ڕۆژ\\n"
@@ -663,6 +668,10 @@ async def tvcode(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "⚠️ ئەم کۆدە تەنها ئەمجارە پیشان دەدرێت؛ بە پارێزراوی بینێرە.",
         parse_mode="HTML"
     )
+
+
+async def tvcode(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await _issue_tv_code(update.effective_message, update.effective_user, context.args)
 
 
 async def tvcodes(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -708,6 +717,36 @@ async def tvrevoke(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.effective_message.reply_text("✅ کۆدەکە هەڵوەشێندرایەوە.")
 
 
+async def _check_channels_and_report(message):
+    await message.reply_text(f"⏳ پشکنینی {len(CHANNELS)} کەناڵ دەستپێکرا؛ تکایە چاوەڕێ بکە...")
+    semaphore = asyncio.Semaphore(8)
+
+    async def check_one(channel):
+        async with semaphore:
+            try:
+                source = await asyncio.wait_for(resolve_source(channel), timeout=30)
+                return source is not None
+            except Exception as exc:
+                log.warning("Availability check failed for channel %s: %s", channel["id"], exc)
+                return False
+
+    results = await asyncio.gather(*(check_one(c) for c in CHANNELS))
+    working = sum(results)
+    broken = len(CHANNELS) - working
+    names = [c["name"] for c, ok in zip(CHANNELS, results) if not ok]
+    report = (
+        f"📊 ئەنجامی پشکنینی کەناڵەکان\\n\\n"
+        f"🟢 کارا: {working}\\n"
+        f"🔴 ناکارا/سەرچاوەی نەدۆزراوە: {broken}\\n"
+        f"📺 کۆی گشتی: {len(CHANNELS)}"
+    )
+    if names:
+        report += "\\n\\nکەناڵە ناکاراکان:\\n" + "\\n".join("• " + n for n in names[:40])
+        if len(names) > 40:
+            report += f"\\n... و {len(names)-40} کەناڵی تر"
+    await message.reply_text(report)
+
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data.clear()
     markup, total = channel_page()
@@ -733,6 +772,24 @@ async def search(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
+    if query.data == "menu:start":
+        context.user_data.clear()
+        markup, total = channel_page()
+        await query.message.reply_text(
+            f"📺 بەخێربێیت! {total} کەناڵ بەردەستن. کەناڵێک هەڵبژێرە یان /search بنووسە.",
+            reply_markup=markup,
+        )
+        return
+
+    if query.data == "menu:tvcode":
+        await _issue_tv_code(query.message, query.from_user, [])
+        return
+
+    if query.data == "menu:broken":
+        context.application.create_task(_check_channels_and_report(query.message))
+        await query.answer("پشکنین دەستی پێکرد")
+        return
+
     if query.data.startswith("page:"):
         page = int(query.data.split(":")[1])
         markup, _ = channel_page(page, context.user_data.get("query", ""))
