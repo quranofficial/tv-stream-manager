@@ -1,0 +1,95 @@
+name: Temporary Direct vs Relay 60s Comparison
+
+on:
+  push:
+    paths:
+      - ".github/workflows/relay-compare.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Compare direct source and relay for 60 seconds each
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, time, urllib.request, urllib.error, socket
+          from pathlib import Path
+
+          cfg = json.loads(Path("runtime.json").read_text())
+          tests = [
+              ("direct_origin", "http://edge01.cdn.omxx.net/live/ku/ku/unit/dunya_hd/tracks-v1a1/mono.ts.m3u8"),
+              ("relay", cfg["base_url"].rstrip("/") + "/stream/43.ts?key=" + cfg["access_key"]),
+          ]
+          results = []
+          for label, url in tests:
+              item = {
+                  "path": label,
+                  "channel_id": "43",
+                  "target_seconds": 60,
+                  "http_status": None,
+                  "bytes_received": 0,
+                  "chunks": 0,
+                  "first_byte_seconds": None,
+                  "measured_seconds": 0,
+                  "average_mbps": 0,
+                  "max_inter_chunk_gap_seconds": None,
+                  "gaps_over_2s": 0,
+                  "error": None,
+              }
+              gaps = []
+              started = time.monotonic()
+              try:
+                  req = urllib.request.Request(url, headers={"User-Agent": "VLC/3.0.21"})
+                  with urllib.request.urlopen(req, timeout=15) as response:
+                      item["http_status"] = response.status
+                      first = True
+                      last = None
+                      deadline = time.monotonic() + 60
+                      while time.monotonic() < deadline:
+                          try:
+                              chunk = response.read(65536)
+                          except socket.timeout:
+                              item["error"] = "read_timeout"
+                              break
+                          now = time.monotonic()
+                          if not chunk:
+                              item["error"] = "early_end_of_stream"
+                              break
+                          if first:
+                              item["first_byte_seconds"] = round(now - started, 3)
+                              first = False
+                          if last is not None:
+                              gaps.append(now - last)
+                          last = now
+                          item["bytes_received"] += len(chunk)
+                          item["chunks"] += 1
+                      item["measured_seconds"] = round(time.monotonic() - (started + (item["first_byte_seconds"] or 0)), 3)
+              except Exception as e:
+                  item["error"] = type(e).__name__ + ": " + str(e)[:180]
+                  item["measured_seconds"] = round(time.monotonic() - started, 3)
+              elapsed = max(item["measured_seconds"], 0.001)
+              item["average_mbps"] = round(item["bytes_received"] * 8 / elapsed / 1_000_000, 3)
+              if gaps:
+                  item["max_inter_chunk_gap_seconds"] = round(max(gaps), 3)
+                  item["gaps_over_2s"] = sum(g > 2 for g in gaps)
+              results.append(item)
+              print(json.dumps(item, indent=2))
+          Path("direct-relay-comparison.json").write_text(json.dumps(results, indent=2))
+          PY
+
+      - name: Upload comparison result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: direct-relay-60s-comparison
+          path: direct-relay-comparison.json
+          if-no-files-found: warn
+          retention-days: 3
