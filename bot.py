@@ -787,7 +787,6 @@ async def buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if query.data == "menu:broken":
         context.application.create_task(_check_channels_and_report(query.message))
-        await query.answer("پشکنین دەستی پێکرد")
         return
 
     if query.data.startswith("page:"):
