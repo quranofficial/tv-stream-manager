@@ -338,11 +338,11 @@ def _split_track_urls(muxed_url):
     marker = "/tracks-v1a1/"
     if marker not in parts.path:
         return None
-    base_path = parts.path.replace(marker, "/", 1)
-    video_path = base_path.rstrip("/") + "/tracks-v1/index.fmp4.m3u8"
+    base_path = parts.path.split(marker, 1)[0].rstrip("/")
+    video_path = base_path + "/tracks-v1/index.fmp4.m3u8"
     audio_paths = [
-        base_path.rstrip("/") + "/tracks-a1/index.fmp4.m3u8",
-        base_path.rstrip("/") + "/tracks-a1/mono.ts.m3u8",
+        base_path + "/tracks-a1/index.fmp4.m3u8",
+        base_path + "/tracks-a1/mono.ts.m3u8",
     ]
     video_url = urllib.parse.urlunsplit(parts._replace(path=video_path))
     audio_urls = [urllib.parse.urlunsplit(parts._replace(path=p)) for p in audio_paths]
