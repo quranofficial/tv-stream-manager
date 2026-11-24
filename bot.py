@@ -803,10 +803,10 @@ async def _send_channel_stats(message, working, failed_channels, unknown_channel
     if cached:
         heading += " (کاشکراو، تا ٣ خولەک)"
     await message.reply_text(
-        f"{heading}:\\n\\n"
-        f"🟢 کارا: {working}\\n"
-        f"🔴 کار ناکەن: {failed}\\n"
-        f"🟡 نەتوانرا پشتڕاست بکرێنەوە: {unknown}\\n"
+        f"{heading}:\n\n"
+        f"🟢 کارا: {working}\n"
+        f"🔴 کار ناکەن: {failed}\n"
+        f"🟡 نەتوانرا پشتڕاست بکرێنەوە: {unknown}\n"
         f"📺 کۆی گشتی: {len(CHANNELS)}"
     )
 
@@ -817,7 +817,7 @@ async def _send_channel_stats(message, working, failed_channels, unknown_channel
         lines.extend(f"• {item['name']} — ID: {item['id']}" for item in channels)
         chunk = ""
         for line in lines:
-            candidate = f"{chunk}\\n{line}" if chunk else line
+            candidate = f"{chunk}\n{line}" if chunk else line
             if len(candidate) > 3500:
                 await message.reply_text(chunk)
                 chunk = line
@@ -872,7 +872,7 @@ async def channel_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if completed % 30 == 0 and completed < len(CHANNELS):
             try:
                 await progress.edit_text(
-                    f"⏳ پشکنین بەردەوامە: {completed}/{len(CHANNELS)}\\n"
+                    f"⏳ پشکنین بەردەوامە: {completed}/{len(CHANNELS)}\n"
                     f"🟢 کارا: {working} | 🔴 ناکارا: {len(failed_channels)} | "
                     f"🟡 نادیار: {len(unknown_channels)}"
                 )
