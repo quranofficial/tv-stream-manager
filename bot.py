@@ -796,15 +796,47 @@ async def search(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await _show_search(update, context, query)
 
 
+async def _send_channel_stats(message, working, failed_channels, unknown_channels, cached=False):
+    failed = len(failed_channels)
+    unknown = len(unknown_channels)
+    heading = "📊 ئەنجامی پشکنینی کەناڵەکان"
+    if cached:
+        heading += " (کاشکراو، تا ٣ خولەک)"
+    await message.reply_text(
+        f"{heading}:\\n\\n"
+        f"🟢 کارا: {working}\\n"
+        f"🔴 کار ناکەن: {failed}\\n"
+        f"🟡 نەتوانرا پشتڕاست بکرێنەوە: {unknown}\\n"
+        f"📺 کۆی گشتی: {len(CHANNELS)}"
+    )
+
+    async def send_name_list(title, channels):
+        if not channels:
+            return
+        lines = [title]
+        lines.extend(f"• {item['name']} — ID: {item['id']}" for item in channels)
+        chunk = ""
+        for line in lines:
+            candidate = f"{chunk}\\n{line}" if chunk else line
+            if len(candidate) > 3500:
+                await message.reply_text(chunk)
+                chunk = line
+            else:
+                chunk = candidate
+        if chunk:
+            await message.reply_text(chunk)
+
+    await send_name_list("🔴 لیستی کەناڵە ناکاراکان:", failed_channels)
+    await send_name_list("🟡 لیستی کەناڵە نادیارەکان (timeout):", unknown_channels)
+
+
 async def channel_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
     global CHANNEL_STATS_CACHE, CHANNEL_STATS_CACHE_AT
     now = asyncio.get_running_loop().time()
     if CHANNEL_STATS_CACHE is not None and now - CHANNEL_STATS_CACHE_AT < 180:
-        working, failed, unknown = CHANNEL_STATS_CACHE
-        await update.effective_message.reply_text(
-            "📊 ئاماری کەناڵەکان (پشکنینی نوێی کەمتر لە ٣ خولەک):\n\n"
-            f"🟢 کارا: {working}\n🔴 کار ناکەن: {failed}\n🟡 نەتوانرا پشتڕاست بکرێنەوە: {unknown}\n"
-            f"📺 کۆی گشتی: {len(CHANNELS)}"
+        working, failed_channels, unknown_channels = CHANNEL_STATS_CACHE
+        await _send_channel_stats(
+            update.effective_message, working, failed_channels, unknown_channels, cached=True
         )
         return
 
@@ -817,42 +849,46 @@ async def channel_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
         async with semaphore:
             try:
                 source = await asyncio.wait_for(resolve_source(channel), timeout=50)
-                return "working" if source else "failed"
+                return ("working", channel)
             except asyncio.TimeoutError:
-                return "unknown"
+                return ("unknown", channel)
             except Exception:
                 log.exception("Channel status check failed: %s", channel.get("id"))
-                return "unknown"
+                return ("unknown", channel)
 
     tasks = [asyncio.create_task(check_one(channel)) for channel in CHANNELS]
-    working = failed = unknown = completed = 0
+    working = completed = 0
+    failed_channels = []
+    unknown_channels = []
     for task in asyncio.as_completed(tasks):
-        result = await task
+        result, channel = await task
         if result == "working":
             working += 1
         elif result == "failed":
-            failed += 1
+            failed_channels.append({"id": channel["id"], "name": channel["name"]})
         else:
-            unknown += 1
+            unknown_channels.append({"id": channel["id"], "name": channel["name"]})
         completed += 1
         if completed % 30 == 0 and completed < len(CHANNELS):
             try:
                 await progress.edit_text(
-                    f"⏳ پشکنین بەردەوامە: {completed}/{len(CHANNELS)}\n"
-                    f"🟢 کارا: {working} | 🔴 ناکارا: {failed} | 🟡 نادیار: {unknown}"
+                    f"⏳ پشکنین بەردەوامە: {completed}/{len(CHANNELS)}\\n"
+                    f"🟢 کارا: {working} | 🔴 ناکارا: {len(failed_channels)} | "
+                    f"🟡 نادیار: {len(unknown_channels)}"
                 )
             except Exception:
                 pass
 
-    CHANNEL_STATS_CACHE = (working, failed, unknown)
+    failed_channels.sort(key=lambda item: str(item["name"]).casefold())
+    unknown_channels.sort(key=lambda item: str(item["name"]).casefold())
+    CHANNEL_STATS_CACHE = (working, failed_channels, unknown_channels)
     CHANNEL_STATS_CACHE_AT = asyncio.get_running_loop().time()
-    await progress.edit_text(
-        "📊 ئەنجامی پشکنینی کەناڵەکان:\n\n"
-        f"🟢 **کارا:** {working}\n"
-        f"🔴 **کار ناکەن:** {failed}\n"
-        f"🟡 **نەتوانرا پشتڕاست بکرێنەوە (timeout):** {unknown}\n"
-        f"📺 **کۆی گشتی:** {len(CHANNELS)}",
-        parse_mode="Markdown",
+    try:
+        await progress.delete()
+    except Exception:
+        pass
+    await _send_channel_stats(
+        update.effective_message, working, failed_channels, unknown_channels
     )
 
 
