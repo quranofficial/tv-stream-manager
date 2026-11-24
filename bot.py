@@ -46,6 +46,10 @@ STREAM_MODES = (
 # Exact user-provided stream sources, kept in this existing bot module.
 # Separate video/audio tracks are muxed by FFmpeg for both Telegram bot and Android app.
 EXPLICIT_SOURCES = {
+    "15": {
+        "mode": "muxed",
+        "url": "http://edge01.cdn.omxx.net/live/ku/ku/unit/mix_kurdy/tracks-v1a1/mono.ts.m3u8"
+    },
     "6": {
         "mode": "separate",
         "video": "http://edge01.cdn.omxx.net/live/ku/ku/unit/pesmerge_hd/tracks-v1/index.fmp4.m3u8",
