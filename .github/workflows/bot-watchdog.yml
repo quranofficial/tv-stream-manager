@@ -102,18 +102,36 @@ jobs:
           except Exception as exc:
               print("Public relay health check unavailable:", type(exc).__name__)
 
-          # A queued or running bot job is already the single active instance.
+          # Keep exactly one bot instance. If code was updated while an older
+          # workflow is still running, cancel that stale instance and launch
+          # the current commit so relay fixes take effect without manual steps.
           _, data = request(api_root + "/actions/workflows/bot.yml/runs?per_page=20")
           runs = data.get("workflow_runs", [])
           active = [r for r in runs if r.get("status") in ("queued", "in_progress")]
+          current_sha = os.getenv("GITHUB_SHA", "")
           if active:
               run = active[0]
-              print(
-                  "Bot is already active; no second run will be started.",
-                  "run_id=", run.get("id"),
-                  "status=", run.get("status"),
-              )
-              raise SystemExit(0)
+              if run.get("head_sha") != current_sha:
+                  print(
+                      "Stopping stale bot instance before deploying current commit.",
+                      "run_id=", run.get("id"),
+                      "old_sha=", run.get("head_sha"),
+                      "new_sha=", current_sha,
+                  )
+                  request(api_root + f"/actions/runs/{run['id']}/cancel", method="POST")
+                  for _ in range(15):
+                      import time
+                      time.sleep(2)
+                      _, latest = request(api_root + f"/actions/runs/{run['id']}")
+                      if latest.get("status") == "completed":
+                          break
+              else:
+                  print(
+                      "Bot is already active on the current commit; no second run will be started.",
+                      "run_id=", run.get("id"),
+                      "status=", run.get("status"),
+                  )
+                  raise SystemExit(0)
 
           if runs:
               latest = runs[0]
