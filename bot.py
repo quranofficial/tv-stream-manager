@@ -480,11 +480,14 @@ async def stream_handler(request):
         )
     video_input = source["url"] if source["mode"] == "muxed" else source["video"]
     video_codec = await _probe_video_codec(video_input)
-    # The Android app uses this User-Agent and needs broadly supported H.264/AAC.
-    # VLC clients keep the original stream-copy behavior unless HEVC is detected.
+    # ExoPlayer supports H.264/AAC natively. Do not transcode every Android
+    # request: that needlessly overloads the relay and can prevent the first
+    # MPEG-TS packets from being produced (HTTP 502). Convert only known
+    # HEVC/H.265 inputs; keep audio in its source codec unless a future
+    # explicit compatibility probe proves conversion is required.
     android_client = "TVStreamManager" in request.headers.get("User-Agent", "")
-    transcode_video = android_client or video_codec in {"hevc", "h265"} or cid in {"195", "196", "198"}
-    transcode_audio = android_client
+    transcode_video = video_codec in {"hevc", "h265"} or cid in {"195", "196", "198"}
+    transcode_audio = False
     log.info(
         "Relay codecs: channel=%s input_video=%s android_client=%s video_transcode=%s audio_transcode=%s",
         cid, video_codec or "unknown", android_client, transcode_video, transcode_audio,
