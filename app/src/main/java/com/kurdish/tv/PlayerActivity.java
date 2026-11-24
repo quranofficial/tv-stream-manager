@@ -12,22 +12,17 @@ import org.json.JSONObject;
 import org.json.JSONArray;
 import java.io.*;
 import java.net.*;
-import androidx.media3.common.MediaItem;
-import androidx.media3.common.MimeTypes;
-import androidx.media3.exoplayer.hls.HlsMediaSource;
-import androidx.media3.common.PlaybackException;
-import androidx.media3.common.Player;
-import androidx.media3.exoplayer.ExoPlayer;
-import androidx.media3.exoplayer.LoadControl;
-import androidx.media3.exoplayer.DefaultLoadControl;
-import androidx.media3.datasource.DefaultHttpDataSource;
-import androidx.media3.exoplayer.source.DefaultMediaSourceFactory;
-import androidx.media3.ui.AspectRatioFrameLayout;
-import androidx.media3.ui.PlayerView;
+import java.util.ArrayList;
+import android.net.Uri;
+import org.videolan.libvlc.LibVLC;
+import org.videolan.libvlc.Media;
+import org.videolan.libvlc.MediaPlayer;
+import org.videolan.libvlc.util.VLCVideoLayout;
 
 public class PlayerActivity extends Activity {
-  private ExoPlayer player;
-  private PlayerView playerView;
+  private MediaPlayer player;
+  private LibVLC libVLC;
+  private VLCVideoLayout playerView;
   private TextView stateText, playButton, muteButton, lockButton, fitButton, liveBadge;
   private ProgressBar loading;
   private LinearLayout topBar, bottomPanel, extraPanel, channelPanel, channelList;
@@ -47,7 +42,7 @@ public class PlayerActivity extends Activity {
   private int networkRetryCount=0;
   private Runnable networkRetryRunnable;
   private boolean muted=false, controlsLocked=false, controlsVisible=true;
-  private int fitMode=AspectRatioFrameLayout.RESIZE_MODE_FIT;
+  private MediaPlayer.ScaleType fitMode=MediaPlayer.ScaleType.SURFACE_BEST_FIT;
   private float oldBrightness=-1f;
   private final int WHITE=0xfff7f3ff, MUTED=0xffb0a5c2, ACCENT=0xffb12cff;
 
@@ -74,7 +69,7 @@ public class PlayerActivity extends Activity {
     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
     hideSystemBars();
     FrameLayout root=new FrameLayout(this);root.setBackgroundColor(Color.BLACK);
-    playerView=new PlayerView(this);playerView.setUseController(false);playerView.setShutterBackgroundColor(Color.BLACK);playerView.setKeepContentOnPlayerReset(true);playerView.setResizeMode(fitMode);
+    playerView=new VLCVideoLayout(this);playerView.setBackgroundColor(Color.BLACK);
     root.addView(playerView,new FrameLayout.LayoutParams(-1,-1));
     FrameLayout shade=new FrameLayout(this);shade.setBackground(new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,new int[]{0xaa050d18,0x00000000,0x00000000,0xbb050d18}));root.addView(shade,new FrameLayout.LayoutParams(-1,-1));
     LinearLayout overlay=new LinearLayout(this);overlay.setOrientation(1);
@@ -100,15 +95,15 @@ public class PlayerActivity extends Activity {
     LinearLayout brightRow=new LinearLayout(this);brightRow.setGravity(Gravity.CENTER_VERTICAL);brightRow.addView(txt("☼",20,WHITE),lp(35,34));
     brightnessSeek=new SeekBar(this);brightnessSeek.setMax(100);brightnessSeek.setProgress(70);brightRow.addView(brightnessSeek,new LinearLayout.LayoutParams(0,dp(34),1));extraPanel.addView(brightRow);
     overlay.addView(extraPanel,lp(-1,-2));
-    volumeSeek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){public void onProgressChanged(SeekBar s,int p,boolean u){if(player!=null){player.setVolume(p/100f);muted=p==0;muteButton.setText(muted?"×":"🔊");}}public void onStartTrackingTouch(SeekBar s){}public void onStopTrackingTouch(SeekBar s){}});
+    volumeSeek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){public void onProgressChanged(SeekBar s,int p,boolean u){if(player!=null){player.setVolume(p);muted=p==0;muteButton.setText(muted?"×":"🔊");}}public void onStartTrackingTouch(SeekBar s){}public void onStopTrackingTouch(SeekBar s){}});
     brightnessSeek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){public void onProgressChanged(SeekBar s,int p,boolean u){WindowManager.LayoutParams a=getWindow().getAttributes();a.screenBrightness=Math.max(.02f,p/100f);getWindow().setAttributes(a);}public void onStartTrackingTouch(SeekBar s){}public void onStopTrackingTouch(SeekBar s){}});
     bottomPanel=new LinearLayout(this);bottomPanel.setGravity(Gravity.CENTER_VERTICAL);bottomPanel.setPadding(dp(18),dp(10),dp(18),dp(14));bottomPanel.setBackground(gradient(0xee10091d,0xff080713,0));
     playButton=control("Ⅱ");bottomPanel.addView(playButton,lp(50,46));playButton.setOnClickListener(v->{if(player==null)return;if(player.isPlaying())player.pause();else player.play();});
     TextView label=txt("KURDISH TV+  •  LIVE",11,0xffc0cbd9);label.setGravity(Gravity.CENTER_VERTICAL);label.setPadding(dp(13),0,0,0);bottomPanel.addView(label,new LinearLayout.LayoutParams(0,-2,1));
     TextView previousChannel=control("▲");bottomPanel.addView(previousChannel,lp(42,46));previousChannel.setOnClickListener(v->tuneRelative(1));
     TextView nextChannel=control("▼");LinearLayout.LayoutParams ncp=lp(42,46);ncp.leftMargin=dp(6);bottomPanel.addView(nextChannel,ncp);nextChannel.setOnClickListener(v->tuneRelative(-1));
-    muteButton=control("🔊");bottomPanel.addView(muteButton,lp(48,46));muteButton.setOnClickListener(v->{muted=!muted;if(player!=null)player.setVolume(muted?0f:(volumeSeek.getProgress()/100f));muteButton.setText(muted?"×":"🔊");});
-    fitButton=control("▣");LinearLayout.LayoutParams fp=lp(48,46);fp.leftMargin=dp(8);bottomPanel.addView(fitButton,fp);fitButton.setOnClickListener(v->{fitMode=fitMode==AspectRatioFrameLayout.RESIZE_MODE_FIT?AspectRatioFrameLayout.RESIZE_MODE_ZOOM:fitMode==AspectRatioFrameLayout.RESIZE_MODE_ZOOM?AspectRatioFrameLayout.RESIZE_MODE_FILL:AspectRatioFrameLayout.RESIZE_MODE_FIT;playerView.setResizeMode(fitMode);fitButton.setText(fitMode==AspectRatioFrameLayout.RESIZE_MODE_FIT?"FIT":fitMode==AspectRatioFrameLayout.RESIZE_MODE_ZOOM?"ZOOM":"FILL");showControls();});
+    muteButton=control("🔊");bottomPanel.addView(muteButton,lp(48,46));muteButton.setOnClickListener(v->{muted=!muted;if(player!=null)player.setVolume(muted?0:volumeSeek.getProgress());muteButton.setText(muted?"×":"🔊");});
+    fitButton=control("▣");LinearLayout.LayoutParams fp=lp(48,46);fp.leftMargin=dp(8);bottomPanel.addView(fitButton,fp);fitButton.setOnClickListener(v->{fitMode=fitMode==MediaPlayer.ScaleType.SURFACE_BEST_FIT?MediaPlayer.ScaleType.SURFACE_FIT_SCREEN:fitMode==MediaPlayer.ScaleType.SURFACE_FIT_SCREEN?MediaPlayer.ScaleType.SURFACE_FILL:MediaPlayer.ScaleType.SURFACE_BEST_FIT;if(player!=null)player.setVideoScale(fitMode);fitButton.setText(fitMode==MediaPlayer.ScaleType.SURFACE_BEST_FIT?"FIT":fitMode==MediaPlayer.ScaleType.SURFACE_FIT_SCREEN?"ZOOM":"FILL");showControls();});
     TextView retry=control("↻");LinearLayout.LayoutParams rp=lp(48,46);rp.leftMargin=dp(8);bottomPanel.addView(retry,rp);retry.setOnClickListener(v->startStream());
     lockButton=control("🔓");LinearLayout.LayoutParams lk=lp(48,46);lk.leftMargin=dp(8);bottomPanel.addView(lockButton,lk);lockButton.setOnClickListener(v->{controlsLocked=!controlsLocked;lockButton.setText(controlsLocked?"🔒":"🔓");if(controlsLocked){extraPanel.setVisibility(View.GONE);topBar.setVisibility(View.GONE);bottomPanel.setVisibility(View.GONE);controlsVisible=false;}else showControls();});
     overlay.addView(bottomPanel,lp(-1,68));
@@ -224,8 +219,8 @@ public class PlayerActivity extends Activity {
   private void startStream(){
     directAttempted=false;relayAttempted=false;runtimeRefreshAttempted=false;networkRetryCount=0;
     loading.setVisibility(View.VISIBLE);stateText.setVisibility(View.VISIBLE);
-    if(relayUrl!=null&&!relayUrl.isEmpty())playRelay("دووبارە دەستپێکردنی پەخش");
-    else refreshRuntime(()->playRelay("پەخش بە لینکی یەکگرتووی VLC"),true);
+    stateText.setText("لینکی نوێی سێرڤەر و پەیوەندی دەپشکنرێت...");
+    refreshRuntime(()->playRelay("سێرڤەر پشتڕاست کرایەوە؛ پەخش دەستپێدەکات"),true);
   }
   private void refreshRuntime(Runnable onSuccess,boolean showError){
     new Thread(()->{
@@ -251,6 +246,11 @@ public class PlayerActivity extends Activity {
           base.toLowerCase(java.util.Locale.ROOT).contains("undefined")||
           base.toLowerCase(java.util.Locale.ROOT).contains("null")||key.isEmpty())
           throw new Exception("runtime.json لینکی نادروستی تێدایە؛ تکایە بۆتەکە لە GitHub Actions دەستپێبکەرەوە.");
+        InetAddress.getAllByName(host);
+        HttpURLConnection health=(HttpURLConnection)new URL(base+"/health").openConnection();
+        health.setConnectTimeout(5000);health.setReadTimeout(5000);
+        int healthCode=health.getResponseCode();health.disconnect();
+        if(healthCode!=200)throw new Exception("سێرڤەری ستریم ئامادە نییە (HTTP "+healthCode+")");
         runtimeBase=base;runtimeKey=key;
         getSharedPreferences("kurdish_tv",0).edit().putString("tv_runtime_base",base).putString("tv_runtime_key",key).apply();
         relayUrl=runtimeBase+"/stream/"+currentChannelId+".ts?key="+runtimeKey;
@@ -294,80 +294,79 @@ public class PlayerActivity extends Activity {
     activePlaybackUrl=url;
     if(networkRetryRunnable!=null){handler.removeCallbacks(networkRetryRunnable);networkRetryRunnable=null;}
     if(player==null){
-      DefaultHttpDataSource.Factory httpFactory=new DefaultHttpDataSource.Factory()
-        .setUserAgent("Mozilla/5.0 TVStreamManager/2.0")
-        .setConnectTimeoutMs(8000)
-        .setReadTimeoutMs(15000)
-        .setAllowCrossProtocolRedirects(true);
-      LoadControl loadControl=new DefaultLoadControl.Builder()
-        .setBufferDurationsMs(1500,12000,500,1000)
-        .setPrioritizeTimeOverSizeThresholds(true)
-        .build();
-      player=new ExoPlayer.Builder(this)
-        .setLoadControl(loadControl)
-        .setMediaSourceFactory(new DefaultMediaSourceFactory(this).setDataSourceFactory(httpFactory))
-        .build();
-      playerView.setPlayer(player);
-      player.addListener(new Player.Listener(){
-        @Override public void onPlaybackStateChanged(int s){
-          if(s==Player.STATE_BUFFERING){loading.setVisibility(View.VISIBLE);stateText.setVisibility(View.VISIBLE);stateText.setText("بارکردنی پەخش...");}
-          else if(s==Player.STATE_READY){networkRetryCount=0;runtimeRefreshAttempted=false;loading.setVisibility(View.GONE);stateText.setVisibility(View.GONE);}
-          else if(s==Player.STATE_ENDED){loading.setVisibility(View.GONE);stateText.setVisibility(View.GONE);}
+      ArrayList<String> options=new ArrayList<>();
+      options.add("--no-video-title-show");
+      options.add("--network-caching=1800");
+      options.add("--live-caching=1800");
+      options.add("--file-caching=1200");
+      options.add("--http-reconnect");
+      options.add("--clock-jitter=0");
+      options.add("--clock-synchro=0");
+      libVLC=new LibVLC(getApplicationContext(),options);
+      player=new MediaPlayer(libVLC);
+      player.attachViews(playerView,null,false,false);
+      player.setVideoScale(fitMode);
+      player.setEventListener(event->{
+        if(isFinishing())return;
+        if(event.type==MediaPlayer.Event.Opening||event.type==MediaPlayer.Event.Buffering){
+          runOnUiThread(()->{loading.setVisibility(View.VISIBLE);stateText.setVisibility(View.VISIBLE);stateText.setText("بارکردنی پەخش بە VLC...");});
+        }else if(event.type==MediaPlayer.Event.Playing){
+          runOnUiThread(()->{networkRetryCount=0;runtimeRefreshAttempted=false;loading.setVisibility(View.GONE);stateText.setVisibility(View.GONE);playButton.setText("Ⅱ");});
+        }else if(event.type==MediaPlayer.Event.Paused){
+          runOnUiThread(()->playButton.setText("▶"));
+        }else if(event.type==MediaPlayer.Event.EndReached){
+          runOnUiThread(()->{loading.setVisibility(View.GONE);stateText.setVisibility(View.GONE);});
+        }else if(event.type==MediaPlayer.Event.EncounteredError){
+          runOnUiThread(()->handlePlaybackFailure());
         }
-        @Override public void onPlayerError(PlaybackException e){
-          if(directAttempted&&!relayAttempted){playRelay("پەخشی ڕاستەوخۆ کار نەکرد؛ گۆڕین بۆ Relay");}
-          else if(isNetworkFailure(e)&&networkRetryCount<2){
-            final String retryUrl=activePlaybackUrl;
-            final int attempt=++networkRetryCount;
-            long delay=1000L*(1L<<(attempt-1));
-            loading.setVisibility(View.VISIBLE);stateText.setVisibility(View.VISIBLE);
-            stateText.setText("ئینتەرنێت لاوازە؛ پەخش بەردەوام دەبێت... هەوڵی "+attempt+"/2");
-            networkRetryRunnable=()->{if(!isFinishing()&&retryUrl.equals(activePlaybackUrl))playUrl(retryUrl);};
-            handler.postDelayed(networkRetryRunnable,delay);
-          }else if(!runtimeRefreshAttempted&&isNetworkFailure(e)){
-            runtimeRefreshAttempted=true;relayAttempted=false;networkRetryCount=0;
-            loading.setVisibility(View.VISIBLE);stateText.setVisibility(View.VISIBLE);
-            stateText.setText("لینکی ستریم نوێ دەکرێتەوە...");
-            refreshRuntime(()->playRelay("لینکی نوێ وەرگیرا؛ دووبارە پەخش دەکرێت"),true);
-          }else{
-            loading.setVisibility(View.GONE);stateText.setVisibility(View.VISIBLE);
-            String detail=PlaybackException.getErrorCodeName(e.errorCode);
-            Throwable cause=e.getCause();
-            if(cause!=null&&cause.getMessage()!=null)detail+=": "+cause.getMessage();
-            stateText.setText("پلەیەری ئەپ نەتوانی پەخش بکات. هەڵە: "+detail);
-            showControls();
-          }
-        }
-        @Override public void onIsPlayingChanged(boolean playing){playButton.setText(playing?"Ⅱ":"▶");}
       });
     }
-    loading.setVisibility(View.VISIBLE);stateText.setVisibility(View.VISIBLE);playButton.setText("Ⅱ");
-    MediaItem item=new MediaItem.Builder().setUri(url)
-      .setMimeType(url.toLowerCase(java.util.Locale.ROOT).contains(".m3u8")
-        ? MimeTypes.APPLICATION_M3U8 : MimeTypes.VIDEO_MP2T)
-      .build();
-    if(url.toLowerCase(java.util.Locale.ROOT).contains(".m3u8")){
-      DefaultHttpDataSource.Factory httpFactory=new DefaultHttpDataSource.Factory()
-        .setUserAgent("Mozilla/5.0 TVStreamManager/2.0")
-        .setConnectTimeoutMs(8000).setReadTimeoutMs(15000)
-        .setAllowCrossProtocolRedirects(true);
-      player.setMediaSource(new HlsMediaSource.Factory(httpFactory)
-        .setAllowChunklessPreparation(false).createMediaSource(item));
+    loading.setVisibility(View.VISIBLE);stateText.setVisibility(View.VISIBLE);
+    stateText.setText("پەیوەندی بە VLC...");
+    playButton.setText("Ⅱ");
+    try{
+      Media media=new Media(libVLC,Uri.parse(url));
+      media.addOption(":network-caching=1800");
+      media.addOption(":live-caching=1800");
+      media.addOption(":http-reconnect");
+      media.addOption(":clock-jitter=0");
+      media.addOption(":clock-synchro=0");
+      player.setMedia(media);
+      media.release();
+      player.play();
+    }catch(Exception e){handlePlaybackFailure();}
+  }
+  private void handlePlaybackFailure(){
+    if(isFinishing())return;
+    if(directAttempted&&!relayAttempted){playRelay("پەخشی ڕاستەوخۆ کار نەکرد؛ گۆڕین بۆ Relay");return;}
+    if(networkRetryCount<2){
+      final int attempt=++networkRetryCount;
+      final String retryUrl=activePlaybackUrl;
+      long delay=attempt==1?1500L:3500L;
+      loading.setVisibility(View.VISIBLE);stateText.setVisibility(View.VISIBLE);
+      stateText.setText("هەوڵی خۆکار بۆ پەخش "+attempt+"/2...");
+      networkRetryRunnable=()->{if(!isFinishing()&&retryUrl.equals(activePlaybackUrl))playUrl(retryUrl);};
+      handler.postDelayed(networkRetryRunnable,delay);
+    }else if(!runtimeRefreshAttempted){
+      runtimeRefreshAttempted=true;relayAttempted=false;networkRetryCount=0;
+      loading.setVisibility(View.VISIBLE);stateText.setVisibility(View.VISIBLE);
+      stateText.setText("لینکی نوێی سێرڤەر وەردەگیرێت...");
+      refreshRuntime(()->playRelay("لینکی نوێ وەرگیرا؛ پەخش دەستپێدەکات"),true);
     }else{
-      player.setMediaItem(item);
+      loading.setVisibility(View.GONE);stateText.setVisibility(View.VISIBLE);
+      stateText.setText("VLC نەتوانی پەخش بکات. پەیوەندی ئینتەرنێت و سێرڤەر بپشکنە.");
+      showControls();
     }
-    player.prepare();
-    player.play();
   }
   private void stopPlaybackCompletely(){
     handler.removeCallbacksAndMessages(null);
     networkRetryRunnable=null;
     activePlaybackUrl="";
-    if(playerView!=null)playerView.setPlayer(null);
     if(player!=null){
-      try{player.stop();player.clearMediaItems();}catch(Exception ignored){}
+      try{player.stop();player.detachViews();}catch(Exception ignored){}
       player.release();player=null;
     }
+    if(libVLC!=null){libVLC.release();libVLC=null;}
   }
   @Override protected void onPause(){
     super.onPause();
