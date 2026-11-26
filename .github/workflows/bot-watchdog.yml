@@ -14,12 +14,13 @@ on:
       - "source_urls.json"
   schedule:
     - cron: "*/5 * * * *"
+  # Restart immediately after the long-running bot workflow exits.
   workflow_run:
     workflows: ["Telegram TV Bot"]
     types: [completed]
   workflow_dispatch:
 
-# Keep watchdog checks serialized; never cancel a check that is restarting the bot.
+# Serialize watchdog events so simultaneous completions/checks cannot launch duplicates.
 concurrency:
   group: telegram-tv-watchdog
   cancel-in-progress: false
@@ -29,15 +30,15 @@ permissions:
   contents: read
 
 jobs:
-  monitor-and-restart:
+  watchdog:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Checkout source for push-time validation
+      - name: Checkout repository for validation
         if: github.event_name == 'push'
         uses: actions/checkout@v4
 
-      - name: Validate Python and JSON configuration
+      - name: Validate bot code and configuration
         if: github.event_name == 'push'
         run: |
           python -m py_compile bot.py
@@ -49,111 +50,28 @@ jobs:
               if path.exists():
                   json.loads(path.read_text(encoding="utf-8"))
                   print(f"Valid JSON: {name}")
-          print("Python syntax and JSON configuration checks passed.")
           PY
-
-      - name: Validate workflow YAML syntax
-        if: github.event_name == 'push'
-        run: |
           ruby -e 'require "yaml"; ARGV.each { |f| YAML.load_file(f); puts "Valid YAML: #{f}" }' \
             .github/workflows/bot.yml .github/workflows/bot-watchdog.yml
 
-      - name: Verify bot and relay, then restart when needed
+      - name: Check active and queued bot runs; restart only when absent
         env:
           GH_TOKEN: ${{ github.token }}
-          REPOSITORY: ${{ github.repository }}
+          GH_REPO: ${{ github.repository }}
         run: |
-          python - <<'PY'
-          import json
-          import os
-          import time
-          import urllib.error
-          import urllib.request
+          set -euo pipefail
 
-          repo = os.environ["REPOSITORY"]
-          token = os.environ["GH_TOKEN"]
-          api_root = f"https://api.github.com/repos/{repo}"
-          headers = {
-              "Authorization": f"Bearer {token}",
-              "Accept": "application/vnd.github+json",
-              "X-GitHub-Api-Version": "2022-11-28",
-          }
+          echo "Checking Telegram TV Bot runs..."
+          active="$(gh run list --repo "$GH_REPO" --workflow bot.yml --branch main --status in_progress --json databaseId --jq 'length')"
+          queued="$(gh run list --repo "$GH_REPO" --workflow bot.yml --branch main --status queued --json databaseId --jq 'length')"
 
-          def request(url, method="GET", payload=None):
-              data = None if payload is None else json.dumps(payload).encode()
-              req = urllib.request.Request(
-                  url, data=data, headers=headers, method=method
-              )
-              try:
-                  with urllib.request.urlopen(req, timeout=20) as response:
-                      body = response.read()
-                      return response.status, json.loads(body) if body else None
-              except urllib.error.HTTPError as exc:
-                  body = exc.read().decode("utf-8", "replace")
-                  raise RuntimeError(f"GitHub API HTTP {exc.code}: {body[:500]}") from exc
+          echo "Active runs: $active"
+          echo "Queued runs: $queued"
 
-          def relay_is_healthy():
-              # Never print runtime.json: it contains the private stream access key.
-              runtime_url = f"https://raw.githubusercontent.com/{repo}/main/runtime.json"
-              with urllib.request.urlopen(runtime_url, timeout=10) as response:
-                  runtime = json.load(response)
-              base = (runtime.get("base_url") or "").rstrip("/")
-              if not base.startswith("https://"):
-                  raise RuntimeError("No current HTTPS relay endpoint")
-              with urllib.request.urlopen(base + "/health", timeout=12) as response:
-                  health = json.load(response)
-              if health.get("status") != "ok":
-                  raise RuntimeError("Relay health endpoint did not report ok")
-              return True
-
-          # Require three consecutive failed health checks before restarting an
-          # apparently-running job, avoiding restarts for a brief tunnel/network blip.
-          healthy = False
-          last_health_error = "health check did not complete"
-          for attempt in range(1, 4):
-              try:
-                  relay_is_healthy()
-                  healthy = True
-                  print(f"Relay health check passed (attempt {attempt}/3).")
-                  break
-              except Exception as exc:
-                  last_health_error = type(exc).__name__
-                  print(f"Relay health check failed (attempt {attempt}/3): {last_health_error}")
-                  if attempt < 3:
-                      time.sleep(10)
-
-          _, data = request(api_root + "/actions/workflows/bot.yml/runs?per_page=20")
-          runs = data.get("workflow_runs", [])
-          active = [r for r in runs if r.get("status") in ("queued", "in_progress")]
-          active.sort(key=lambda r: r.get("run_number", 0), reverse=True)
-
-          if active and healthy:
-              run = active[0]
-              print("Bot and relay are healthy; keeping the existing run.",
-                    "run_id=", run.get("id"), "status=", run.get("status"))
-              raise SystemExit(0)
-
-          if active and not healthy:
-              run = active[0]
-              run_id = run.get("id")
-              print("Bot job exists but relay failed three health checks; cancelling it to refresh the tunnel.",
-                    "run_id=", run_id, "reason=", last_health_error)
-              status, _ = request(api_root + f"/actions/runs/{run_id}/cancel", method="POST")
-              print("Cancellation requested; HTTP", status)
-
-          elif runs:
-              latest = runs[0]
-              print("No active bot run found. Last conclusion:",
-                    latest.get("conclusion") or latest.get("status"))
-          else:
-              print("No previous bot run found; starting the first run.")
-
-          status, _ = request(
-              api_root + "/actions/workflows/bot.yml/dispatches",
-              method="POST",
-              payload={"ref": "main"},
-          )
-          if status != 204:
-              raise RuntimeError(f"Bot restart dispatch returned HTTP {status}")
-          print("Bot restart dispatch accepted by GitHub.")
-          PY
+          if [ "$active" -eq 0 ] && [ "$queued" -eq 0 ]; then
+            echo "Telegram TV Bot is not running. Starting it now..."
+            gh workflow run bot.yml --ref main --repo "$GH_REPO"
+            echo "Restart request sent."
+          else
+            echo "Telegram TV Bot is already active or queued. No duplicate run will be started."
+          fi
